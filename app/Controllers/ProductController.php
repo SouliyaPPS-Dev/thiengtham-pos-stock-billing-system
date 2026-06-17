@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Helpers\ImageKit;
 
 class ProductController extends BaseController {
     public function index() {
@@ -59,6 +60,11 @@ class ProductController extends BaseController {
             exit;
         }
 
+        $imageUrl = null;
+        if (!empty($_FILES['image']['name'])) {
+            $imageUrl = ImageKit::upload('image', '/pos-stock/products');
+        }
+
         (new Product())->create([
             'name' => $name,
             'sku' => $sku,
@@ -70,6 +76,7 @@ class ProductController extends BaseController {
             'unit' => $unit,
             'barcode' => $barcode,
             'description' => $description,
+            'image' => $imageUrl,
         ]);
 
         header('Location: ' . url('/products') . '?success=1');
@@ -103,14 +110,15 @@ class ProductController extends BaseController {
         }
 
         $name = $_POST['name'] ?? '';
+        $sku = $_POST['sku'] ?? '';
         if (empty($name)) {
             header('Location: ' . url("/products/{$id}/edit") . '?error=1&error_msg=' . urlencode('ກະລຸນາປ້ອນຊື່ສິນຄ້າ'));
             exit;
         }
 
-        $productModel->update($id, [
+        $data = [
             'name' => $name,
-            'sku' => $sku,
+            'sku' => $sku ?? '',
             'category_id' => ($_POST['category_id'] ?? '') ?: null,
             'selling_price' => $_POST['price'] ?? 0,
             'cost_price' => $_POST['cost_price'] ?? 0,
@@ -119,7 +127,16 @@ class ProductController extends BaseController {
             'unit' => $_POST['unit'] ?? 'ຊິ້ນ',
             'barcode' => $_POST['barcode'] ?? '',
             'description' => $_POST['description'] ?? '',
-        ]);
+        ];
+
+        if (!empty($_FILES['image']['name'])) {
+            $imageUrl = ImageKit::upload('image', '/pos-stock/products');
+            if ($imageUrl) {
+                $data['image'] = $imageUrl;
+            }
+        }
+
+        $productModel->update($id, $data);
 
         header('Location: ' . url('/products') . '?updated=1');
         exit;

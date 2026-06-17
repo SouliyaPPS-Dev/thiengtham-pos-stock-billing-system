@@ -1,64 +1,67 @@
-<div class="p-4 md:p-6 space-y-6">
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800">ຜູ້ສະໜອງ</h1>
-            <p class="text-sm text-gray-500">ຈັດການຂໍ້ມູນຜູ້ສະໜອງສິນຄ້າ</p>
-        </div>
-        <a href="<?= url('/suppliers/create') ?>" class="bg-primary text-white rounded-xl px-4 py-2 font-bold hover:opacity-90 inline-flex items-center gap-2">
-            <i class="fas fa-plus"></i>
-            <span>ເພີ່ມຜູ້ສະໜອງ</span>
-        </a>
-    </div>
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-sky-50/30 p-4 md:p-8">
+    <div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
 
-    <div class="table-wrap">
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="border-b text-left">
-                        <th>ຊື່ຜູ້ສະໜອງ</th>
-                        <th>ຜູ້ຕິດຕໍ່</th>
-                        <th>ເບີໂທ</th>
-                        <th>ອີເມວ</th>
-                        <th>ທີ່ຢູ່</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($suppliers)): ?>
-                    <tr>
-                        <td colspan="6">
-                            <div class="empty-state">
-                                <div class="empty-state-icon">
-                                    <i class="fas fa-truck"></i>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">ຜູ້ສະໜອງ</h1>
+                <p class="text-sm text-gray-500 mt-0.5">ຈັດການຂໍ້ມູນຜູ້ສະໜອງສິນຄ້າ</p>
+            </div>
+            <a href="<?= url('/suppliers/create') ?>" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
+                <i class="fas fa-plus"></i>
+                <span>ເພີ່ມຜູ້ສະໜອງ</span>
+            </a>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-6 md:p-8">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100">
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່ຜູ້ສະໜອງ</th>
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຜູ້ຕິດຕໍ່</th>
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ເບີໂທ</th>
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ອີເມວ</th>
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ທີ່ຢູ່</th>
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (empty($suppliers)): ?>
+                        <tr>
+                            <td colspan="6" class="py-3 px-2">
+                                <div class="flex flex-col items-center justify-center py-12 text-center">
+                                    <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
+                                        <i class="fas fa-truck text-2xl"></i>
+                                    </div>
+                                    <p class="text-base font-bold text-gray-600">ຍັງບໍ່ມີຜູ້ສະໜອງ</p>
+                                    <p class="text-sm text-gray-400 mt-1">ຜູ້ສະໜອງຈະສະແດງຢູ່ນີ້</p>
                                 </div>
-                                <p class="empty-state-title">ຍັງບໍ່ມີຜູ້ສະໜອງ</p>
-                                <p class="empty-state-desc">ຜູ້ສະໜອງຈະສະແດງຢູ່ນີ້</p>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php else: ?>
-                    <?php foreach ($suppliers as $s): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($s['name']) ?></td>
-                        <td><?= htmlspecialchars($s['contact_person'] ?? '-') ?></td>
-                        <td><?= htmlspecialchars($s['phone'] ?? '-') ?></td>
-                        <td><?= htmlspecialchars($s['email'] ?? '-') ?></td>
-                        <td class="max-w-[200px] truncate"><?= htmlspecialchars($s['address'] ?? '-') ?></td>
-                        <td>
-                            <div class="flex items-center gap-1">
-                                <a href="<?= url('/suppliers/' . $s['id'] . '/edit') ?>" class="icon-btn icon-btn-edit" title="ແກ້ໄຂ">
-                                    <i class="fas fa-pen text-xs"></i>
-                                </a>
-                                <a href="<?= url('/suppliers/' . $s['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="icon-btn icon-btn-delete" title="ລຶບ">
-                                    <i class="fas fa-trash text-xs"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        <?php else: ?>
+                        <?php foreach ($suppliers as $s): ?>
+                        <tr class="border-b border-gray-50 last:border-0">
+                            <td class="py-3 px-2 font-medium text-gray-800"><?= htmlspecialchars($s['name']) ?></td>
+                            <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['contact_person'] ?? '-') ?></td>
+                            <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['phone'] ?? '-') ?></td>
+                            <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['email'] ?? '-') ?></td>
+                            <td class="py-3 px-2 text-gray-600 max-w-[200px] truncate"><?= htmlspecialchars($s['address'] ?? '-') ?></td>
+                            <td class="py-3 px-2">
+                                <div class="flex items-center gap-1">
+                                    <a href="<?= url('/suppliers/' . $s['id'] . '/edit') ?>" class="icon-btn icon-btn-edit" title="ແກ້ໄຂ">
+                                        <i class="fas fa-pen text-xs"></i>
+                                    </a>
+                                    <a href="<?= url('/suppliers/' . $s['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="icon-btn icon-btn-delete" title="ລຶບ">
+                                        <i class="fas fa-trash text-xs"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
