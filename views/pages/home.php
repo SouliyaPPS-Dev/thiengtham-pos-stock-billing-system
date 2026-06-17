@@ -30,9 +30,9 @@
         </div>
 
         <div class="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            <div class="bg-white rounded-2xl border border-sky-200 p-4 md:p-6 hover:shadow-md transition-shadow">
+            <div class="stat-card border-sky-200">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-sky-50 rounded-xl flex items-center justify-center text-primary">
+                    <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-sky-50 to-sky-100 text-primary shadow-sm shadow-sky-200/30">
                         <i class="fas fa-box text-lg md:text-xl"></i>
                     </div>
                 </div>
@@ -43,9 +43,9 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-amber-200 p-4 md:p-6 hover:shadow-md transition-shadow">
+            <div class="stat-card border-amber-200">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-amber-50 rounded-xl flex items-center justify-center text-amber-500">
+                    <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-amber-50 to-amber-100 text-amber-500 shadow-sm shadow-amber-200/30">
                         <i class="fas fa-exclamation-triangle text-lg md:text-xl"></i>
                     </div>
                     <span class="text-[10px] md:text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg">ສິນຄ້າໃກ້ໝົດ</span>
@@ -57,9 +57,9 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-emerald-200 p-4 md:p-6 hover:shadow-md transition-shadow">
+            <div class="stat-card border-emerald-200">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500">
+                    <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-500 shadow-sm shadow-emerald-200/30">
                         <i class="fas fa-shopping-cart text-lg md:text-xl"></i>
                     </div>
                     <span class="text-[10px] md:text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">ມື້ນີ້</span>
@@ -71,9 +71,9 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-violet-200 p-4 md:p-6 hover:shadow-md transition-shadow">
+            <div class="stat-card border-violet-200">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 bg-violet-50 rounded-xl flex items-center justify-center text-violet-500">
+                    <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-violet-50 to-violet-100 text-violet-500 shadow-sm shadow-violet-200/30">
                         <i class="fas fa-users text-lg md:text-xl"></i>
                     </div>
                 </div>
@@ -189,11 +189,12 @@
                 </svg>
             </div>
             <?php else: ?>
-            <div class="h-[<?= $chartHeight ?>px] flex items-center justify-center text-gray-400">
-                <div class="text-center">
-                    <i class="fas fa-chart-line text-4xl text-gray-200 mb-2"></i>
-                    <p class="font-bold">ບໍ່ມີຂໍ້ມູນໃນໄລຍະນີ້</p>
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-chart-line"></i>
                 </div>
+                <p class="empty-state-title">ບໍ່ມີຂໍ້ມູນໃນໄລຍະນີ້</p>
+                <p class="empty-state-desc">ລອງປ່ຽນຊ່ວງວັນທີໃໝ່</p>
             </div>
             <?php endif; ?>
         </div>
@@ -210,7 +211,13 @@
                 <div class="p-4 md:p-6 overflow-x-auto">
                     <div class="space-y-4 md:space-y-6">
                         <?php if (empty($stats['recent_sales'])): ?>
-                        <p class="text-center text-gray-400 py-4">ບໍ່ມີລາຍການຂາຍ</p>
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            <p class="empty-state-title">ບໍ່ມີລາຍການຂາຍ</p>
+                            <p class="empty-state-desc">ລອງປ່ຽນຊ່ວງວັນທີໃໝ່</p>
+                        </div>
                         <?php else: foreach($stats['recent_sales'] as $s): ?>
                         <div class="flex items-center gap-3 md:gap-4">
                             <div class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
@@ -236,7 +243,13 @@
                     <?php
                     $colors = ['bg-sky-500', 'bg-blue-500', 'bg-purple-500', 'bg-emerald-500', 'bg-amber-500'];
                     if (empty($stats['popular_products'])): ?>
-                    <p class="text-center text-gray-400 py-4">ບໍ່ມີຂໍ້ມູນ</p>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <p class="empty-state-title">ບໍ່ມີຂໍ້ມູນ</p>
+                        <p class="empty-state-desc">ລອງປ່ຽນຊ່ວງວັນທີໃໝ່</p>
+                    </div>
                     <?php else: foreach($stats['popular_products'] as $index => $item): ?>
                     <div class="flex items-center gap-3 md:gap-4">
                         <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400">
@@ -245,10 +258,10 @@
                         <div class="flex-1 min-w-0 space-y-1.5 md:space-y-2">
                             <div class="flex items-center justify-between">
                                 <p class="text-sm font-bold text-gray-800 truncate"><?= htmlspecialchars($item['name']) ?></p>
-                                <span class="text-[11px] md:text-xs font-bold text-gray-500 whitespace-nowrap ml-2"><?= $item['qty'] ?> ຊິ້ນ</span>
+                                <span class="text-[11px] md:text-xs font-bold text-gray-500 whitespace-nowrap ml-2"><?= $item['total_qty'] ?> ຊິ້ນ</span>
                             </div>
-                            <div class="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                                <div class="<?= $colors[$index] ?? 'bg-primary' ?> h-full transition-all duration-1000" style="width: <?= min(100, ($item['qty'] / 10) * 100) ?>%"></div>
+                            <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                                <div class="<?= $colors[$index] ?? 'bg-primary' ?> h-full transition-all duration-1000" style="width: <?= min(100, ($item['total_qty'] / 10) * 100) ?>%"></div>
                             </div>
                         </div>
                     </div>

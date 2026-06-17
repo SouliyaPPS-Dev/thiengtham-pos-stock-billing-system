@@ -1,0 +1,58 @@
+# PWA files — serve directly from /public/
+RewriteRule ^(manifest\.json|sw\.js|offline\.html|robots\.txt|sitemap\.xml)$ public/$1 [L]
+ 
+<IfModule mod_rewrite.c> 
+    RewriteEngine On
+
+    # PWA files — serve directly from /public/ (explicit paths for LiteSpeed compat)
+    RewriteRule ^(manifest\.json|sw\.js|offline\.html)$ public/$1 [L]
+
+    # Allow direct access to existing files
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    # Allow direct access to existing directories
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Route everything else through public/index.php
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+</IfModule>
+ 
+# No cache for service worker
+<FilesMatch "sw\.js$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </IfModule>
+</FilesMatch>
+
+# Access Control (Apache 2.4+)
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+
+# Access Control (Apache 2.2 / LiteSpeed)
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+</IfModule>
+
+# Security: Deny access to sensitive files
+<FilesMatch "^\.env|database\.sql$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Prevent directory listing
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+# Set the default index file
+DirectoryIndex public/index.php
+ 

@@ -10,31 +10,36 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-2xl border p-4 md:p-6">
+    <div class="table-wrap">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b text-left">
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່ຜູ້ໃຊ້</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່ເຕັມ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ບົດບາດ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ສະຖານະ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວັນທີສ້າງ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider"></th>
+                        <th>ຊື່ຜູ້ໃຊ້</th>
+                        <th>ຊື່ເຕັມ</th>
+                        <th>ບົດບາດ</th>
+                        <th>ສະຖານະ</th>
+                        <th>ວັນທີສ້າງ</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($users)): ?>
                     <tr>
-                        <td colspan="6" class="py-12 text-center text-gray-400">
-                            <i class="fas fa-users-cog text-3xl mb-2 block"></i>
-                            <span>ຍັງບໍ່ມີພະນັກງານ</span>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-users-cog"></i>
+                                </div>
+                                <p class="empty-state-title">ຍັງບໍ່ມີພະນັກງານ</p>
+                                <p class="empty-state-desc">ພະນັກງານຈະສະແດງຢູ່ນີ້</p>
+                            </div>
                         </td>
                     </tr>
                     <?php else: ?>
                     <?php foreach ($users as $u): ?>
-                    <tr class="border-b last:border-0 hover:bg-gray-50 transition-colors">
-                        <td class="py-3 px-2">
+                    <tr>
+                        <td>
                             <div class="flex items-center gap-2">
                                 <div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
                                     <?= mb_substr($u['fullname'] ?? $u['username'], 0, 1) ?>
@@ -42,28 +47,28 @@
                                 <span class="font-medium text-gray-800"><?= htmlspecialchars($u['username']) ?></span>
                             </div>
                         </td>
-                        <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($u['fullname'] ?? '-') ?></td>
-                        <td class="py-3 px-2">
+                        <td><?= htmlspecialchars($u['fullname'] ?? '-') ?></td>
+                        <td>
                             <?php if (($u['role'] ?? 'staff') === 'admin'): ?>
                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-600 text-xs font-bold"><i class="fas fa-shield-alt text-[10px]"></i> Admin</span>
                             <?php else: ?>
                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 text-xs font-bold"><i class="fas fa-user text-[10px]"></i> Staff</span>
                             <?php endif; ?>
                         </td>
-                        <td class="py-3 px-2">
+                        <td>
                             <?php if (($u['status'] ?? 'active') === 'active'): ?>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-50 text-green-600 text-xs font-bold"><i class="fas fa-circle text-[6px]"></i> ເປີດໃຊ້</span>
+                            <span class="status-badge status-badge-green"><span class="dot"></span> ເປີດໃຊ້</span>
                             <?php else: ?>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-50 text-red-600 text-xs font-bold"><i class="fas fa-circle text-[6px]"></i> ປິດໃຊ້</span>
+                            <span class="status-badge status-badge-red"><span class="dot"></span> ປິດໃຊ້</span>
                             <?php endif; ?>
                         </td>
-                        <td class="py-3 px-2 text-gray-500 text-xs"><?= htmlspecialchars(date('d/m/Y', strtotime($u['created_at']))) ?></td>
-                        <td class="py-3 px-2">
+                        <td><?= htmlspecialchars(date('d/m/Y', strtotime($u['created_at']))) ?></td>
+                        <td>
                             <div class="flex items-center gap-1">
-                                <a href="<?= url('/users/' . $u['id'] . '/edit') ?>" class="h-8 w-8 rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center" title="ແກ້ໄຂ">
+                                <a href="<?= url('/users/' . $u['id'] . '/edit') ?>" class="icon-btn icon-btn-edit" title="ແກ້ໄຂ">
                                     <i class="fas fa-pen text-xs"></i>
                                 </a>
-                                <a href="<?= url('/users/' . $u['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="h-8 w-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center" title="ລຶບ">
+                                <a href="<?= url('/users/' . $u['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="icon-btn icon-btn-delete" title="ລຶບ">
                                     <i class="fas fa-trash text-xs"></i>
                                 </a>
                             </div>

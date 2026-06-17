@@ -10,7 +10,7 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-2xl border p-4 md:p-6">
+    <div class="table-wrap">
         <form method="GET" action="<?= url('/products') ?>" class="flex flex-col sm:flex-row gap-3 mb-4">
             <div class="flex-1 relative">
                 <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
@@ -34,30 +34,35 @@
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
-                    <tr class="border-b text-left">
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຮູບ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່ສິນຄ້າ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">SKU</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ໝວດ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລາຄາຂາຍ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ສະຕ໋ອກ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ສະຖານະ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider"></th>
+                    <tr>
+                        <th>ຮູບ</th>
+                        <th>ຊື່ສິນຄ້າ</th>
+                        <th>SKU</th>
+                        <th>ໝວດ</th>
+                        <th>ລາຄາຂາຍ</th>
+                        <th>ສະຕ໋ອກ</th>
+                        <th>ສະຖານະ</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($products)): ?>
                     <tr>
-                        <td colspan="8" class="py-12 text-center text-gray-400">
-                            <i class="fas fa-box-open text-3xl mb-2 block"></i>
-                            <span>ຍັງບໍ່ມີສິນຄ້າ</span>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-box-open"></i>
+                                </div>
+                                <p class="empty-state-title">ຍັງບໍ່ມີສິນຄ້າ</p>
+                                <p class="empty-state-desc">ເພີ່ມສິນຄ້າຊະນິດທຳອິດ</p>
+                            </div>
                         </td>
                     </tr>
                     <?php else: ?>
                     <?php foreach ($products as $p): ?>
-                    <tr class="border-b last:border-0 hover:bg-gray-50 transition-colors">
-                        <td class="py-3 px-2">
-                            <div class="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 overflow-hidden">
+                    <tr>
+                        <td>
+                            <div class="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 overflow-hidden">
                                 <?php if (!empty($p['image'])): ?>
                                 <img src="<?= htmlspecialchars($p['image']) ?>" class="h-full w-full object-cover" alt="">
                                 <?php else: ?>
@@ -65,33 +70,33 @@
                                 <?php endif; ?>
                             </div>
                         </td>
-                        <td class="py-3 px-2 font-medium text-gray-800"><?= htmlspecialchars($p['name']) ?></td>
-                        <td class="py-3 px-2 text-gray-500 text-xs"><?= htmlspecialchars($p['sku'] ?? '-') ?></td>
-                        <td class="py-3 px-2 text-gray-500 text-xs"><?= htmlspecialchars($p['category_name'] ?? '-') ?></td>
-                        <td class="py-3 px-2 font-medium"><?= number_format($p['selling_price'], 0) ?> ກີບ</td>
-                        <td class="py-3 px-2">
+                        <td><?= htmlspecialchars($p['name']) ?></td>
+                        <td><?= htmlspecialchars($p['sku'] ?? '-') ?></td>
+                        <td><?= htmlspecialchars($p['category_name'] ?? '-') ?></td>
+                        <td><?= number_format($p['selling_price'], 0) ?> ກີບ</td>
+                        <td>
                             <?php
                             $stock = (int)($p['stock'] ?? 0);
-                            $color = $stock === 0 ? 'text-red-600 bg-red-50' : ($stock <= 10 ? 'text-amber-600 bg-amber-50' : 'text-green-600 bg-green-50');
+                            $color = $stock === 0 ? 'status-badge-red' : ($stock <= 10 ? 'status-badge-amber' : 'status-badge-green');
                             ?>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold <?= $color ?>">
+                            <span class="status-badge <?= $color ?>">
                                 <i class="fas fa-cubes text-[10px]"></i>
                                 <?= $stock ?>
                             </span>
                         </td>
-                        <td class="py-3 px-2">
+                        <td>
                             <?php if ($p['status'] === 'active'): ?>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-50 text-green-600 text-xs font-bold"><i class="fas fa-circle text-[6px]"></i> ເປີດໃຊ້</span>
+                            <span class="status-badge status-badge-green"><span class="dot"></span><i class="fas fa-circle text-[6px]"></i> ເປີດໃຊ້</span>
                             <?php else: ?>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gray-100 text-gray-500 text-xs font-bold"><i class="fas fa-circle text-[6px]"></i> ປິດໃຊ້</span>
+                            <span class="status-badge status-badge-gray"><span class="dot"></span><i class="fas fa-circle text-[6px]"></i> ປິດໃຊ້</span>
                             <?php endif; ?>
                         </td>
-                        <td class="py-3 px-2">
+                        <td>
                             <div class="flex items-center gap-1">
-                                <a href="<?= url('/products/' . $p['id'] . '/edit') ?>" class="h-8 w-8 rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center" title="ແກ້ໄຂ">
+                                <a href="<?= url('/products/' . $p['id'] . '/edit') ?>" class="icon-btn icon-btn-edit" title="ແກ້ໄຂ">
                                     <i class="fas fa-pen text-xs"></i>
                                 </a>
-                                <a href="<?= url('/products/' . $p['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="h-8 w-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center" title="ລຶບ">
+                                <a href="<?= url('/products/' . $p['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="icon-btn icon-btn-delete" title="ລຶບ">
                                     <i class="fas fa-trash text-xs"></i>
                                 </a>
                             </div>

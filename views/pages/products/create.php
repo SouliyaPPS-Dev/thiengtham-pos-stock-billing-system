@@ -9,19 +9,19 @@
         </div>
     </div>
 
-    <div class="bg-white rounded-2xl border p-4 md:p-6">
+    <div class="table-wrap">
         <form action="<?= url('/products/store') ?>" method="POST" enctype="multipart/form-data" class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="space-y-1.5">
-                <label class="text-sm font-bold text-gray-700">ຊື່ສິນຄ້າ <span class="text-red-500">*</span></label>
-                <input type="text" name="name" required class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="ປ້ອນຊື່ສິນຄ້າ">
+                <label class="form-label">ຊື່ສິນຄ້າ <span class="text-red-500">*</span></label>
+                <input type="text" name="name" required class="form-input" placeholder="ປ້ອນຊື່ສິນຄ້າ">
             </div>
             <div class="space-y-1.5">
-                <label class="text-sm font-bold text-gray-700">SKU</label>
-                <input type="text" name="sku" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="ລະຫັດສິນຄ້າ">
+                <label class="form-label">SKU</label>
+                <input type="text" name="sku" class="form-input" placeholder="ລະຫັດສິນຄ້າ">
             </div>
             <div class="space-y-1.5">
-                <label class="text-sm font-bold text-gray-700">ໝວດສິນຄ້າ</label>
-                <select name="category_id" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                <label class="form-label">ໝວດສິນຄ້າ</label>
+                <select name="category_id" class="form-input">
                     <option value="">-- ເລືອກໝວດ --</option>
                     <?php foreach ($categories as $cat): ?>
                     <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
@@ -29,46 +29,46 @@
                 </select>
             </div>
             <div class="space-y-1.5">
-                <label class="text-sm font-bold text-gray-700">ລາຄາຕົ້ນທຶນ</label>
-                <input type="number" name="cost_price" step="0.01" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="0">
+                <label class="form-label">ລາຄາຕົ້ນທຶນ</label>
+                <input type="number" name="cost_price" step="0.01" class="form-input" placeholder="0">
             </div>
             <div class="space-y-1.5">
-                <label class="text-sm font-bold text-gray-700">ລາຄາຂາຍ <span class="text-red-500">*</span></label>
-                <input type="number" name="selling_price" required step="0.01" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="0">
+                <label class="form-label">ລາຄາຂາຍ <span class="text-red-500">*</span></label>
+                <input type="number" name="selling_price" required step="0.01" class="form-input" placeholder="0">
             </div>
             <div class="space-y-1.5">
-                <label class="text-sm font-bold text-gray-700">ສະຕ໋ອກ</label>
-                <input type="number" name="stock" value="0" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                <label class="form-label">ສະຕ໋ອກ</label>
+                <input type="number" name="stock" value="0" class="form-input">
             </div>
             <div class="space-y-1.5">
-                <label class="text-sm font-bold text-gray-700">ສະຕ໋ອກຕ່ຳສຸດ</label>
-                <input type="number" name="min_stock" value="0" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                <label class="form-label">ສະຕ໋ອກຕ່ຳສຸດ</label>
+                <input type="number" name="min_stock" value="0" class="form-input">
             </div>
             <div class="space-y-1.5">
-                <label class="text-sm font-bold text-gray-700">ຫົວໜ່ວຍ</label>
-                <input type="text" name="unit" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="ຊິ້ນ, ກິໂລ, ລິດ...">
+                <label class="form-label">ຫົວໜ່ວຍ</label>
+                <input type="text" name="unit" class="form-input" placeholder="ຊິ້ນ, ກິໂລ, ລິດ...">
             </div>
             <div class="space-y-1.5">
-                <label class="text-sm font-bold text-gray-700">ສະຖານະ</label>
-                <select name="status" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                <label class="form-label">ສະຖານະ</label>
+                <select name="status" class="form-input">
                     <option value="active">ເປີດໃຊ້</option>
                     <option value="inactive">ປິດໃຊ້</option>
                 </select>
             </div>
             <div class="space-y-1.5 md:col-span-2">
-                <label class="text-sm font-bold text-gray-700">ລາຍລະອຽດ</label>
-                <textarea name="description" rows="3" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="ລາຍລະອຽດສິນຄ້າ"></textarea>
+                <label class="form-label">ລາຍລະອຽດ</label>
+                <textarea name="description" rows="3" class="form-input" placeholder="ລາຍລະອຽດສິນຄ້າ"></textarea>
             </div>
             <div class="space-y-1.5 md:col-span-2">
-                <label class="text-sm font-bold text-gray-700">ຮູບສິນຄ້າ</label>
-                <input type="file" name="image" accept="image/*" class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                <label class="form-label">ຮູບສິນຄ້າ</label>
+                <input type="file" name="image" accept="image/*" class="form-input">
             </div>
             <div class="md:col-span-2 flex items-center gap-3 pt-2">
-                <button type="submit" class="bg-primary text-white rounded-xl px-6 py-2.5 font-bold hover:opacity-90 inline-flex items-center gap-2">
+                <button type="submit" class="btn-primary">
                     <i class="fas fa-save"></i>
                     <span>ບັນທຶກ</span>
                 </button>
-                <a href="<?= url('/products') ?>" class="bg-gray-100 text-gray-600 rounded-xl px-6 py-2.5 font-bold hover:bg-gray-200 inline-flex items-center gap-2">
+                <a href="<?= url('/products') ?>" class="btn-secondary">
                     <i class="fas fa-times"></i>
                     <span>ຍົກເລີກ</span>
                 </a>

@@ -10,7 +10,7 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-2xl border p-4 md:p-6">
+    <div class="table-wrap">
         <form method="GET" action="<?= url('/customers') ?>" class="flex flex-col sm:flex-row gap-3 mb-4">
             <div class="flex-1 relative">
                 <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
@@ -25,26 +25,31 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b text-left">
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ເບີໂທ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ອີເມວ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຍອດຊື້ທັງໝົດ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວັນທີສ້າງ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider"></th>
+                        <th>ຊື່</th>
+                        <th>ເບີໂທ</th>
+                        <th>ອີເມວ</th>
+                        <th>ຍອດຊື້ທັງໝົດ</th>
+                        <th>ວັນທີສ້າງ</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($customers)): ?>
                     <tr>
-                        <td colspan="6" class="py-12 text-center text-gray-400">
-                            <i class="fas fa-users text-3xl mb-2 block"></i>
-                            <span>ຍັງບໍ່ມີລູກຄ້າ</span>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <p class="empty-state-title">ຍັງບໍ່ມີລູກຄ້າ</p>
+                                <p class="empty-state-desc">ລູກຄ້າຈະສະແດງຢູ່ນີ້</p>
+                            </div>
                         </td>
                     </tr>
                     <?php else: ?>
                     <?php foreach ($customers as $c): ?>
-                    <tr class="border-b last:border-0 hover:bg-gray-50 transition-colors">
-                        <td class="py-3 px-2">
+                    <tr>
+                        <td>
                             <div class="flex items-center gap-2">
                                 <div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
                                     <?= mb_substr($c['name'], 0, 1) ?>
@@ -52,16 +57,16 @@
                                 <span class="font-medium text-gray-800"><?= htmlspecialchars($c['name']) ?></span>
                             </div>
                         </td>
-                        <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($c['phone'] ?? '-') ?></td>
-                        <td class="py-3 px-2 text-gray-500 text-xs"><?= htmlspecialchars($c['email'] ?? '-') ?></td>
-                        <td class="py-3 px-2 font-medium"><?= number_format($c['total_purchases'] ?? 0, 0) ?> ກີບ</td>
-                        <td class="py-3 px-2 text-gray-500 text-xs"><?= htmlspecialchars(date('d/m/Y', strtotime($c['created_at']))) ?></td>
-                        <td class="py-3 px-2">
+                        <td><?= htmlspecialchars($c['phone'] ?? '-') ?></td>
+                        <td><?= htmlspecialchars($c['email'] ?? '-') ?></td>
+                        <td><?= number_format($c['total_purchases'] ?? 0, 0) ?> ກີບ</td>
+                        <td><?= htmlspecialchars(date('d/m/Y', strtotime($c['created_at']))) ?></td>
+                        <td>
                             <div class="flex items-center gap-1">
-                                <a href="<?= url('/customers/' . $c['id'] . '/edit') ?>" class="h-8 w-8 rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center" title="ແກ້ໄຂ">
+                                <a href="<?= url('/customers/' . $c['id'] . '/edit') ?>" class="icon-btn icon-btn-edit" title="ແກ້ໄຂ">
                                     <i class="fas fa-pen text-xs"></i>
                                 </a>
-                                <a href="<?= url('/customers/' . $c['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="h-8 w-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center" title="ລຶບ">
+                                <a href="<?= url('/customers/' . $c['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="icon-btn icon-btn-delete" title="ລຶບ">
                                     <i class="fas fa-trash text-xs"></i>
                                 </a>
                             </div>
