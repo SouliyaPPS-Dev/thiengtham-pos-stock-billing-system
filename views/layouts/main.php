@@ -116,95 +116,91 @@ $lp = '?layout=' . $manual_pref;
 
             <?php if ($layout_pref === 'sidebar'): ?>
 
-            <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-                   class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r transition-transform duration-300 transform md:translate-x-0 md:static md:inset-0 flex-shrink-0">
-                <div class="flex flex-col h-full">
-                    <div class="flex items-center justify-center h-20 border-b flex-shrink-0">
-                        <a href="<?= url('/' . $lp) ?>" class="flex items-center space-x-2">
-                            <div class="h-10 w-10 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-sm shadow-lg shadow-sky-200">
-                                <i class="fas fa-cash-register"></i>
-                            </div>
-                            <span class="font-bold text-lg text-primary"><?= get_store_name() ?></span>
-                        </a>
-                    </div>
-
-                    <nav class="flex-grow px-3 py-2 space-y-0.5 overflow-y-auto">
-                        <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/') ?>">
-                            <span class="w-8 h-8 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-xs"><i class="fas fa-chart-pie"></i></span>
-                            <span>ໜ້າຫຼັກ</span>
-                        </a>
-                        <a href="<?= url('/pos?layout=navbar') ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/pos') ?>">
-                            <span class="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs"><i class="fas fa-cash-register"></i></span>
-                            <span>POS ຂາຍສິນຄ້າ</span>
-                        </a>
-                        <a href="<?= url('/products' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/products') ?>">
-                            <span class="w-8 h-8 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-xs"><i class="fas fa-box"></i></span>
-                            <span>ສິນຄ້າ</span>
-                        </a>
-                        <a href="<?= url('/categories' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/categories') ?>">
-                            <span class="w-8 h-8 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 text-xs"><i class="fas fa-tags"></i></span>
-                            <span>ໝວດສິນຄ້າ</span>
-                        </a>
-                        <a href="<?= url('/sales' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/sales') ?>">
-                            <span class="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-xs"><i class="fas fa-receipt"></i></span>
-                            <span>ປະຫວັດການຂາຍ</span>
-                        </a>
-                        <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/customers') ?>">
-                            <span class="w-8 h-8 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-xs"><i class="fas fa-users"></i></span>
-                            <span>ລູກຄ້າ</span>
-                        </a>
-                        <a href="<?= url('/suppliers' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/suppliers') ?>">
-                            <span class="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-xs"><i class="fas fa-truck"></i></span>
-                            <span>ຜູ້ສະໜອງ</span>
-                        </a>
-                        <div class="border-t my-2 mx-3"></div>
-                        <a href="<?= url('/users' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/users') ?>">
-                            <span class="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-xs"><i class="fas fa-users-cog"></i></span>
-                            <span>ພະນັກງານ</span>
-                        </a>
-                        <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/settings') ?>">
-                            <span class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-xs"><i class="fas fa-cog"></i></span>
-                            <span>ຕັ້ງຄ່າ</span>
-                        </a>
-                    </nav>
-
-                    <div class="p-4 border-t space-y-4 flex-shrink-0">
-                        <div class="px-4">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Layout Mode</p>
-                            <div class="grid grid-cols-2 gap-2">
-                                <a href="?layout=sidebar" class="flex flex-col items-center justify-center p-2 rounded-lg border text-[10px] font-bold <?= $layout_pref === 'sidebar' ? 'border-primary text-primary bg-sky-50' : 'text-gray-400 bg-gray-50' ?>">
-                                    <i class="fas fa-columns mb-1"></i> Sidebar
-                                </a>
-                                <a href="?layout=navbar" class="flex flex-col items-center justify-center p-2 rounded-lg border text-[10px] font-bold <?= $layout_pref === 'navbar' ? 'border-primary text-primary bg-sky-50' : 'text-gray-400 bg-gray-50' ?>">
-                                    <i class="fas fa-window-maximize mb-1"></i> Navbar
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center space-x-3 px-4">
-                            <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white">
-                                <i class="fas fa-user text-xs"></i>
-                            </div>
-                            <div class="flex-grow overflow-hidden text-sm">
-                                <p class="font-medium truncate"><?= $_SESSION['user']['username'] ?? 'Admin' ?></p>
-                                <p class="text-xs text-gray-500">ຜູ້ຈັດການ</p>
-                            </div>
-                        </div>
-                        <a href="<?= url('/logout') ?>" onclick="confirmLogout(event)" class="flex items-center px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
-                            <i class="fas fa-sign-out-alt w-6"></i>
-                            <span>ອອກຈາກລະບົບ</span>
-                        </a>
-                    </div>
-                </div>
-            </aside>
+            <!-- Mobile overlay -->
             <div x-show="sidebarOpen" @click="sidebarOpen = false"
-                 class="fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden"
+                 class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0"
                  x-transition:enter-end="opacity-100"
                  x-transition:leave="transition ease-in duration-200"
                  x-transition:leave-start="opacity-100"
                  x-transition:leave-end="opacity-0"></div>
+
+            <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+                   class="fixed inset-y-0 left-0 z-50 w-64 bg-white/95 backdrop-blur-xl border-r border-gray-100 transition-all duration-300 ease-out transform md:translate-x-0 md:static md:inset-0 flex-shrink-0 flex flex-col">
+                <div class="flex items-center justify-between h-16 px-4 border-b border-gray-100 flex-shrink-0">
+                    <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-2.5">
+                        <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white shadow-lg shadow-sky-200">
+                            <i class="fas fa-cash-register text-sm"></i>
+                        </div>
+                        <span class="font-black text-base text-gray-800 tracking-tight"><?= get_store_name() ?></span>
+                    </a>
+                    <button @click="sidebarOpen = false" class="md:hidden h-8 w-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
+                </div>
+
+                <nav class="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 pb-2">ເມນູຫຼັກ</div>
+                    <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-xs"><i class="fas fa-chart-pie"></i></span>
+                        <span>ໜ້າຫຼັກ</span>
+                    </a>
+                    <a href="<?= url('/pos?layout=navbar') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/pos') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs"><i class="fas fa-cash-register"></i></span>
+                        <span>POS ຂາຍສິນຄ້າ</span>
+                    </a>
+                    <a href="<?= url('/products' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/products') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-xs"><i class="fas fa-box"></i></span>
+                        <span>ສິນຄ້າ</span>
+                    </a>
+                    <a href="<?= url('/categories' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/categories') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 text-xs"><i class="fas fa-tags"></i></span>
+                        <span>ໝວດສິນຄ້າ</span>
+                    </a>
+                    <a href="<?= url('/sales' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/sales') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-xs"><i class="fas fa-receipt"></i></span>
+                        <span>ປະຫວັດການຂາຍ</span>
+                    </a>
+                    <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/customers') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-xs"><i class="fas fa-users"></i></span>
+                        <span>ລູກຄ້າ</span>
+                    </a>
+                    <a href="<?= url('/suppliers' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/suppliers') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-xs"><i class="fas fa-truck"></i></span>
+                        <span>ຜູ້ສະໜອງ</span>
+                    </a>
+                    <div class="border-t border-gray-100 my-3 mx-3"></div>
+                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 pb-2">ລະບົບ</div>
+                    <a href="<?= url('/users' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/users') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-xs"><i class="fas fa-users-cog"></i></span>
+                        <span>ພະນັກງານ</span>
+                    </a>
+                    <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/settings') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-xs"><i class="fas fa-cog"></i></span>
+                        <span>ຕັ້ງຄ່າ</span>
+                    </a>
+                </nav>
+
+                <div class="p-3 border-t border-gray-100 flex-shrink-0">
+                    <div class="flex items-center gap-3 px-2 mb-2">
+                        <div class="relative flex-shrink-0">
+                            <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-sky-700 flex items-center justify-center text-white text-sm shadow-md">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 border-2 border-white"></div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-gray-800 truncate leading-tight"><?= $_SESSION['user']['username'] ?? 'Admin' ?></p>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">ຜູ້ຈັດການ</p>
+                        </div>
+                    </div>
+                    <a href="<?= url('/logout') ?>" onclick="confirmLogout(event)" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-all text-sm font-bold">
+                        <span class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500"><i class="fas fa-sign-out-alt text-xs"></i></span>
+                        <span>ອອກຈາກລະບົບ</span>
+                    </a>
+                </div>
+            </aside>
 
             <?php else: ?>
 
@@ -331,22 +327,50 @@ $lp = '?layout=' . $manual_pref;
 
         <div class="flex-grow flex flex-col min-w-0 overflow-hidden">
             <?php if ($layout_pref === 'sidebar' && (!isset($no_nav) || !$no_nav)): ?>
-            <header class="h-16 bg-white border-b flex items-center justify-between px-4 flex-shrink-0">
-                <div class="flex items-center">
-                    <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg mr-2">
-                        <i class="fas fa-bars"></i>
+            <header class="h-14 md:h-16 bg-white/90 backdrop-blur-md border-b border-gray-100 flex items-center justify-between px-4 md:px-6 flex-shrink-0 sticky top-0 z-30">
+                <div class="flex items-center gap-3">
+                    <button @click="sidebarOpen = !sidebarOpen" class="md:hidden h-9 w-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-500 hover:bg-primary/10 hover:text-primary transition-all">
+                        <i class="fas fa-bars text-sm"></i>
                     </button>
-                    <h2 class="font-semibold text-gray-800"><?= $title ?? 'ໜ້າຫຼັກ' ?></h2>
+                    <div class="hidden md:flex items-center gap-2 text-sm text-gray-400">
+                        <i class="fas fa-home text-[10px]"></i>
+                        <span class="text-gray-300">/</span>
+                        <span class="text-gray-700 font-medium"><?= $title ?? 'ໜ້າຫຼັກ' ?></span>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <button onclick="toggleFullscreen()" class="flex items-center gap-2 px-3 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors text-sm font-medium">
-                        <i class="fas fa-expand"></i>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleFullscreen()" class="h-9 w-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all" title="ເຕັມຈໍ">
+                        <i class="fas fa-expand text-xs"></i>
                     </button>
+                    <div class="h-6 w-px bg-gray-200 mx-1"></div>
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open" class="flex items-center gap-2 h-9 px-3 rounded-xl bg-gray-50 hover:bg-primary/5 transition-all group">
+                            <div class="h-6 w-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary text-[10px] group-hover:bg-primary group-hover:text-white transition-all">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <span class="hidden sm:block text-xs font-bold text-gray-700 max-w-[100px] truncate"><?= $_SESSION['user']['username'] ?? 'Admin' ?></span>
+                            <i class="fas fa-chevron-down text-[8px] text-gray-400"></i>
+                        </button>
+                        <div x-show="open" @click.away="open = false"
+                             class="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-gray-100 shadow-xl shadow-gray-200/50 p-2 z-50 animate-scale-in"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100">
+                            <div class="p-3 border-b border-gray-100 mb-1">
+                                <p class="text-sm font-black text-gray-800"><?= $_SESSION['user']['username'] ?? 'Admin' ?></p>
+                                <p class="text-[10px] font-bold text-primary uppercase tracking-wider mt-0.5">ຜູ້ຈັດການ</p>
+                            </div>
+                            <a href="<?= url('/logout') ?>" onclick="confirmLogout(event)" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-xl text-xs font-bold transition-all">
+                                <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500"><i class="fas fa-sign-out-alt"></i></div>
+                                <span>ອອກຈາກລະບົບ</span>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </header>
             <?php endif; ?>
 
-            <main class="flex-grow overflow-y-auto">
+            <main class="flex-1 overflow-y-auto">
                 <?= $content ?>
             </main>
         </div>

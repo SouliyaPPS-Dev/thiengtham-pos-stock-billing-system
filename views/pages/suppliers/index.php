@@ -10,41 +10,46 @@
         </a>
     </div>
 
-    <div class="bg-white rounded-2xl border p-4 md:p-6">
+    <div class="table-wrap">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b text-left">
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່ຜູ້ສະໜອງ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຜູ້ຕິດຕໍ່</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ເບີໂທ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ອີເມວ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ທີ່ຢູ່</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider"></th>
+                        <th>ຊື່ຜູ້ສະໜອງ</th>
+                        <th>ຜູ້ຕິດຕໍ່</th>
+                        <th>ເບີໂທ</th>
+                        <th>ອີເມວ</th>
+                        <th>ທີ່ຢູ່</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($suppliers)): ?>
                     <tr>
-                        <td colspan="6" class="py-12 text-center text-gray-400">
-                            <i class="fas fa-truck text-3xl mb-2 block"></i>
-                            <span>ຍັງບໍ່ມີຜູ້ສະໜອງ</span>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-truck"></i>
+                                </div>
+                                <p class="empty-state-title">ຍັງບໍ່ມີຜູ້ສະໜອງ</p>
+                                <p class="empty-state-desc">ຜູ້ສະໜອງຈະສະແດງຢູ່ນີ້</p>
+                            </div>
                         </td>
                     </tr>
                     <?php else: ?>
                     <?php foreach ($suppliers as $s): ?>
-                    <tr class="border-b last:border-0 hover:bg-gray-50 transition-colors">
-                        <td class="py-3 px-2 font-medium text-gray-800"><?= htmlspecialchars($s['name']) ?></td>
-                        <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['contact_person'] ?? '-') ?></td>
-                        <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['phone'] ?? '-') ?></td>
-                        <td class="py-3 px-2 text-gray-500 text-xs"><?= htmlspecialchars($s['email'] ?? '-') ?></td>
-                        <td class="py-3 px-2 text-gray-500 text-xs max-w-[200px] truncate"><?= htmlspecialchars($s['address'] ?? '-') ?></td>
-                        <td class="py-3 px-2">
+                    <tr>
+                        <td><?= htmlspecialchars($s['name']) ?></td>
+                        <td><?= htmlspecialchars($s['contact_person'] ?? '-') ?></td>
+                        <td><?= htmlspecialchars($s['phone'] ?? '-') ?></td>
+                        <td><?= htmlspecialchars($s['email'] ?? '-') ?></td>
+                        <td class="max-w-[200px] truncate"><?= htmlspecialchars($s['address'] ?? '-') ?></td>
+                        <td>
                             <div class="flex items-center gap-1">
-                                <a href="<?= url('/suppliers/' . $s['id'] . '/edit') ?>" class="h-8 w-8 rounded-lg bg-amber-50 text-amber-500 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center" title="ແກ້ໄຂ">
+                                <a href="<?= url('/suppliers/' . $s['id'] . '/edit') ?>" class="icon-btn icon-btn-edit" title="ແກ້ໄຂ">
                                     <i class="fas fa-pen text-xs"></i>
                                 </a>
-                                <a href="<?= url('/suppliers/' . $s['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="h-8 w-8 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center" title="ລຶບ">
+                                <a href="<?= url('/suppliers/' . $s['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="icon-btn icon-btn-delete" title="ລຶບ">
                                     <i class="fas fa-trash text-xs"></i>
                                 </a>
                             </div>

@@ -4,7 +4,7 @@
         <p class="text-sm text-gray-500">ບັນທຶກການຂາຍທັງໝົດ</p>
     </div>
 
-    <div class="bg-white rounded-2xl border p-4 md:p-6">
+    <div class="table-wrap">
         <form method="GET" action="<?= url('/sales') ?>" class="flex flex-col sm:flex-row gap-3 mb-4">
             <div class="flex-1 relative">
                 <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
@@ -19,40 +19,45 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr class="border-b text-left">
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ໃບບິນ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວັນທີ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລູກຄ້າ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລາຍການ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຍອດລວມ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ສະຖານະ</th>
-                        <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider"></th>
+                        <th>ໃບບິນ</th>
+                        <th>ວັນທີ</th>
+                        <th>ລູກຄ້າ</th>
+                        <th>ລາຍການ</th>
+                        <th>ຍອດລວມ</th>
+                        <th>ສະຖານະ</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($sales)): ?>
                     <tr>
-                        <td colspan="7" class="py-12 text-center text-gray-400">
-                            <i class="fas fa-receipt text-3xl mb-2 block"></i>
-                            <span>ຍັງບໍ່ມີປະຫວັດການຂາຍ</span>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-receipt"></i>
+                                </div>
+                                <p class="empty-state-title">ຍັງບໍ່ມີປະຫວັດການຂາຍ</p>
+                                <p class="empty-state-desc">ປະຫວັດການຂາຍຈະສະແດງຢູ່ນີ້</p>
+                            </div>
                         </td>
                     </tr>
                     <?php else: ?>
                     <?php foreach ($sales as $s): ?>
-                    <tr class="border-b last:border-0 hover:bg-gray-50 transition-colors cursor-pointer" onclick="window.location.href='<?= url('/sales/' . $s['id']) ?>'">
-                        <td class="py-3 px-2 font-mono font-bold text-gray-800">#<?= htmlspecialchars($s['invoice_number'] ?? str_pad($s['id'], 6, '0', STR_PAD_LEFT)) ?></td>
-                        <td class="py-3 px-2 text-gray-500 text-xs"><?= htmlspecialchars(date('d/m/Y H:i', strtotime($s['created_at']))) ?></td>
-                        <td class="py-3 px-2 text-gray-700"><?= htmlspecialchars($s['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></td>
-                        <td class="py-3 px-2 text-gray-500"><?= (int)($s['items_count'] ?? 0) ?></td>
-                        <td class="py-3 px-2 font-bold"><?= number_format($s['total'], 0) ?> ກີບ</td>
-                        <td class="py-3 px-2">
+                    <tr class="cursor-pointer" onclick="window.location.href='<?= url('/sales/' . $s['id']) ?>'">
+                        <td class="font-mono font-bold text-gray-800">#<?= htmlspecialchars($s['invoice_number'] ?? str_pad($s['id'], 6, '0', STR_PAD_LEFT)) ?></td>
+                        <td><?= htmlspecialchars(date('d/m/Y H:i', strtotime($s['created_at']))) ?></td>
+                        <td><?= htmlspecialchars($s['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></td>
+                        <td><?= (int)($s['items_count'] ?? 0) ?></td>
+                        <td><?= number_format($s['total'], 0) ?> ກີບ</td>
+                        <td>
                             <?php if (($s['status'] ?? 'completed') === 'completed'): ?>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-green-50 text-green-600 text-xs font-bold"><i class="fas fa-check-circle"></i> ສຳເລັດ</span>
+                            <span class="status-badge status-badge-green"><span class="dot"></span> ສຳເລັດ</span>
                             <?php else: ?>
-                            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-red-50 text-red-600 text-xs font-bold"><i class="fas fa-undo"></i> ຄືນເງິນ</span>
+                            <span class="status-badge status-badge-red"><span class="dot"></span> ຄືນເງິນ</span>
                             <?php endif; ?>
                         </td>
-                        <td class="py-3 px-2">
-                            <a href="<?= url('/sales/' . $s['id']) ?>" class="h-8 w-8 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white transition-all flex items-center justify-center">
+                        <td>
+                            <a href="<?= url('/sales/' . $s['id']) ?>" class="icon-btn icon-btn-view">
                                 <i class="fas fa-eye text-xs"></i>
                             </a>
                         </td>

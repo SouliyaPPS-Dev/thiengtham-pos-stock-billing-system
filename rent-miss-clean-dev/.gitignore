@@ -1,0 +1,63 @@
+# Environment variables
+# .env - Uncomment for production deployment, but keep out of git
+.env.local
+.env.production
+.env.*.local
+
+# Database files
+*.sql
+*.sqlite
+*.sqlite3
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Cache and temporary files
+cache/
+tmp/
+temp/
+*.tmp
+
+# Composer (if used)
+/vendor/
+composer.lock
+
+# Node modules (if used)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+
+# Upload directories
+/public/uploads/
+/public/assets/uploads/
+
+# Session files
+/sessions/
+*.session
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# PHPUnit (if used)
+.phpunit.result.cache
