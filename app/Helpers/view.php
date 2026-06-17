@@ -1,0 +1,134 @@
+<?php
+
+function get_layout_preference() {
+    $currentPath = $_SERVER['REQUEST_URI'] ?? '';
+    $isForcedNavbar = (strpos($currentPath, '/pos') !== false || strpos($currentPath, '/sales') !== false);
+
+    if (isset($_GET['layout'])) {
+        $layout = $_GET['layout'];
+        if (!($isForcedNavbar && $layout === 'navbar')) {
+            $_SESSION['layout_pref'] = $layout;
+        }
+        return $isForcedNavbar ? 'navbar' : $layout;
+    }
+
+    if ($isForcedNavbar) {
+        return 'navbar';
+    }
+
+    return $_SESSION['layout_pref'] ?? 'sidebar';
+}
+
+function view($path, $data = []) {
+    extract($data);
+    $path = str_replace('.', '/', $path);
+    $viewFile = __DIR__ . "/../../views/$path.php";
+
+    if (!file_exists($viewFile)) {
+        die("View file not found: $path");
+    }
+
+    $layout_pref = get_layout_preference();
+
+    ob_start();
+    require $viewFile;
+    $content = ob_get_clean();
+
+    if (isset($data['layout']) && $data['layout'] === false) {
+        echo $content;
+    } else {
+        require __DIR__ . "/../../views/layouts/main.php";
+    }
+}
+
+function component($name, $data = []) {
+    extract($data);
+    $path = str_replace('.', '/', $name);
+    require __DIR__ . "/../../views/components/$path.php";
+}
+
+function url($path = '/') {
+    $env = $_ENV['APP_ENV'] ?? 'development';
+    $prodUrl = $_ENV['PROD_APP_URL'] ?? '';
+
+    if ($env === 'production' && !empty($prodUrl)) {
+        $baseUrl = rtrim($prodUrl, '/');
+    } else {
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $basePath = str_replace('/public/index.php', '', $scriptName);
+        $basePath = str_replace('/index.php', '', $basePath);
+
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+        $protocol = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] === '1') ? 'https' : 'http';
+        if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+            $protocol = 'https';
+        }
+
+        $baseUrl = $protocol . '://' . $host . $basePath;
+    }
+
+    $docRoot = realpath($_SERVER['DOCUMENT_ROOT'] ?? '');
+    $publicDir = realpath(__DIR__ . '/../../public');
+    if ($docRoot && $publicDir && $docRoot === $publicDir) {
+        $path = preg_replace('#^/public/#', '/', $path);
+    }
+
+    $fullUrl = $baseUrl . '/' . ltrim($path, '/');
+    return rtrim($fullUrl, '/');
+}
+
+function current_url() {
+    $path = $_SERVER['REQUEST_URI'] ?? '/';
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    $protocol = isset($_SERVER['HTTPS']) && ($_SERVER['HTTPS'] === 'on' || $_SERVER['HTTPS'] === '1') ? 'https' : 'http';
+    if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
+        $protocol = 'https';
+    }
+    $fullUrl = $protocol . '://' . $host . strtok($path, '?');
+    return rtrim($fullUrl, '/');
+}
+
+function is_menu_active($routePath) {
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+    $currentPath = strtok($requestUri, '?');
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $basePath = str_replace('/public/index.php', '', $scriptName);
+    $basePath = str_replace('/index.php', '', $basePath);
+    if (!empty($basePath) && strpos($currentPath, $basePath) === 0) {
+        $currentPath = substr($currentPath, strlen($basePath));
+    }
+    $currentPath = rtrim($currentPath, '/');
+    if (empty($currentPath)) $currentPath = '/';
+    $routePath = '/' . ltrim($routePath, '/');
+    if ($routePath === '/' || $routePath === '') {
+        return $currentPath === '/' || $currentPath === '';
+    }
+    return $currentPath === $routePath || strpos($currentPath, $routePath) === 0;
+}
+
+function get_menu_active_class($routePath, $activeClass = 'menu-active-box', $defaultClass = 'text-gray-600 hover:bg-gray-100') {
+    return is_menu_active($routePath) ? $activeClass : $defaultClass;
+}
+
+function get_store_name() {
+    try {
+        $db = \App\Core\Database::getInstance()->getConnection();
+        $stmt = $db->query("SELECT store_name FROM settings LIMIT 1");
+        if ($stmt && $row = $stmt->fetch()) {
+            return htmlspecialchars($row['store_name'] ?: 'My Store');
+        }
+    } catch (\Exception $e) {}
+    return 'My Store';
+}
+
+function get_logo_url($logoPath) {
+    if (empty($logoPath)) return '';
+    if (strpos($logoPath, 'http') === 0) return $logoPath;
+    $env = $_ENV['APP_ENV'] ?? 'development';
+    $host = $_SERVER['HTTP_HOST'] ?? '';
+    if ($env === 'development' || strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false) {
+        return url($logoPath);
+    }
+    $prodUrl = $_ENV['PROD_APP_URL'] ?? 'https://your-app.hf.space';
+    return $prodUrl . '/' . ltrim($logoPath, '/');
+}

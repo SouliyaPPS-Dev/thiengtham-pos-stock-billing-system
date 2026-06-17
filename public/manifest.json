@@ -1,0 +1,51 @@
+{
+  "name": "POS & Stock - ລະບົບຂາຍ ແລະ ຈັດການສາງສິນຄ້າ",
+  "short_name": "POS Stock",
+  "description": "ລະບົບຂາຍສິນຄ້າ ແລະ ຈັດການສາງສິນຄ້າ",
+  "id": "pos-stock-app-v1",
+  "start_url": "../",
+  "scope": "../",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#0ea5e9",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "POS ຂາຍສິນຄ້າ",
+      "url": "../pos?layout=navbar",
+      "icons": [
+        { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" }
+      ]
+    },
+    {
+      "name": "ສິນຄ້າ",
+      "url": "../products",
+      "icons": [
+        { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" }
+      ]
+    }
+  ]
+}
