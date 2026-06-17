@@ -1,0 +1,45 @@
+RewriteRule ^(manifest\.json|sw\.js|offline\.html|robots\.txt|sitemap\.xml)$ public/$1 [L]
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^(manifest\.json|sw\.js|offline\.html)$ public/$1 [L]
+
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule ^ - [L]
+
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    RewriteRule ^(.*)$ public/index.php [L,QSA]
+</IfModule>
+
+<FilesMatch "sw\.js$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Allow from all
+</IfModule>
+
+<FilesMatch "^\.env|database\.sql$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+DirectoryIndex public/index.php
