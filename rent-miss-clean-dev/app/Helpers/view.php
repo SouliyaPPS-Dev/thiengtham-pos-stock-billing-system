@@ -1,23 +1,9 @@
 <?php
 
 function get_layout_preference() {
-    $currentPath = $_SERVER['REQUEST_URI'] ?? '';
-    $isForcedNavbar = (strpos($currentPath, '/pos') !== false || strpos($currentPath, '/rentals') !== false);
-
     if (isset($_GET['layout'])) {
-        $layout = $_GET['layout'];
-        
-        // If it's a forced page and we are setting it to 'navbar', 
-        // don't update the session so the manual choice for other pages is preserved.
-        if (!($isForcedNavbar && $layout === 'navbar')) {
-            $_SESSION['layout_pref'] = $layout;
-        }
-        
-        return $isForcedNavbar ? 'navbar' : $layout;
-    }
-    
-    if ($isForcedNavbar) {
-        return 'navbar';
+        $_SESSION['layout_pref'] = $_GET['layout'];
+        return $_GET['layout'];
     }
      
     return $_SESSION['layout_pref'] ?? 'sidebar';

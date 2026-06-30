@@ -140,11 +140,11 @@
                             <td class="px-6 py-4 text-right font-black text-red-600"><?= number_format($item['amount']) ?></td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center justify-center gap-2">
-                                    <button @click="openEdit(<?= htmlspecialchars(json_encode($item)) ?>)" class="w-10 h-10 flex items-center justify-center bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl transition-all shadow-sm border border-amber-100" title="ແກ້ໄຂ">
-                                        <i class="fas fa-edit text-base"></i>
+                                    <button @click="openEdit(<?= htmlspecialchars(json_encode($item)) ?>)" class="px-3 h-10 flex items-center justify-center gap-1.5 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl transition-all shadow-sm border border-amber-100 text-xs font-bold" title="ແກ້ໄຂ">
+                                        <i class="fas fa-edit"></i> ແກ້ໄຂ
                                     </button>
-                                    <button @click="deleteExpense(<?= $item['id'] ?>)" class="w-10 h-10 flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm border border-red-100" title="ລຶບ">
-                                        <i class="fas fa-trash text-base"></i>
+                                    <button @click="deleteExpense(<?= $item['id'] ?>)" class="px-3 h-10 flex items-center justify-center gap-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm border border-red-100 text-xs font-bold" title="ລຶບ">
+                                        <i class="fas fa-trash"></i> ລຶບ
                                     </button>
                                 </div>
                             </td>
@@ -177,11 +177,11 @@
                     <?= htmlspecialchars($item['description']) ?>
                 </div>
                 <div class="flex gap-2 justify-end border-t border-gray-50 pt-3">
-                    <button @click="openEdit(<?= htmlspecialchars(json_encode($item)) ?>)" class="flex-1 py-2.5 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-xs">
-                        <i class="fas fa-edit mr-1.5"></i> ແກ້ໄຂ
+                    <button @click="openEdit(<?= htmlspecialchars(json_encode($item)) ?>)" class="flex-1 py-2.5 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center gap-1.5 text-xs font-bold hover:bg-amber-100 transition-colors" title="ແກ້ໄຂ">
+                        <i class="fas fa-edit"></i> ແກ້ໄຂ
                     </button>
-                    <button @click="deleteExpense(<?= $item['id'] ?>)" class="flex-1 py-2.5 rounded-xl bg-red-50 text-red-500 flex items-center justify-center font-bold text-xs">
-                        <i class="fas fa-trash mr-1.5"></i> ລຶບອອກ
+                    <button @click="deleteExpense(<?= $item['id'] ?>)" class="flex-1 py-2.5 rounded-xl bg-red-50 text-red-500 flex items-center justify-center gap-1.5 text-xs font-bold hover:bg-red-100 transition-colors" title="ລຶບ">
+                        <i class="fas fa-trash"></i> ລຶບ
                     </button>
                 </div>
             </div>

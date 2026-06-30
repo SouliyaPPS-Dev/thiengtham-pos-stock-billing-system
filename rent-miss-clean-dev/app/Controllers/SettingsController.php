@@ -30,7 +30,7 @@ class SettingsController extends BaseController {
                 'store_phone' => $_POST['store_phone'] ?? '',
                 'store_address' => $_POST['store_address'] ?? '',
                 'store_email' => $_POST['store_email'] ?? '',
-                'currency' => $_POST['currency'] ?? '₭',
+                'currency' => $_POST['currency'] ?? 'ກີບ',
                 'tax_percent' => $_POST['tax_percent'] ?? 0,
                 'paper_size' => $_POST['paper_size'] ?? '80mm',
                 'rental_terms' => $_POST['rental_terms'] ?? '',

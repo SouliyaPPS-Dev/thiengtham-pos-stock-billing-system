@@ -4,7 +4,7 @@
         <div class="flex flex-col items-center mb-10">
             <div class="relative">
                 <div class="absolute -inset-1 bg-gradient-to-r from-primary to-sky-400 rounded-full blur opacity-25"></div>
-                <img src="<?= url('/public/logo.jpg') ?>" alt="Logo" class="relative h-24 w-24 object-cover rounded-full border-4 border-white shadow-xl">
+                <img src="<?= url('/public/logo.jpg') ?>" alt="Logo" class="relative h-24 w-24 rounded-full border-4 border-white shadow-xl">
             </div>
             <h1 class="mt-6 text-3xl font-black tracking-tight text-gray-800">Miss Clean</h1>
             <p class="text-gray-500 font-medium">ລະບົບຈັດການຊຸດໄໝໃຫ້ເຊົ່າ</p>

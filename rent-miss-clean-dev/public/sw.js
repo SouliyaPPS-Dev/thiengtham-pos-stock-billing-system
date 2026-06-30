@@ -1,4 +1,4 @@
-const CACHE_NAME = "miss-clean-v3";
+const CACHE_NAME = "miss-clean-v4";
 
 const STATIC_ASSETS = [
   "./public/css/app.css",

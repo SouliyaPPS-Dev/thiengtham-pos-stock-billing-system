@@ -228,18 +228,18 @@
                     <h3 class="font-bold text-gray-800 leading-none text-sm md:text-base">ກຣາຟລາຍຮັບ-ລາຍຈ່າຍ (ລາຍວັນ)</h3>
                     <p class="text-xs md:text-sm text-gray-500 mt-1"><?= $fromDate && $toDate ? htmlspecialchars($fromDate) . ' ເຖິງ ' . htmlspecialchars($toDate) : 'ປະຈຳເດືອນ ' . date('m/Y') ?></p>
                 </div>
-                <div class="flex items-center gap-3 md:gap-4">
+                <div class="flex items-center gap-4 md:gap-5">
                     <div class="flex items-center gap-1.5">
-                        <span class="w-3 md:w-4 h-0.5 rounded bg-emerald-500"></span>
-                        <span class="text-[10px] md:text-[11px] font-bold text-gray-500">ລາຍຮັບ</span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-100"></span>
+                        <span class="text-[11px] md:text-xs font-bold text-gray-600">ລາຍຮັບ</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <span class="w-3 md:w-4 h-0.5 rounded bg-red-400"></span>
-                        <span class="text-[10px] md:text-[11px] font-bold text-gray-500">ລາຍຈ່າຍ</span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-red-400 ring-2 ring-red-100"></span>
+                        <span class="text-[11px] md:text-xs font-bold text-gray-600">ລາຍຈ່າຍ</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <span class="w-3 md:w-4 h-0.5 rounded bg-blue-500"></span>
-                        <span class="text-[10px] md:text-[11px] font-bold text-gray-500">ກຳໄລສຸດທິ</span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 ring-2 ring-blue-100"></span>
+                        <span class="text-[11px] md:text-xs font-bold text-gray-600">ກຳໄລສຸດທິ</span>
                     </div>
                 </div>
             </div>
@@ -252,8 +252,8 @@
                         $yY = $padTop + $i * $yStepPx;
                         $yVal = $niceMax - ($i * $yStepVal);
                     ?>
-                    <line x1="<?= $padLeft ?>" y1="<?= $yY ?>" x2="<?= $chartWidth - $padRight ?>" y2="<?= $yY ?>" stroke="#f1f5f9" stroke-dasharray="4,4" stroke-width="1"/>
-                    <text x="<?= $padLeft - 8 ?>" y="<?= $yY + 4 ?>" text-anchor="end" class="text-[10px]" fill="#94a3b8" font-size="10"><?= number_format($yVal) ?></text>
+                    <line x1="<?= $padLeft ?>" y1="<?= $yY ?>" x2="<?= $chartWidth - $padRight ?>" y2="<?= $yY ?>" stroke="#e2e8f0" stroke-dasharray="3,3" stroke-width="1"/>
+                    <text x="<?= $padLeft - 8 ?>" y="<?= $yY + 4 ?>" text-anchor="end" fill="#64748b" font-size="10" font-weight="600"><?= number_format($yVal) ?></text>
                     <?php endfor; ?>
                     
                     <!-- X-axis labels (show every 5th to avoid crowding) -->
@@ -262,20 +262,21 @@
                         $xX = $padLeft + ($i / max(1, $pointCount - 1)) * $plotW;
                         $label = \DateTime::createFromFormat('Y-m-d', $days[$i])->format('d/m');
                     ?>
-                    <text x="<?= $xX ?>" y="<?= $chartHeight - 12 ?>" text-anchor="middle" fill="#94a3b8" font-size="9"><?= $label ?></text>
+                    <line x1="<?= $xX ?>" y1="<?= $padTop ?>" x2="<?= $xX ?>" y2="<?= $chartHeight - $padBottom ?>" stroke="#f8fafc" stroke-width="1"/>
+                    <text x="<?= $xX ?>" y="<?= $chartHeight - 12 ?>" text-anchor="middle" fill="#64748b" font-size="9" font-weight="500"><?= $label ?></text>
                     <?php endfor; ?>
                     
                     <!-- Zero line for profit (if negative values exist) -->
                     <?php if ($profitMin < 0): 
                         $zeroY = $padTop + (0 - $profitMin) / $profitRange * $plotH;
                     ?>
-                    <line x1="<?= $padLeft ?>" y1="<?= $zeroY ?>" x2="<?= $chartWidth - $padRight ?>" y2="<?= $zeroY ?>" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,3"/>
+                    <line x1="<?= $padLeft ?>" y1="<?= $zeroY ?>" x2="<?= $chartWidth - $padRight ?>" y2="<?= $zeroY ?>" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4,4"/>
                     <?php endif; ?>
                     
                     <!-- Income area fill -->
                     <defs>
                         <linearGradient id="incomeGrad" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stop-color="#10b981" stop-opacity="0.2"/>
+                            <stop offset="0%" stop-color="#10b981" stop-opacity="0.25"/>
                             <stop offset="100%" stop-color="#10b981" stop-opacity="0.02"/>
                         </linearGradient>
                         <linearGradient id="expenseGrad" x1="0" y1="0" x2="0" y2="1">
@@ -284,22 +285,22 @@
                         </linearGradient>
                         <linearGradient id="profitGrad" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.15"/>
-                            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.02"/>
+                            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.01"/>
                         </linearGradient>
                     </defs>
                     
                     <!-- Income area + line -->
                     <polygon fill="url(#incomeGrad)" points="<?= $padLeft ?>,<?= $padTop + $plotH ?> <?= $incomePts ?> <?= $padLeft + $plotW ?>,<?= $padTop + $plotH ?>"/>
-                    <polyline fill="none" stroke="#10b981" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="<?= $incomePts ?>" class="cursor-pointer"/>
+                    <polyline fill="none" stroke="#10b981" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" points="<?= $incomePts ?>" class="cursor-pointer"/>
                     
                     <!-- Expense area + line -->
                     <polygon fill="url(#expenseGrad)" points="<?= $padLeft ?>,<?= $padTop + $plotH ?> <?= $expensePts ?> <?= $padLeft + $plotW ?>,<?= $padTop + $plotH ?>"/>
-                    <polyline fill="none" stroke="#f87171" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" points="<?= $expensePts ?>" class="cursor-pointer"/>
+                    <polyline fill="none" stroke="#f87171" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" points="<?= $expensePts ?>" class="cursor-pointer"/>
                     
                     <!-- Profit area + line -->
                     <?php if ($profitPts): ?>
                     <polygon fill="url(#profitGrad)" points="<?= $padLeft ?>,<?= $padTop + $plotH ?> <?= $profitPts ?> <?= $padLeft + $plotW ?>,<?= $padTop + $plotH ?>"/>
-                    <polyline fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5,3" points="<?= $profitPts ?>" class="cursor-pointer"/>
+                    <polyline fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="6,3" points="<?= $profitPts ?>" class="cursor-pointer"/>
                     <?php endif; ?>
                     
                     <!-- Data dots with hover tooltips -->
@@ -311,17 +312,17 @@
                     ?>
                     <!-- Income dot -->
                     <g class="cursor-pointer">
-                        <circle cx="<?= $xX ?>" cy="<?= $yI ?>" r="4" fill="#10b981" stroke="white" stroke-width="2" class="hover:r-[6] transition-all"/>
+                        <circle cx="<?= $xX ?>" cy="<?= $yI ?>" r="4.5" fill="#10b981" stroke="white" stroke-width="2.5"/>
                         <title>ລາຍຮັບ: <?= number_format($incomeDayData[$i]) ?> ກີບ</title>
                     </g>
                     <!-- Expense dot -->
                     <g class="cursor-pointer">
-                        <circle cx="<?= $xX ?>" cy="<?= $yE ?>" r="4" fill="#f87171" stroke="white" stroke-width="2"/>
+                        <circle cx="<?= $xX ?>" cy="<?= $yE ?>" r="4.5" fill="#f87171" stroke="white" stroke-width="2.5"/>
                         <title>ລາຍຈ່າຍ: <?= number_format($expenseDayData[$i]) ?> ກີບ</title>
                     </g>
                     <!-- Profit dot -->
                     <g class="cursor-pointer">
-                        <circle cx="<?= $xX ?>" cy="<?= $yP ?>" r="3" fill="#3b82f6" stroke="white" stroke-width="1.5"/>
+                        <circle cx="<?= $xX ?>" cy="<?= $yP ?>" r="3.5" fill="#3b82f6" stroke="white" stroke-width="2"/>
                         <title>ກຳໄລ: <?= number_format($profitDayData[$i]) ?> ກີບ</title>
                     </g>
                     <?php endfor; ?>
@@ -337,18 +338,35 @@
             <?php endif; ?>
             
             <!-- Total summary row -->
-            <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-xs">
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400">ລວມລາຍຮັບ</span>
-                    <span class="font-black text-emerald-600"><?= number_format(array_sum($incomeDayData)) ?> ກີບ</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400">ລວມລາຍຈ່າຍ</span>
-                    <span class="font-black text-red-500"><?= number_format(array_sum($expenseDayData)) ?> ກີບ</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-400">ກຳໄລສຸດທິ</span>
-                    <span class="font-black <?= (array_sum($incomeDayData) - array_sum($expenseDayData)) >= 0 ? 'text-sky-600' : 'text-red-600' ?>"><?= number_format(array_sum($incomeDayData) - array_sum($expenseDayData)) ?> ກີບ</span>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="flex items-center gap-3 p-3 bg-emerald-50/50 rounded-xl border border-emerald-100">
+                        <div class="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
+                            <i class="fas fa-arrow-up text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">ລວມລາຍຮັບ</p>
+                            <p class="text-sm font-black text-emerald-600"><?= number_format(array_sum($incomeDayData)) ?> ກີບ</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 bg-red-50/50 rounded-xl border border-red-100">
+                        <div class="w-9 h-9 rounded-lg bg-red-100 flex items-center justify-center text-red-500">
+                            <i class="fas fa-arrow-down text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">ລວມລາຍຈ່າຍ</p>
+                            <p class="text-sm font-black text-red-500"><?= number_format(array_sum($expenseDayData)) ?> ກີບ</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 p-3 rounded-xl border <?= (array_sum($incomeDayData) - array_sum($expenseDayData)) >= 0 ? 'bg-sky-50/50 border-sky-100' : 'bg-red-50/50 border-red-100' ?>">
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center text-sm <?= (array_sum($incomeDayData) - array_sum($expenseDayData)) >= 0 ? 'bg-sky-100 text-sky-600' : 'bg-red-100 text-red-500' ?>">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">ກຳໄລສຸດທິ</p>
+                            <p class="text-sm font-black <?= (array_sum($incomeDayData) - array_sum($expenseDayData)) >= 0 ? 'text-sky-600' : 'text-red-600' ?>"><?= number_format(array_sum($incomeDayData) - array_sum($expenseDayData)) ?> ກີບ</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -370,7 +388,11 @@
                         <?php else: foreach($stats['recent_rentals'] as $r): ?>
                         <div class="flex items-center gap-3 md:gap-4">
                             <div class="relative flex h-9 w-9 md:h-10 md:w-10 shrink-0 overflow-hidden rounded-full ring-2 ring-gray-100 bg-primary/10 flex items-center justify-center text-primary">
+                                <?php if (!empty($r['customer_avatar'])): ?>
+                                <img src="<?= htmlspecialchars($r['customer_avatar']) ?>" alt="" class="w-full h-full object-cover">
+                                <?php else: ?>
                                 <i class="fas fa-user text-xs md:text-sm"></i>
+                                <?php endif; ?>
                             </div>
                             <div class="flex-1 min-w-0 space-y-0.5">
                                 <p class="text-sm font-bold text-gray-800 leading-none truncate"><?= htmlspecialchars($r['customer_name']) ?></p>
@@ -412,11 +434,14 @@
                             </div>
                         </div>
                     </div>
+                 
                     <?php endforeach; endif; ?>
                 </div>
             </div>
         </div>
     </div>
+    <br>
+    <br>
 </div>
 
  

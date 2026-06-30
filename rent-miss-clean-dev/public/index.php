@@ -64,12 +64,14 @@ if ($isDebug) {
     ini_set('display_errors', 0);
 }
 
-// Auto-detect environment based on host
+// Auto-detect environment based on host (only if not explicitly set in .env)
 $host = $_SERVER['HTTP_HOST'] ?? '';
 $isLocalhost = (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false);
 
-// Override APP_ENV based on host detection
-$_ENV['APP_ENV'] = $isLocalhost ? 'development' : 'production';
+$envFromFile = $_ENV['APP_ENV'] ?? '';
+if ($envFromFile !== 'production' && $envFromFile !== 'offline') {
+    $_ENV['APP_ENV'] = $isLocalhost ? 'development' : 'production';
+}
 
 // Detect environment and set database config
 $env = $_ENV['APP_ENV'] ?? 'development';
@@ -78,6 +80,7 @@ if ($env === 'production') {
     $_ENV['DB_USERNAME'] = $_ENV['PROD_DB_USERNAME'] ?? 'root';
     $_ENV['DB_PASSWORD'] = $_ENV['PROD_DB_PASSWORD'] ?? '';
     $_ENV['DB_DATABASE'] = $_ENV['PROD_DB_DATABASE'] ?? '';
+    $_ENV['DB_PORT'] = $_ENV['PROD_DB_PORT'] ?? '3306';
 }
 
 // Adjust REQUEST_URI for subdirectories

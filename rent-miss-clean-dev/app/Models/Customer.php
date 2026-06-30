@@ -43,10 +43,11 @@ class Customer {
     }
     
     public function createCustomer($data) {
+        $avatar = $data['avatar'] ?? null;
         $sql = "INSERT INTO customers (fullname, phone, email, id_card_no, address, province, district, village, 
                 occupation, gender, date_of_birth, contact_person, contact_phone, 
-                customer_type, status, notes, created_by) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                customer_type, status, notes, avatar, created_by) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         $stmt = $this->db->prepare($sql);
         return $stmt->execute([
@@ -54,11 +55,28 @@ class Customer {
             $data['address'], $data['province'], $data['district'], $data['village'],
             $data['occupation'], $data['gender'], $data['date_of_birth'],
             $data['contact_person'], $data['contact_phone'], $data['customer_type'],
-            $data['status'], $data['notes'], $data['created_by']
+            $data['status'], $data['notes'], $avatar, $data['created_by']
         ]);
     }
     
     public function updateCustomer($id, $data) {
+        $avatar = $data['avatar'] ?? null;
+
+        if (array_key_exists('avatar', $data)) {
+            $sql = "UPDATE customers SET fullname=?, phone=?, email=?, id_card_no=?, address=?, province=?, 
+                    district=?, village=?, occupation=?, gender=?, date_of_birth=?, 
+                    contact_person=?, contact_phone=?, customer_type=?, status=?, notes=?, avatar=? 
+                    WHERE id=?";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([
+                $data['fullname'], $data['phone'], $data['email'], $data['id_card_no'],
+                $data['address'], $data['province'], $data['district'], $data['village'],
+                $data['occupation'], $data['gender'], $data['date_of_birth'],
+                $data['contact_person'], $data['contact_phone'], $data['customer_type'],
+                $data['status'], $data['notes'], $avatar, $id
+            ]);
+        }
+
         $sql = "UPDATE customers SET fullname=?, phone=?, email=?, id_card_no=?, address=?, province=?, 
                 district=?, village=?, occupation=?, gender=?, date_of_birth=?, 
                 contact_person=?, contact_phone=?, customer_type=?, status=?, notes=? 

@@ -8,6 +8,8 @@ class RentalController extends BaseController
     {
         $db = \App\Core\Database::getInstance()->getConnection();
 
+        $this->updateOverdueStatuses();
+
         $search = $_GET['search'] ?? '';
         $status = $_GET['status'] ?? '';
  
@@ -94,7 +96,7 @@ class RentalController extends BaseController
     {
         $db = \App\Core\Database::getInstance()->getConnection();
         $stmt = $db->prepare("
-            SELECT ri.*, p.name as product_name, p.code as product_code, p.size
+            SELECT ri.*, p.name as product_name, p.code as product_code, p.size, p.rental_price as product_base_price
             FROM rental_items ri
             LEFT JOIN products p ON ri.product_id = p.id
             WHERE ri.rental_id = ?
@@ -110,10 +112,14 @@ class RentalController extends BaseController
     public function getData($id)
     {
         $db = \App\Core\Database::getInstance()->getConnection();
+        $this->updateOverdueStatuses();
         $stmt = $db->prepare("
-            SELECT r.*, c.fullname as customer_name, c.phone as customer_phone
+            SELECT r.*, c.fullname as customer_name, c.phone as customer_phone,
+                   u.full_name as created_by_name, pm.name as payment_method_name
             FROM rentals r
             LEFT JOIN customers c ON r.customer_id = c.id
+            LEFT JOIN users u ON r.user_id = u.id
+            LEFT JOIN payment_methods pm ON r.payment_method_id = pm.id
             WHERE r.id = ?
         ");
         $stmt->execute([$id]);
@@ -172,6 +178,54 @@ class RentalController extends BaseController
             header('Location: ' . url('/rentals?error=1'));
         }
         exit;
+    }
+
+    public function bulkDelete()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . url('/rentals'));
+            exit;
+        }
+
+        $ids = $_POST['ids'] ?? [];
+        if (empty($ids) || !is_array($ids)) {
+            header('Location: ' . url('/rentals?error=1'));
+            exit;
+        }
+
+        $ids = array_map('intval', $ids);
+        $db = \App\Core\Database::getInstance()->getConnection();
+
+        try {
+            $db->beginTransaction();
+
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+
+            $stmt = $db->prepare("SELECT product_id, qty FROM rental_items WHERE rental_id IN ($placeholders)");
+            $stmt->execute($ids);
+            $items = $stmt->fetchAll();
+
+            $updateProductStmt = $db->prepare("UPDATE products SET status = 'Available' WHERE id = ?");
+            $restoreStockStmt = $db->prepare("UPDATE products SET stock = stock + ? WHERE id = ?");
+            foreach ($items as $item) {
+                $updateProductStmt->execute([$item['product_id']]);
+                $restoreStockStmt->execute([$item['qty'], $item['product_id']]);
+            }
+
+            $stmt = $db->prepare("DELETE FROM rental_items WHERE rental_id IN ($placeholders)");
+            $stmt->execute($ids);
+
+            $stmt = $db->prepare("DELETE FROM rentals WHERE id IN ($placeholders)");
+            $stmt->execute($ids);
+
+            $db->commit();
+            header('Location: ' . url('/rentals?deleted=1'));
+            exit;
+        } catch (\Exception $e) {
+            $db->rollBack();
+            header('Location: ' . url('/rentals?error=1'));
+            exit;
+        }
     }
 
     public function updateStatus()
@@ -240,6 +294,18 @@ class RentalController extends BaseController
         header('Content-Type: application/json');
         echo json_encode(['success' => true, 'notifications' => $rentals]);
         exit;
+    }
+
+    private function updateOverdueStatuses()
+    {
+        $db = \App\Core\Database::getInstance()->getConnection();
+        $stmt = $db->prepare("
+            UPDATE rentals 
+            SET status = 'Overdue' 
+            WHERE status = 'Active' 
+            AND DATEDIFF(CURDATE(), return_date) > 3
+        ");
+        $stmt->execute();
     }
 }
         

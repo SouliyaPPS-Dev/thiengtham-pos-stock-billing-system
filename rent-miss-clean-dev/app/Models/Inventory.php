@@ -36,8 +36,8 @@ class Inventory {
     }
     
     public function create($data) {
-        $sql = "INSERT INTO products (code, name, category_id, size, bust, waist, hips, color, rental_price, deposit_price, stock, image, status) 
-                VALUES (:code, :name, :category_id, :size, :bust, :waist, :hips, :color, :rental_price, :deposit_price, :stock, :image, :status)";
+        $sql = "INSERT INTO products (code, name, category_id, size, bust, waist, hips, color, rental_price, stock, image, status) 
+                VALUES (:code, :name, :category_id, :size, :bust, :waist, :hips, :color, :rental_price, :stock, :image, :status)";
         $stmt = $this->db->prepare($sql);
         return $stmt->execute($data);
     }

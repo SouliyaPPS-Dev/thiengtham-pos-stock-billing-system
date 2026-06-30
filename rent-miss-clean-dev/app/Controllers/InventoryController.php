@@ -39,7 +39,6 @@ class InventoryController extends BaseController {
                 'hips' => $_POST['hips'],
                 'color' => $_POST['color'],
                 'rental_price' => $_POST['rental_price'],
-                'deposit_price' => $_POST['deposit_price'],
                 'stock' => (int)($_POST['stock'] ?? 0),
                 'image' => $imageUrl,
                 'status' => $_POST['status'] ?? 'Available'
@@ -67,7 +66,6 @@ class InventoryController extends BaseController {
                 'hips' => $_POST['hips'],
                 'color' => $_POST['color'],
                 'rental_price' => $_POST['rental_price'],
-                'deposit_price' => $_POST['deposit_price'],
                 'stock' => (int)($_POST['stock'] ?? 0),
                 'status' => $_POST['status']
             ];
@@ -108,6 +106,25 @@ class InventoryController extends BaseController {
                 exit;
             }
         }
+    }
+
+    public function rentalHistory($id) {
+        $db = \App\Core\Database::getInstance()->getConnection();
+        $stmt = $db->prepare("
+            SELECT r.id, r.invoice_number, r.pickup_date, r.return_date, r.created_at, r.status,
+                   c.fullname as customer_name, c.phone as customer_phone, ri.qty
+            FROM rental_items ri
+            JOIN rentals r ON ri.rental_id = r.id
+            LEFT JOIN customers c ON r.customer_id = c.id
+            WHERE ri.product_id = ?
+            ORDER BY r.created_at DESC
+        ");
+        $stmt->execute([$id]);
+        $history = $stmt->fetchAll();
+
+        header('Content-Type: application/json');
+        echo json_encode($history);
+        exit;
     }
 }
   

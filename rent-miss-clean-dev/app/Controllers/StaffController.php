@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\User;
+use App\Helpers\ImageKit;
 
 class StaffController extends BaseController {
     public function index() {
@@ -26,7 +27,14 @@ class StaffController extends BaseController {
                 'role' => $_POST['role'],
                 'status' => $_POST['status'] ?? 'Active'
             ];
-            
+
+            if (!empty($_FILES['avatar']['name'])) {
+                $avatarUrl = ImageKit::upload('avatar', '/rent_miss_clean/staff');
+                if ($avatarUrl) {
+                    $data['avatar'] = $avatarUrl;
+                }
+            }
+
             if ($userModel->create($data)) {
                 header('Location: ' . url('/staff?success=1'));
                 exit;
@@ -47,11 +55,18 @@ class StaffController extends BaseController {
                 'role' => $_POST['role'],
                 'status' => $_POST['status']
             ];
-            
+
             if (!empty($_POST['password'])) {
                 $data['password'] = $_POST['password'];
             }
-            
+
+            if (!empty($_FILES['avatar']['name'])) {
+                $avatarUrl = ImageKit::upload('avatar', '/rent_miss_clean/staff');
+                if ($avatarUrl) {
+                    $data['avatar'] = $avatarUrl;
+                }
+            }
+
             if ($userModel->update($id, $data)) {
                 header('Location: ' . url('/staff?updated=1'));
                 exit;
