@@ -163,4 +163,124 @@ class Product
         $stmt = $this->db()->prepare("UPDATE products SET stock = stock - ? WHERE id = ?");
         return $stmt->execute([$qty, $id]);
     }
+
+    public function getFeatured($limit = 8)
+    {
+        $stmt = $this->db()->prepare("SELECT p.*, c.name as category_name
+                                       FROM products p
+                                       LEFT JOIN categories c ON c.id = p.category_id
+                                       WHERE p.status = 'Active' AND p.featured = 1
+                                       ORDER BY p.id DESC
+                                       LIMIT ?");
+        $stmt->execute([(int)$limit]);
+        return $stmt->fetchAll();
+    }
+
+    public function getBySlug($slug)
+    {
+        $stmt = $this->db()->prepare("SELECT p.*, c.name as category_name, c.slug as category_slug
+                                       FROM products p
+                                       LEFT JOIN categories c ON c.id = p.category_id
+                                       WHERE p.slug = ? AND p.status = 'Active'
+                                       LIMIT 1");
+        $stmt->execute([$slug]);
+        return $stmt->fetch();
+    }
+
+    public function getByCategorySlug($slug, $page = 1, $perPage = 12)
+    {
+        $offset = ($page - 1) * $perPage;
+        $stmt = $this->db()->prepare("SELECT p.*, c.name as category_name
+                                       FROM products p
+                                       LEFT JOIN categories c ON c.id = p.category_id
+                                       WHERE c.slug = ? AND p.status = 'Active'
+                                       ORDER BY p.id DESC
+                                       LIMIT ? OFFSET ?");
+        $stmt->execute([$slug, (int)$perPage, (int)$offset]);
+        return $stmt->fetchAll();
+    }
+
+    public function countByCategorySlug($slug)
+    {
+        $stmt = $this->db()->prepare("SELECT COUNT(*) as total
+                                       FROM products p
+                                       LEFT JOIN categories c ON c.id = p.category_id
+                                       WHERE c.slug = ? AND p.status = 'Active'");
+        $stmt->execute([$slug]);
+        return (int)$stmt->fetch()['total'];
+    }
+
+    public function getRelated($productId, $categoryId, $limit = 4)
+    {
+        $stmt = $this->db()->prepare("SELECT p.*, c.name as category_name
+                                       FROM products p
+                                       LEFT JOIN categories c ON c.id = p.category_id
+                                       WHERE p.id != ? AND p.category_id = ? AND p.status = 'Active'
+                                       ORDER BY RAND()
+                                       LIMIT ?");
+        $stmt->execute([$productId, $categoryId, (int)$limit]);
+        return $stmt->fetchAll();
+    }
+
+    public function getProductImages($productId)
+    {
+        $stmt = $this->db()->prepare("SELECT * FROM product_images WHERE product_id = ? ORDER BY sort_order ASC");
+        $stmt->execute([$productId]);
+        return $stmt->fetchAll();
+    }
+
+    public function searchPublic($query = '', $categoryId = null, $page = 1, $perPage = 12)
+    {
+        $offset = ($page - 1) * $perPage;
+        $where = "p.status = 'Active'";
+        $params = [];
+
+        if (!empty($query)) {
+            $where .= " AND (p.name LIKE ? OR p.description LIKE ?)";
+            $q = "%{$query}%";
+            $params[] = $q;
+            $params[] = $q;
+        }
+
+        if (!empty($categoryId)) {
+            $where .= " AND p.category_id = ?";
+            $params[] = (int)$categoryId;
+        }
+
+        $sql = "SELECT p.*, c.name as category_name
+                FROM products p
+                LEFT JOIN categories c ON c.id = p.category_id
+                WHERE $where
+                ORDER BY p.id DESC
+                LIMIT ? OFFSET ?";
+        $params[] = (int)$perPage;
+        $params[] = (int)$offset;
+
+        $stmt = $this->db()->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchAll();
+    }
+
+    public function countSearchPublic($query = '', $categoryId = null)
+    {
+        $where = "p.status = 'Active'";
+        $params = [];
+
+        if (!empty($query)) {
+            $where .= " AND (p.name LIKE ? OR p.description LIKE ?)";
+            $q = "%{$query}%";
+            $params[] = $q;
+            $params[] = $q;
+        }
+
+        if (!empty($categoryId)) {
+            $where .= " AND p.category_id = ?";
+            $params[] = (int)$categoryId;
+        }
+
+        $sql = "SELECT COUNT(*) as total FROM products p WHERE $where";
+        $stmt = $this->db()->prepare($sql);
+        $stmt->execute($params);
+        return (int)$stmt->fetch()['total'];
+    }
 }

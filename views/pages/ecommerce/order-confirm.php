@@ -1,0 +1,96 @@
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Success Header -->
+    <div class="text-center mb-8">
+        <div class="w-20 h-20 rounded-2xl bg-emerald-100 flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-check-circle text-4xl text-emerald-500"></i>
+        </div>
+        <h1 class="text-2xl md:text-3xl font-black text-gray-800 mb-2">ສັ່ງຊື້ສຳເລັດ!</h1>
+        <p class="text-gray-500">ຂອບໃຈທີ່ສັ່ງຊື້ສິນຄ້າກັບພວກເຮົາ</p>
+    </div>
+
+    <!-- Order Number -->
+    <div class="bg-white rounded-2xl border border-gray-100 p-6 mb-6 text-center">
+        <p class="text-sm text-gray-500 mb-1">ເລກທີຄຳສັ່ງຊື້</p>
+        <p class="text-2xl font-black text-sky-600">#<?= htmlspecialchars($order['order_number']) ?></p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Order Items -->
+        <div class="md:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+            <h3 class="text-lg font-black text-gray-800 mb-4">ລາຍການສິນຄ້າ</h3>
+            <div class="space-y-3">
+                <?php foreach ($items as $item): ?>
+                <div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+                    <div>
+                        <p class="text-sm font-bold text-gray-800"><?= htmlspecialchars($item['product_name']) ?></p>
+                        <p class="text-xs text-gray-500">x<?= (int)$item['quantity'] ?> @ <?= number_format((float)$item['unit_price'], 0) ?> ກີບ</p>
+                    </div>
+                    <span class="text-sm font-bold text-gray-800"><?= number_format((float)$item['subtotal'], 0) ?> ກີບ</span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <!-- Order Totals -->
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h3 class="text-lg font-black text-gray-800 mb-4">ລາຍລະອຽດການຊຳລະ</h3>
+            <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">ລາຄາລວມ</span>
+                    <span class="font-bold"><?= number_format((float)$order['subtotal'], 0) ?> ກີບ</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">ຄ່າຈັດສົ່ງ</span>
+                    <span class="font-bold"><?= number_format((float)$order['shipping_fee'], 0) ?> ກີບ</span>
+                </div>
+                <?php if ((float)$order['discount'] > 0): ?>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-500">ສ່ວນຫຼຸດ</span>
+                    <span class="font-bold text-red-500">-<?= number_format((float)$order['discount'], 0) ?> ກີບ</span>
+                </div>
+                <?php endif; ?>
+                <div class="border-t pt-2 mt-2">
+                    <div class="flex justify-between">
+                        <span class="font-black text-gray-800">ລວມທັງໝົດ</span>
+                        <span class="text-xl font-black text-sky-600"><?= number_format((float)$order['grand_total'], 0) ?> ກີບ</span>
+                    </div>
+                </div>
+                <div class="mt-3 pt-3 border-t">
+                    <div class="flex justify-between text-sm">
+                        <span class="text-gray-500">ວິທີຊຳລະ</span>
+                        <span class="font-bold"><?= $order['payment_method'] === 'cod' ? 'ເງິນສົດປາຍທາງ' : 'QR Code' ?></span>
+                    </div>
+                    <div class="flex justify-between text-sm mt-1">
+                        <span class="text-gray-500">ສະຖານະ</span>
+                        <span class="font-bold text-amber-600"><?= htmlspecialchars($order['order_status'] ?? 'Pending') ?></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="bg-white rounded-2xl border border-gray-100 p-6">
+            <h3 class="text-lg font-black text-gray-800 mb-4">ຂໍ້ມູນຈັດສົ່ງ</h3>
+            <div class="space-y-2 text-sm">
+                <p><span class="text-gray-500">ຊື່:</span> <span class="font-bold"><?= htmlspecialchars($order['customer_name']) ?></span></p>
+                <p><span class="text-gray-500">ເບີໂທ:</span> <span class="font-bold"><?= htmlspecialchars($order['customer_phone']) ?></span></p>
+                <?php if (!empty($order['customer_email'])): ?>
+                <p><span class="text-gray-500">ອີເມວ:</span> <span class="font-bold"><?= htmlspecialchars($order['customer_email']) ?></span></p>
+                <?php endif; ?>
+                <p><span class="text-gray-500">ທີ່ຢູ່:</span> <span class="font-bold"><?= htmlspecialchars($order['shipping_address']) ?></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+        <a href="<?= url('/products') ?>" class="inline-flex items-center gap-2 bg-sky-600 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-sky-700 transition-all shadow-lg shadow-sky-200">
+            <i class="fas fa-shopping-bag"></i> ຊື້ສິນຄ້າເພີ່ມ
+        </a>
+        <a href="<?= url('/') ?>" class="inline-flex items-center gap-2 border border-gray-200 text-gray-600 font-bold px-8 py-3.5 rounded-xl hover:bg-gray-50 transition-all">
+            <i class="fas fa-home"></i> ກັບໄປໜ້າຫຼັກ
+        </a>
+    </div>
+
+    <p class="text-center text-sm text-gray-400 mt-6">ພວກເຮົາຈະຕິດຕໍ່ຫາທ່ານເພື່ອຢືນຢັນຄຳສັ່ງຊື້</p>
+</div>

@@ -2,7 +2,10 @@
 
 function get_layout_preference() {
     $currentPath = $_SERVER['REQUEST_URI'] ?? '';
-    $isForcedNavbar = (strpos($currentPath, '/pos') !== false || strpos($currentPath, '/sales') !== false);
+    $isForcedNavbar = (
+        strpos($currentPath, '/admin/pos') !== false ||
+        strpos($currentPath, '/admin/sales') !== false
+    );
 
     if (isset($_GET['layout'])) {
         $layout = $_GET['layout'];
@@ -19,10 +22,19 @@ function get_layout_preference() {
     return $_SESSION['layout_pref'] ?? 'sidebar';
 }
 
+function is_admin_route() {
+    $currentPath = $_SERVER['REQUEST_URI'] ?? '/';
+    return strpos($currentPath, '/admin') === 0;
+}
+
 function view($path, $data = []) {
     extract($data);
     $path = str_replace('.', '/', $path);
     $viewFile = __DIR__ . "/../../views/$path.php";
+
+    if (!file_exists($viewFile)) {
+        $viewFile = __DIR__ . "/../../views/$path/index.php";
+    }
 
     if (!file_exists($viewFile)) {
         die("View file not found: $path");
@@ -37,7 +49,15 @@ function view($path, $data = []) {
     if (isset($data['layout']) && $data['layout'] === false) {
         echo $content;
     } else {
-        require __DIR__ . "/../../views/layouts/main.php";
+        $layoutFile = isset($data['layout']) && is_string($data['layout'])
+            ? __DIR__ . "/../../views/layouts/{$data['layout']}.php"
+            : __DIR__ . "/../../views/layouts/main.php";
+
+        if (!file_exists($layoutFile)) {
+            $layoutFile = __DIR__ . "/../../views/layouts/main.php";
+        }
+
+        require $layoutFile;
     }
 }
 
@@ -103,7 +123,10 @@ function is_menu_active($routePath) {
     if ($routePath === '/' || $routePath === '') {
         return $currentPath === '/' || $currentPath === '';
     }
-    return $currentPath === $routePath || strpos($currentPath, $routePath) === 0;
+    if ($routePath === '/admin') {
+        return $currentPath === '/admin' || $currentPath === '/admin/';
+    }
+    return $currentPath === $routePath || strpos($currentPath, $routePath . '/') === 0 || strpos($currentPath, $routePath) === 0;
 }
 
 function get_menu_active_class($routePath, $activeClass = 'menu-active-box', $defaultClass = 'text-gray-600 hover:bg-gray-100') {

@@ -2,6 +2,7 @@
 $layout_pref = $layout_pref ?? get_layout_preference();
 $manual_pref = $_SESSION['layout_pref'] ?? 'sidebar';
 $lp = '?layout=' . $manual_pref;
+$adminPrefix = '/admin';
 ?>
 <!DOCTYPE html>
 <html lang="lo">
@@ -116,7 +117,6 @@ $lp = '?layout=' . $manual_pref;
 
             <?php if ($layout_pref === 'sidebar'): ?>
 
-            <!-- Mobile overlay -->
             <div x-show="sidebarOpen" @click="sidebarOpen = false"
                  class="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm md:hidden"
                  x-transition:enter="transition ease-out duration-300"
@@ -129,7 +129,7 @@ $lp = '?layout=' . $manual_pref;
             <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
                    class="fixed inset-y-0 left-0 z-50 w-64 bg-white/95 backdrop-blur-xl border-r border-gray-100 transition-all duration-300 ease-out transform md:translate-x-0 md:static md:inset-0 flex-shrink-0 flex flex-col">
                 <div class="flex items-center justify-between h-16 px-4 border-b border-gray-100 flex-shrink-0">
-                    <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-2.5">
+                    <a href="<?= url($adminPrefix . $lp) ?>" class="flex items-center gap-2.5">
                         <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white shadow-lg shadow-sky-200">
                             <i class="fas fa-cash-register text-sm"></i>
                         </div>
@@ -142,41 +142,49 @@ $lp = '?layout=' . $manual_pref;
 
                 <nav class="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
                     <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 pb-2">ເມນູຫຼັກ</div>
-                    <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/') ?>">
+                    <a href="<?= url($adminPrefix . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin') ?>">
                         <span class="w-8 h-8 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-xs"><i class="fas fa-chart-pie"></i></span>
                         <span>ໜ້າຫຼັກ</span>
                     </a>
-                    <a href="<?= url('/pos?layout=navbar') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/pos') ?>">
+                    <a href="<?= url($adminPrefix . '/pos') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/pos') ?>">
                         <span class="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs"><i class="fas fa-cash-register"></i></span>
                         <span>POS ຂາຍສິນຄ້າ</span>
                     </a>
-                    <a href="<?= url('/products' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/products') ?>">
+                    <a href="<?= url($adminPrefix . '/products') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/products') ?>">
                         <span class="w-8 h-8 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-xs"><i class="fas fa-box"></i></span>
                         <span>ສິນຄ້າ</span>
                     </a>
-                    <a href="<?= url('/categories' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/categories') ?>">
+                    <a href="<?= url($adminPrefix . '/categories') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/categories') ?>">
                         <span class="w-8 h-8 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 text-xs"><i class="fas fa-tags"></i></span>
                         <span>ໝວດສິນຄ້າ</span>
                     </a>
-                    <a href="<?= url('/sales' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/sales') ?>">
+                    <a href="<?= url($adminPrefix . '/sales') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/sales') ?>">
                         <span class="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-xs"><i class="fas fa-receipt"></i></span>
                         <span>ປະຫວັດການຂາຍ</span>
                     </a>
-                    <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/customers') ?>">
+                    <a href="<?= url($adminPrefix . '/customers') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/customers') ?>">
                         <span class="w-8 h-8 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-xs"><i class="fas fa-users"></i></span>
                         <span>ລູກຄ້າ</span>
                     </a>
-                    <a href="<?= url('/suppliers' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/suppliers') ?>">
+                    <a href="<?= url($adminPrefix . '/suppliers') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/suppliers') ?>">
                         <span class="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-xs"><i class="fas fa-truck"></i></span>
                         <span>ຜູ້ສະໜອງ</span>
                     </a>
+
+                    <div class="border-t border-gray-100 my-3 mx-3"></div>
+                    <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 pb-2">ຮັບ-ຈ່າຍ</div>
+                    <a href="<?= url($adminPrefix . '/expenses') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/expenses') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-red-100 flex items-center justify-center text-red-600 text-xs"><i class="fas fa-money-bill-wave"></i></span>
+                        <span>ລາຍຈ່າຍ</span>
+                    </a>
+
                     <div class="border-t border-gray-100 my-3 mx-3"></div>
                     <div class="text-[10px] font-black text-gray-400 uppercase tracking-widest px-3 pb-2">ລະບົບ</div>
-                    <a href="<?= url('/users' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/users') ?>">
+                    <a href="<?= url($adminPrefix . '/users') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/users') ?>">
                         <span class="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-xs"><i class="fas fa-users-cog"></i></span>
                         <span>ພະນັກງານ</span>
                     </a>
-                    <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/settings') ?>">
+                    <a href="<?= url($adminPrefix . '/settings') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/settings') ?>">
                         <span class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-xs"><i class="fas fa-cog"></i></span>
                         <span>ຕັ້ງຄ່າ</span>
                     </a>
@@ -195,7 +203,7 @@ $lp = '?layout=' . $manual_pref;
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">ຜູ້ຈັດການ</p>
                         </div>
                     </div>
-                    <a href="<?= url('/logout') ?>" onclick="confirmLogout(event)" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-all text-sm font-bold">
+                    <a href="<?= url($adminPrefix . '/logout') ?>" onclick="confirmLogout(event)" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-xl transition-all text-sm font-bold">
                         <span class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500"><i class="fas fa-sign-out-alt text-xs"></i></span>
                         <span>ອອກຈາກລະບົບ</span>
                     </a>
@@ -207,7 +215,7 @@ $lp = '?layout=' . $manual_pref;
             <header class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40 shadow-sm">
                 <div class="w-full px-3 lg:px-6 flex items-center h-14 lg:h-16 justify-between">
                     <div class="flex items-center gap-2 lg:gap-6 min-w-0 flex-shrink">
-                        <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-2 flex-shrink-0">
+                        <a href="<?= url($adminPrefix . $lp) ?>" class="flex items-center gap-2 flex-shrink-0">
                             <div class="h-8 w-8 lg:h-10 lg:w-10 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs lg:text-sm shadow-lg shadow-sky-200">
                                 <i class="fas fa-cash-register"></i>
                             </div>
@@ -215,31 +223,34 @@ $lp = '?layout=' . $manual_pref;
                         </a>
 
                         <nav class="hidden md:flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
-                            <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                            <a href="<?= url($adminPrefix . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
                                 <span class="w-5 h-5 rounded-md bg-sky-100 flex items-center justify-center text-sky-600 text-[9px]"><i class="fas fa-chart-pie"></i></span>ໜ້າຫຼັກ
                             </a>
-                            <a href="<?= url('/pos?layout=navbar') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/pos') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                            <a href="<?= url($adminPrefix . '/pos') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/pos') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
                                 <span class="w-5 h-5 rounded-md bg-emerald-100 flex items-center justify-center text-emerald-600 text-[9px]"><i class="fas fa-cash-register"></i></span>POS
                             </a>
-                            <a href="<?= url('/products' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/products') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                            <a href="<?= url($adminPrefix . '/products') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/products') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
                                 <span class="w-5 h-5 rounded-md bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-[9px]"><i class="fas fa-box"></i></span>ສິນຄ້າ
                             </a>
-                            <a href="<?= url('/categories' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/categories') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                            <a href="<?= url($adminPrefix . '/categories') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/categories') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
                                 <span class="w-5 h-5 rounded-md bg-purple-100 flex items-center justify-center text-purple-600 text-[9px]"><i class="fas fa-tags"></i></span>ໝວດ
                             </a>
-                            <a href="<?= url('/sales' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/sales') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                            <a href="<?= url($adminPrefix . '/sales') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/sales') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
                                 <span class="w-5 h-5 rounded-md bg-amber-100 flex items-center justify-center text-amber-600 text-[9px]"><i class="fas fa-receipt"></i></span>ປະຫວັດ
                             </a>
-                            <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/customers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                            <a href="<?= url($adminPrefix . '/customers') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/customers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
                                 <span class="w-5 h-5 rounded-md bg-violet-100 flex items-center justify-center text-violet-600 text-[9px]"><i class="fas fa-users"></i></span>ລູກຄ້າ
                             </a>
-                            <a href="<?= url('/suppliers' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/suppliers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                            <a href="<?= url($adminPrefix . '/suppliers') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/suppliers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
                                 <span class="w-5 h-5 rounded-md bg-orange-100 flex items-center justify-center text-orange-600 text-[9px]"><i class="fas fa-truck"></i></span>ຜູ້ສະໜອງ
                             </a>
-                            <a href="<?= url('/users' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/users') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                            <a href="<?= url($adminPrefix . '/expenses') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/expenses') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                                <span class="w-5 h-5 rounded-md bg-red-100 flex items-center justify-center text-red-600 text-[9px]"><i class="fas fa-money-bill-wave"></i></span>ລາຍຈ່າຍ
+                            </a>
+                            <a href="<?= url($adminPrefix . '/users') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/users') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
                                 <span class="w-5 h-5 rounded-md bg-rose-100 flex items-center justify-center text-rose-600 text-[9px]"><i class="fas fa-users-cog"></i></span>ພະນັກງານ
                             </a>
-                            <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/settings') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                            <a href="<?= url($adminPrefix . '/settings') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/settings') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
                                 <span class="w-5 h-5 rounded-md bg-gray-100 flex items-center justify-center text-gray-600 text-[9px]"><i class="fas fa-cog"></i></span>ຕັ້ງຄ່າ
                             </a>
                         </nav>
@@ -259,7 +270,7 @@ $lp = '?layout=' . $manual_pref;
                             <i class="fas fa-expand text-xs"></i>
                         </button>
 
-                        <div x-data="{ open: false }">
+                        <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open" class="flex items-center gap-2 h-8 lg:h-9 px-2 lg:px-3 rounded-xl bg-gray-100/80 hover:bg-primary/10 transition-all group">
                                 <div class="h-6 w-6 lg:h-7 lg:w-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
                                     <i class="fas fa-user text-[10px] lg:text-xs"></i>
@@ -276,7 +287,7 @@ $lp = '?layout=' . $manual_pref;
                                     <p class="text-sm font-black text-gray-800 truncate"><?= $_SESSION['user']['username'] ?? 'Admin' ?></p>
                                     <p class="text-[10px] font-bold text-primary uppercase tracking-wider mt-0.5">ຜູ້ຈັດການ</p>
                                 </div>
-                                <a href="<?= url('/logout') ?>" onclick="confirmLogout(event)" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-lg text-xs font-black transition-all">
+                                <a href="<?= url($adminPrefix . '/logout') ?>" onclick="confirmLogout(event)" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-lg text-xs font-black transition-all">
                                     <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
                                         <i class="fas fa-sign-out-alt"></i>
                                     </div>
@@ -292,32 +303,35 @@ $lp = '?layout=' . $manual_pref;
                 </div>
 
                 <div x-show="sidebarOpen" class="md:hidden border-t border-gray-50 bg-white/95 backdrop-blur-md p-3 space-y-1 shadow-lg" @click.away="sidebarOpen = false">
-                    <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                    <a href="<?= url($adminPrefix . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
                         <span class="w-9 h-9 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-sm"><i class="fas fa-chart-pie"></i></span> ໜ້າຫຼັກ
                     </a>
-                    <a href="<?= url('/pos?layout=navbar') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/pos') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                    <a href="<?= url($adminPrefix . '/pos') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/pos') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
                         <span class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-sm"><i class="fas fa-cash-register"></i></span> POS ຂາຍສິນຄ້າ
                     </a>
-                    <a href="<?= url('/products' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/products') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                    <a href="<?= url($adminPrefix . '/products') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/products') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
                         <span class="w-9 h-9 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-sm"><i class="fas fa-box"></i></span> ສິນຄ້າ
                     </a>
-                    <a href="<?= url('/categories' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/categories') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                    <a href="<?= url($adminPrefix . '/categories') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/categories') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
                         <span class="w-9 h-9 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 text-sm"><i class="fas fa-tags"></i></span> ໝວດສິນຄ້າ
                     </a>
-                    <a href="<?= url('/sales' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/sales') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                    <a href="<?= url($adminPrefix . '/sales') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/sales') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
                         <span class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-sm"><i class="fas fa-receipt"></i></span> ປະຫວັດການຂາຍ
                     </a>
-                    <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/customers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                    <a href="<?= url($adminPrefix . '/customers') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/customers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
                         <span class="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-sm"><i class="fas fa-users"></i></span> ລູກຄ້າ
                     </a>
-                    <a href="<?= url('/suppliers' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/suppliers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                    <a href="<?= url($adminPrefix . '/suppliers') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/suppliers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
                         <span class="w-9 h-9 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-sm"><i class="fas fa-truck"></i></span> ຜູ້ສະໜອງ
                     </a>
+                    <a href="<?= url($adminPrefix . '/expenses') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/expenses') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                        <span class="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center text-red-600 text-sm"><i class="fas fa-money-bill-wave"></i></span> ລາຍຈ່າຍ
+                    </a>
                     <div class="border-t my-2"></div>
-                    <a href="<?= url('/users' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/users') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                    <a href="<?= url($adminPrefix . '/users') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/users') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
                         <span class="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-sm"><i class="fas fa-users-cog"></i></span> ພະນັກງານ
                     </a>
-                    <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/settings') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                    <a href="<?= url($adminPrefix . '/settings') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/settings') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
                         <span class="w-9 h-9 rounded-xl bg-gray-100 flex items-center justify-center text-gray-600 text-sm"><i class="fas fa-cog"></i></span> ຕັ້ງຄ່າ
                     </a>
                 </div>
@@ -360,7 +374,7 @@ $lp = '?layout=' . $manual_pref;
                                 <p class="text-sm font-black text-gray-800"><?= $_SESSION['user']['username'] ?? 'Admin' ?></p>
                                 <p class="text-[10px] font-bold text-primary uppercase tracking-wider mt-0.5">ຜູ້ຈັດການ</p>
                             </div>
-                            <a href="<?= url('/logout') ?>" onclick="confirmLogout(event)" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-xl text-xs font-bold transition-all">
+                            <a href="<?= url($adminPrefix . '/logout') ?>" onclick="confirmLogout(event)" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-xl text-xs font-bold transition-all">
                                 <div class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500"><i class="fas fa-sign-out-alt"></i></div>
                                 <span>ອອກຈາກລະບົບ</span>
                             </a>

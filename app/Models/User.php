@@ -35,8 +35,8 @@ class User
             $data['username'],
             $password,
             $data['full_name'] ?? '',
-            $data['role'] ?? 'cashier',
-            $data['status'] ?? 'active',
+            $data['role'] ?? 'staff',
+            $data['status'] ?? 'Active',
         ]);
 
         return $this->db()->lastInsertId();
