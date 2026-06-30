@@ -13,9 +13,8 @@ class Sale
 
     public function getAll($where = '', $params = [], $limit = 0, $offset = 0)
     {
-        $sql = "SELECT s.*, c.fullname as customer_name, c.phone as customer_phone
-                FROM sales s
-                LEFT JOIN customers c ON c.id = s.customer_id";
+        $sql = "SELECT s.*
+                FROM sales s";
 
         if (!empty($where)) {
             $sql .= " WHERE $where";
@@ -38,18 +37,17 @@ class Sale
 
     public function getById($id)
     {
-        $stmt = $this->db()->prepare("SELECT s.*, c.fullname as customer_name, c.phone as customer_phone
-                                      FROM sales s
-                                      LEFT JOIN customers c ON c.id = s.customer_id
-                                      WHERE s.id = ?");
+        $stmt = $this->db()->prepare("SELECT s.*
+                                       FROM sales s
+                                       WHERE s.id = ?");
         $stmt->execute([$id]);
         $sale = $stmt->fetch();
 
         if ($sale) {
-            $stmtItems = $this->db()->prepare("SELECT si.*, p.name as product_name, p.sku
-                                               FROM sale_items si
-                                               LEFT JOIN products p ON p.id = si.product_id
-                                               WHERE si.sale_id = ?");
+            $stmtItems = $this->db()->prepare("SELECT si.*, si.unit_price AS price, p.name AS product_name, p.sku
+                                                FROM sale_items si
+                                                LEFT JOIN products p ON p.id = si.product_id
+                                                WHERE si.sale_id = ?");
             $stmtItems->execute([$id]);
             $sale['items'] = $stmtItems->fetchAll();
         }
@@ -60,8 +58,8 @@ class Sale
     public function getTodayTotal()
     {
         $stmt = $this->db()->prepare("SELECT COALESCE(SUM(grand_total), 0) as total
-                                      FROM sales
-                                      WHERE DATE(created_at) = CURDATE()");
+                                       FROM sales
+                                       WHERE DATE(created_at) = CURDATE()");
         $stmt->execute();
         return (float)$stmt->fetch()['total'];
     }
@@ -76,19 +74,18 @@ class Sale
         }
 
         $stmt = $this->db()->prepare("SELECT COALESCE(SUM(grand_total), 0) as total
-                                      FROM sales
-                                      WHERE DATE(created_at) BETWEEN ? AND ?");
+                                       FROM sales
+                                       WHERE DATE(created_at) BETWEEN ? AND ?");
         $stmt->execute([$fromDate, $toDate]);
         return (float)$stmt->fetch()['total'];
     }
 
     public function getRecent($limit = 10)
     {
-        $stmt = $this->db()->prepare("SELECT s.*, c.fullname as customer_name
-                                      FROM sales s
-                                      LEFT JOIN customers c ON c.id = s.customer_id
-                                      ORDER BY s.id DESC
-                                      LIMIT ?");
+        $stmt = $this->db()->prepare("SELECT s.*
+                                       FROM sales s
+                                       ORDER BY s.id DESC
+                                       LIMIT ?");
         $stmt->execute([(int)$limit]);
         return $stmt->fetchAll();
     }
@@ -96,22 +93,22 @@ class Sale
     public function getPopularProducts($limit = 10)
     {
         $stmt = $this->db()->prepare("SELECT p.id, p.name, p.sku, SUM(si.quantity) as total_qty, SUM(si.subtotal) as total_revenue
-                                      FROM sale_items si
-                                      JOIN products p ON p.id = si.product_id
-                                      GROUP BY p.id, p.name, p.sku
-                                      ORDER BY total_qty DESC
-                                      LIMIT ?");
+                                       FROM sale_items si
+                                       JOIN products p ON p.id = si.product_id
+                                       GROUP BY p.id, p.name, p.sku
+                                       ORDER BY total_qty DESC
+                                       LIMIT ?");
         $stmt->execute([(int)$limit]);
         return $stmt->fetchAll();
     }
 
     public function getSalesByDay($fromDate, $toDate)
     {
-        $stmt = $this->db()->prepare("SELECT DATE(created_at) as date, COUNT(*) as total_orders, SUM(grand_total) as total_revenue
-                                      FROM sales
-                                      WHERE DATE(created_at) BETWEEN ? AND ?
-                                      GROUP BY DATE(created_at)
-                                      ORDER BY date ASC");
+        $stmt = $this->db()->prepare("SELECT DATE(created_at) as day, COUNT(*) as total_orders, SUM(grand_total) as total
+                                       FROM sales
+                                       WHERE DATE(created_at) BETWEEN ? AND ?
+                                       GROUP BY DATE(created_at)
+                                       ORDER BY day ASC");
         $stmt->execute([$fromDate, $toDate]);
         return $stmt->fetchAll();
     }
@@ -123,35 +120,53 @@ class Sale
         try {
             $invoiceNo = $this->generateInvoiceNumber();
 
-            $stmt = $this->db()->prepare("INSERT INTO sales (invoice_no, customer_id, subtotal, tax, discount, grand_total, payment_method, paid_amount, change_amount, status, notes, created_at, updated_at)
-                                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+            if (empty($data['customer_name']) && !empty($data['customer_id'])) {
+                $stmt = $this->db()->prepare("SELECT fullname, phone, address FROM customers WHERE id = ?");
+                $stmt->execute([$data['customer_id']]);
+                $cust = $stmt->fetch();
+                if ($cust) {
+                    $data['customer_name'] = $cust['fullname'];
+                    $data['customer_phone'] = $cust['phone'] ?? '';
+                    $data['customer_address'] = $cust['address'] ?? '';
+                }
+            }
+
+            $stmt = $this->db()->prepare("INSERT INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at, updated_at)
+                                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
             $stmt->execute([
                 $invoiceNo,
                 $data['customer_id'] ?? null,
+                $data['customer_name'] ?? '',
+                $data['customer_phone'] ?? '',
+                $data['customer_address'] ?? '',
                 $data['subtotal'] ?? 0,
-                $data['tax'] ?? 0,
                 $data['discount'] ?? 0,
+                $data['discount_type'] ?? 'percentage',
+                $data['tax_percent'] ?? 0,
+                $data['tax_amount'] ?? 0,
                 $data['grand_total'] ?? 0,
                 $data['payment_method'] ?? 'cash',
-                $data['paid_amount'] ?? 0,
+                $data['amount_paid'] ?? 0,
                 $data['change_amount'] ?? 0,
-                $data['status'] ?? 'completed',
                 $data['notes'] ?? '',
+                $data['status'] ?? 'completed',
+                $data['created_by'] ?? ($_SESSION['user']['id'] ?? null),
             ]);
 
             $saleId = $this->db()->lastInsertId();
 
-            $stmtItem = $this->db()->prepare("INSERT INTO sale_items (sale_id, product_id, quantity, price, subtotal)
-                                              VALUES (?, ?, ?, ?, ?)");
+            $stmtItem = $this->db()->prepare("INSERT INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal)
+                                               VALUES (?, ?, ?, ?, ?, ?)");
             $stmtStock = $this->db()->prepare("UPDATE products SET stock = stock - ? WHERE id = ?");
 
             foreach ($items as $item) {
                 $stmtItem->execute([
                     $saleId,
                     $item['product_id'],
+                    $item['product_name'] ?? '',
                     $item['quantity'],
-                    $item['price'],
-                    $item['subtotal'] ?? ($item['quantity'] * $item['price']),
+                    $item['unit_price'] ?? ($item['price'] ?? 0),
+                    $item['subtotal'] ?? ($item['quantity'] * ($item['unit_price'] ?? $item['price'])),
                 ]);
 
                 $stmtStock->execute([$item['quantity'], $item['product_id']]);
@@ -168,7 +183,7 @@ class Sale
     public function generateInvoiceNumber()
     {
         $prefix = 'INV-' . date('Ymd') . '-';
-        $stmt = $this->db()->prepare("SELECT COUNT(*) as cnt FROM sales WHERE invoice_no LIKE ? AND DATE(created_at) = CURDATE()");
+        $stmt = $this->db()->prepare("SELECT COUNT(*) as cnt FROM sales WHERE invoice_number LIKE ? AND DATE(created_at) = CURDATE()");
         $stmt->execute([$prefix . '%']);
         $count = (int)$stmt->fetch()['cnt'];
         $seq = str_pad($count + 1, 4, '0', STR_PAD_LEFT);
@@ -186,7 +201,7 @@ class Sale
         $params = [];
 
         if (!empty($search)) {
-            $where = '(s.invoice_no LIKE ? OR c.fullname LIKE ?)';
+            $where = '(s.invoice_number LIKE ? OR s.customer_name LIKE ?)';
             $q = "%{$search}%";
             $params = [$q, $q];
         }
@@ -207,7 +222,7 @@ class Sale
         $params = [];
 
         if (!empty($search)) {
-            $where = '(s.invoice_no LIKE ? OR c.fullname LIKE ?)';
+            $where = '(s.invoice_number LIKE ? OR s.customer_name LIKE ?)';
             $q = "%{$search}%";
             $params = [$q, $q];
         }
@@ -219,8 +234,7 @@ class Sale
         }
 
         $sql = "SELECT COUNT(*) as total
-                FROM sales s
-                LEFT JOIN customers c ON c.id = s.customer_id";
+                FROM sales s";
 
         if (!empty($where)) {
             $sql .= " WHERE $where";
@@ -233,10 +247,10 @@ class Sale
 
     public function getItems($id)
     {
-        $stmt = $this->db()->prepare("SELECT si.*, p.name as product_name, p.sku
-                                      FROM sale_items si
-                                      LEFT JOIN products p ON p.id = si.product_id
-                                      WHERE si.sale_id = ?");
+        $stmt = $this->db()->prepare("SELECT si.*, si.unit_price AS price, p.name as product_name, p.sku
+                                       FROM sale_items si
+                                       LEFT JOIN products p ON p.id = si.product_id
+                                       WHERE si.sale_id = ?");
         $stmt->execute([$id]);
         return $stmt->fetchAll();
     }

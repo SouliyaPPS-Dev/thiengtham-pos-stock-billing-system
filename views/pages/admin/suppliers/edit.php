@@ -1,0 +1,72 @@
+<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-sky-50/30 p-4 md:p-8">
+    <div class="max-w-2xl mx-auto space-y-6 animate-fade-in">
+
+        <div class="flex items-center gap-4">
+            <a href="<?= url('/admin/suppliers') ?>" class="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">ແກ້ໄຂຜູ້ສະໜອງ</h1>
+                <p class="text-sm text-gray-500 mt-0.5">ແກ້ໄຂຂໍ້ມູນຜູ້ສະໜອງ</p>
+            </div>
+        </div>
+
+        <form action="<?= url('/admin/suppliers/' . $supplier['id'] . '/update') ?>" method="POST" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8 space-y-5">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="space-y-1.5">
+                    <label class="text-sm font-bold text-gray-700">ຊື່ຜູ້ສະໜອງ <span class="text-red-400">*</span></label>
+                    <input type="text" name="name" required value="<?= htmlspecialchars($supplier['name']) ?>"
+                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                           placeholder="ຊື່ຜູ້ສະໜອງ">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-sm font-bold text-gray-700">ຜູ້ຕິດຕໍ່</label>
+                    <input type="text" name="contact_person" value="<?= htmlspecialchars($supplier['contact_person'] ?? '') ?>"
+                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                           placeholder="ຊື່ຜູ້ຕິດຕໍ່">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-sm font-bold text-gray-700">ເບີໂທ <span class="text-red-400">*</span></label>
+                    <input type="text" name="phone" required value="<?= htmlspecialchars($supplier['phone'] ?? '') ?>"
+                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                           placeholder="ເບີໂທລະສັບ">
+                </div>
+                <div class="space-y-1.5">
+                    <label class="text-sm font-bold text-gray-700">ອີເມວ</label>
+                    <input type="email" name="email" value="<?= htmlspecialchars($supplier['email'] ?? '') ?>"
+                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                           placeholder="ອີເມວ">
+                </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-sm font-bold text-gray-700">ທີ່ຢູ່</label>
+                <textarea name="address" rows="3" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none" placeholder="ທີ່ຢູ່"><?= htmlspecialchars($supplier['address'] ?? '') ?></textarea>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-sm font-bold text-gray-700">ຫມາຍເຫດ</label>
+                <textarea name="notes" rows="2" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none" placeholder="ຫມາຍເຫດ"><?= htmlspecialchars($supplier['notes'] ?? '') ?></textarea>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-sm font-bold text-gray-700">ສະຖານະ</label>
+                <select name="status" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                    <option value="active" <?= ($supplier['status'] ?? 'active') === 'active' ? 'selected' : '' ?>>ເປີດໃຊ້</option>
+                    <option value="inactive" <?= ($supplier['status'] ?? '') === 'inactive' ? 'selected' : '' ?>>ປິດໃຊ້</option>
+                </select>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2">
+                <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
+                    <i class="fas fa-save"></i>
+                    ບັນທຶກການແກ້ໄຂ
+                </button>
+                <a href="<?= url('/admin/suppliers') ?>" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">
+                    <i class="fas fa-times"></i>
+                    ຍົກເລີກ
+                </a>
+            </div>
+        </form>
+    </div>
+</div>

@@ -125,4 +125,18 @@ class Customer
         $stmt->execute([$q, $q]);
         return (int)$stmt->fetch()['total'];
     }
+
+    public function findByEmail($email)
+    {
+        $stmt = $this->db()->prepare("SELECT * FROM customers WHERE email = ? LIMIT 1");
+        $stmt->execute([$email]);
+        return $stmt->fetch();
+    }
+
+    public function findByPhone($phone)
+    {
+        $stmt = $this->db()->prepare("SELECT * FROM customers WHERE phone = ? LIMIT 1");
+        $stmt->execute([$phone]);
+        return $stmt->fetch();
+    }
 }

@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Controllers\Admin;
+
+use App\Models\Sale;
+
+class SaleController extends \App\Controllers\BaseController
+{
+    public function index()
+    {
+        $saleModel = new Sale();
+
+        $search = $_GET['search'] ?? '';
+        $fromDate = $_GET['from_date'] ?? '';
+        $toDate = $_GET['to_date'] ?? '';
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = 20;
+
+        $sales = $saleModel->paginate($page, $perPage, $search, $fromDate, $toDate);
+        $total = $saleModel->countAll($search, $fromDate, $toDate);
+        $totalPages = max(1, ceil($total / $perPage));
+
+        return view('pages.admin.sales.index', [
+            'title' => 'ປະຫວັດການຂາຍ',
+            'sales' => $sales,
+            'search' => $search,
+            'fromDate' => $fromDate,
+            'toDate' => $toDate,
+            'page' => $page,
+            'totalPages' => $totalPages,
+            'total' => $total,
+        ]);
+    }
+
+    public function show($id)
+    {
+        $sale = (new Sale())->find($id);
+
+        if (!$sale) {
+            $this->redirect('/admin/sales', [
+                'error' => 1,
+                'error_msg' => 'ບໍ່ພົບບິນ',
+            ]);
+        }
+
+        return view('pages.admin.sales.show', [
+            'title' => 'ໃບເກັບເງິນ #' . htmlspecialchars($sale['invoice_number'] ?? $sale['id']),
+            'sale' => $sale,
+        ]);
+    }
+}

@@ -1,0 +1,92 @@
+<?php
+
+namespace App\Controllers\Admin;
+
+use App\Models\Settings;
+use App\Helpers\ImageKit;
+
+class SettingsController extends \App\Controllers\BaseController
+{
+    public function index()
+    {
+        $settings = (new Settings())->getAll();
+
+        return view('pages.admin.settings.index', [
+            'title' => 'ຕັ້ງຄ່າລະບົບ',
+            'settings' => $settings,
+        ]);
+    }
+
+    public function update()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/settings');
+        }
+
+        $settingsModel = new Settings();
+
+        $keys = [
+            'store_name', 'store_phone', 'store_address', 'store_email',
+            'currency', 'tax_percent', 'paper_size', 'receipt_footer',
+        ];
+
+        foreach ($keys as $key) {
+            if (isset($_POST[$key])) {
+                $settingsModel->set($key, $_POST[$key]);
+            }
+        }
+
+        if (!empty($_FILES['store_logo']['name'])) {
+            $logoUrl = ImageKit::upload('store_logo', '/pos-stock');
+            if ($logoUrl) {
+                $settingsModel->set('store_logo', $logoUrl);
+            }
+        }
+
+        $this->redirect('/admin/settings', ['updated' => 1]);
+    }
+
+    public function changePassword()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/settings');
+        }
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+
+        if (empty($currentPassword) || empty($newPassword) || empty($confirmPassword)) {
+            $this->redirect('/admin/settings', [
+                'error' => 1,
+                'error_msg' => 'ກະລຸນາປ້ອນຂໍ້ມູນໃຫ້ຄົບຖ້ວນ',
+            ]);
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            $this->redirect('/admin/settings', [
+                'error' => 1,
+                'error_msg' => 'ລະຫັດຜ່ານໃໝ່ບໍ່ກົງກັນ',
+            ]);
+        }
+
+        $userId = $_SESSION['user']['id'] ?? 0;
+        $db = \App\Core\Database::getInstance()->getConnection();
+        $stmt = $db->prepare("SELECT password FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch();
+
+        if (!$user || !password_verify($currentPassword, $user['password'])) {
+            $this->redirect('/admin/settings', [
+                'error' => 1,
+                'error_msg' => 'ລະຫັດຜ່ານປັດຈຸບັນບໍ່ຖືກຕ້ອງ',
+            ]);
+        }
+
+        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmtUpdate = $db->prepare("UPDATE users SET password = ?, updated_at = NOW() WHERE id = ?");
+        $stmtUpdate->execute([$newHash, $userId]);
+
+        $this->redirect('/admin/settings', ['success' => 1]);
+    }
+}
