@@ -4,9 +4,14 @@
             <a href="<?= url('/customers') ?>" class="p-2 text-gray-500 hover:bg-gray-100 rounded-lg">
                 <i class="fas fa-arrow-left"></i>
             </a>
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800"><?= htmlspecialchars($customer['fullname'] ?? '') ?></h1>
-                <p class="text-sm text-gray-500"><?= htmlspecialchars($customer['phone'] ?? '') ?></p>
+            <div class="flex items-center gap-4">
+                <?php if (!empty($customer['avatar'])): ?>
+                <img src="<?= htmlspecialchars($customer['avatar']) ?>" alt="" class="w-14 h-14 rounded-full object-cover border">
+                <?php endif; ?>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800"><?= htmlspecialchars($customer['fullname'] ?? '') ?></h1>
+                    <p class="text-sm text-gray-500"><?= htmlspecialchars($customer['phone'] ?? '') ?></p>
+                </div>
             </div>
         </div>
         <div class="flex items-center gap-2">

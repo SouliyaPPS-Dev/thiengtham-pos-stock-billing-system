@@ -1,11 +1,12 @@
-# PWA files — serve directly from /public/
-RewriteRule ^(manifest\.json|sw\.js|offline\.html|robots\.txt|sitemap\.xml)$ public/$1 [L]
- 
 <IfModule mod_rewrite.c> 
     RewriteEngine On
 
     # PWA files — serve directly from /public/ (explicit paths for LiteSpeed compat)
-    RewriteRule ^(manifest\.json|sw\.js|offline\.html)$ public/$1 [L]
+    RewriteRule ^(manifest\.json|offline\.html|robots\.txt|sitemap\.xml)$ public/$1 [L]
+
+    # Serve everything under /public/ as static files (bypass PHP routing)
+    # This prevents PHP from intercepting manifest.json, SW, or other assets on HF Spaces
+    RewriteRule ^public/ - [L]
 
     # Allow direct access to existing files
     RewriteCond %{REQUEST_FILENAME} -f
@@ -18,11 +19,28 @@ RewriteRule ^(manifest\.json|sw\.js|offline\.html|robots\.txt|sitemap\.xml)$ pub
     # Route everything else through public/index.php
     RewriteRule ^(.*)$ public/index.php [L,QSA]
 </IfModule>
+
+# MIME types (LiteSpeed compat)
+<IfModule mod_mime.c>
+    AddType application/json .json
+    AddType image/png .png
+    AddType image/jpeg .jpg .jpeg
+    AddType image/svg+xml .svg
+    AddType text/javascript .js
+    AddType text/css .css
+</IfModule>
  
 # No cache for service worker
 <FilesMatch "sw\.js$">
     <IfModule mod_headers.c>
         Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </IfModule>
+</FilesMatch>
+
+# Cache static assets with versioning (1 year, immutable)
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff2?|ttf|eot)$">
+    <IfModule mod_headers.c>
+        Header set Cache-Control "public, max-age=31536000, immutable"
     </IfModule>
 </FilesMatch>
 

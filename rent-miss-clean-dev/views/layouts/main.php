@@ -14,7 +14,7 @@ $lp = '?layout=' . $manual_pref;
     <link rel="icon" type="image/jpeg" href="<?= url('/public/logo.jpg') ?>">
      
     <!-- PWA Manifest & Meta Tags -->
-    <link rel="manifest" href="<?= url('/public/manifest.json') ?>" crossorigin="use-credentials">
+    <link rel="manifest" href="<?= url('/public/manifest.json') ?>">
     <meta name="theme-color" content="#0ea5e9">
     
     <!-- iOS / Safari PWA Support -->
@@ -33,7 +33,7 @@ $lp = '?layout=' . $manual_pref;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Tailwind CSS (Compiled) -->
-    <link rel="stylesheet" href="<?= url('/public/css/app.css') ?>">
+    <link rel="stylesheet" href="<?= url('/public/css/app.css') ?>?v=<?= filemtime(__DIR__ . '/../../public/css/app.css') ?>">
     
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -150,44 +150,43 @@ $lp = '?layout=' . $manual_pref;
                 <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r transition-transform duration-300 transform md:translate-x-0 md:static md:inset-0 flex-shrink-0">
                     <div class="flex flex-col h-full">
                         <div class="flex items-center justify-center h-20 border-b flex-shrink-0"> 
-                            <a href="<?= url('/' . $lp) ?>" class="flex items-center space-x-2">
-                                <img src="<?= url('/public/logo.jpg') ?>" alt="Logo" class="h-10 w-10 object-cover rounded-full border">
-                                <span class="font-bold text-lg text-primary"><?= get_store_name() ?></span>
+                            <a href="<?= url('/' . $lp) ?>">
+                                <img src="<?= url('/public/logo.jpg') ?>" alt="Logo" class="h-12 w-12 rounded-full border-2 border-primary/20 shadow-sm">
                             </a>
                         </div>
 
-                        <nav class="flex-grow px-3 py-2 space-y-0.5 overflow-y-auto">
-                            <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/') ?>">
-                                <span class="w-8 h-8 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-xs"><i class="fas fa-home"></i></span>
+                        <nav class="flex-grow px-3 py-2 space-y-3 overflow-y-auto">
+                            <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-colors text-lg font-bold <?= get_menu_active_class('/') ?>">
+                                <span class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-sm"><i class="fas fa-home"></i></span>
                                 <span>ສະຫຼຸບລາຍຮັບ-ລາຍຈ່າຍ</span>
                             </a>
-                            <a href="<?= url('/pos?layout=navbar') ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/pos') ?>">
-                                <span class="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs"><i class="fas fa-cash-register"></i></span>
+                            <a href="<?= url('/pos' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-colors text-lg font-bold <?= get_menu_active_class('/pos') ?>">
+                                <span class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-sm"><i class="fas fa-cash-register"></i></span>
                                 <span>POS ລະບົບຂາຍ</span> 
                             </a>
-                            <a href="<?= url('/rentals?layout=navbar') ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/rentals') ?>">
-                                <span class="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-xs"><i class="fas fa-receipt"></i></span>
+                            <a href="<?= url('/rentals' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-colors text-lg font-bold <?= get_menu_active_class('/rentals') ?>">
+                                <span class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-sm"><i class="fas fa-receipt"></i></span>
                                 <span>ປະຫວັດບິນເຊົ່າ</span>
-                                <span class="ml-auto <?= get_active_rentals_count() > 0 ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-500' ?> text-[10px] font-black px-2 py-0.5 rounded-full"><?= get_active_rentals_count() ?></span>
+                                <span class="ml-auto <?= get_active_rentals_count() > 0 ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-500' ?> text-xs font-black px-2 py-0.5 rounded-full"><?= get_active_rentals_count() ?></span>
                             </a>
-                            <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/customers') ?>">
-                                <span class="w-8 h-8 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-xs"><i class="fas fa-users"></i></span>
+                            <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-colors text-lg font-bold <?= get_menu_active_class('/customers') ?>">
+                                <span class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-sm"><i class="fas fa-users"></i></span>
                                 <span>ລູກຄ້າ</span>
                             </a>
-                            <a href="<?= url('/inventory' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/inventory') ?>">
-                                <span class="w-8 h-8 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-xs"><i class="fas fa-tshirt"></i></span>
+                            <a href="<?= url('/inventory' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-colors text-lg font-bold <?= get_menu_active_class('/inventory') ?>">
+                                <span class="w-10 h-10 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-sm"><i class="fas fa-tshirt"></i></span>
                                 <span>ສາງຊຸດໄໝ</span>
                             </a>
-                            <a href="<?= url('/expenses' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/expenses') ?>">
-                                <span class="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-xs"><i class="fas fa-file-invoice-dollar"></i></span>
+                            <a href="<?= url('/expenses' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-colors text-lg font-bold <?= get_menu_active_class('/expenses') ?>">
+                                <span class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-sm"><i class="fas fa-file-invoice-dollar"></i></span>
                                 <span>ບັນທຶກລາຍຈ່າຍ</span>
                             </a>
-                            <a href="<?= url('/staff' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/staff') ?>">
-                                <span class="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-xs"><i class="fas fa-users-cog"></i></span>
+                            <a href="<?= url('/staff' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-colors text-lg font-bold <?= get_menu_active_class('/staff') ?>">
+                                <span class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-sm"><i class="fas fa-users-cog"></i></span>
                                 <span>ຈັດການພະນັກງານ</span>
                             </a>
-                            <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2 rounded-xl transition-colors text-sm font-bold <?= get_menu_active_class('/settings') ?>">
-                                <span class="w-8 h-8 rounded-xl flex items-center justify-center <?= is_menu_active('/settings') ? 'text-white' : 'text-gray-600' ?> text-xs"><i class="fas fa-cog"></i></span>
+                            <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-colors text-lg font-bold <?= get_menu_active_class('/settings') ?>">
+                                <span class="w-10 h-10 rounded-xl flex items-center justify-center <?= is_menu_active('/settings') ? 'text-white' : 'text-gray-600' ?> text-sm"><i class="fas fa-cog"></i></span>
                                 <span>ຕັ້ງຄ່າລະບົບ</span>
                             </a>
                         </nav>
@@ -195,35 +194,39 @@ $lp = '?layout=' . $manual_pref;
                         <div class="p-4 border-t space-y-4 flex-shrink-0">
                             <!-- Layout Switcher (Sidebar) -->
                             <div class="px-4">
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Layout Mode</p>
+                                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Layout Mode</p>
                                 <div class="grid grid-cols-2 gap-2">
-                                    <a href="?layout=sidebar" class="flex flex-col items-center justify-center p-2 rounded-lg border text-[10px] font-bold <?= $layout_pref === 'sidebar' ? 'border-primary text-primary bg-sky-50' : 'text-gray-400 bg-gray-50' ?>">
+                                    <a href="?layout=sidebar" class="flex flex-col items-center justify-center p-2 rounded-lg border text-xs font-bold <?= $layout_pref === 'sidebar' ? 'border-primary text-primary bg-sky-50' : 'text-gray-400 bg-gray-50' ?>">
                                         <i class="fas fa-columns mb-1"></i>
                                         Sidebar
                                     </a>
-                                    <a href="?layout=navbar" class="flex flex-col items-center justify-center p-2 rounded-lg border text-[10px] font-bold <?= $layout_pref === 'navbar' ? 'border-primary text-primary bg-sky-50' : 'text-gray-400 bg-gray-50' ?>">
+                                    <a href="?layout=navbar" class="flex flex-col items-center justify-center p-2 rounded-lg border text-xs font-bold <?= $layout_pref === 'navbar' ? 'border-primary text-primary bg-sky-50' : 'text-gray-400 bg-gray-50' ?>">
                                         <i class="fas fa-window-maximize mb-1"></i>
                                         Navbar
                                     </a> 
                                 </div>
-                                <!-- <div class="px-4 mt-2"> 
-                                    <button onclick="installPWA()" class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-primary/30 text-xs font-bold text-white bg-primary hover:bg-primary/90 transition-all shadow-sm">
-                                    <i class="fas fa-download"></i>
-                                        ຕິດຕັ້ງແອັບ
-                                </button>
-                                </div> -->
                             </div> 
-  
+
+                            <div class="flex items-center gap-2 px-4">
+                                <button onclick="installPWA()" class="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-primary text-white rounded-lg text-xs font-black hover:bg-primary/90 transition-all shadow-sm">
+                                    <i class="fas fa-download"></i>
+                                    ຕິດຕັ້ງແອັບ
+                                </button>
+                                <button onclick="toggleFullscreen()" class="flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-500 hover:bg-sky-500 hover:text-white rounded-lg text-xs font-black transition-all">
+                                    <i class="fas fa-expand"></i>
+                                </button>
+                            </div>
+   
                             <div class="flex items-center space-x-3 px-4">
-                                <div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white">
-                                    <i class="fas fa-user text-xs"></i>
+                                <div class="h-10 w-10 rounded-full bg-primary flex items-center justify-center text-white">
+                                    <i class="fas fa-user text-sm"></i>
                                 </div>
-                                <div class="flex-grow overflow-hidden text-sm">
-                                    <p class="font-medium truncate"><?= $_SESSION['user']['username'] ?? 'Admin' ?></p>
-                                    <p class="text-xs text-gray-500">ຜູ້ຈັດການ</p>
+                                <div class="flex-grow overflow-hidden">
+                                    <p class="font-bold text-base truncate"><?= $_SESSION['user']['username'] ?? 'Admin' ?></p>
+                                    <p class="text-sm text-gray-500">ຜູ້ຈັດການ</p>
                                 </div>
                             </div>
-                            <a href="<?= url('/logout') ?>" onclick="confirmLogout(event)" class="flex items-center px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition-colors">
+                            <a href="<?= url('/logout') ?>" onclick="confirmLogout(event)" class="flex items-center px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition-colors text-sm font-bold">
                                 <i class="fas fa-sign-out-alt w-6"></i>
                                 <span>ອອກຈາກລະບົບ</span>
                             </a>
@@ -238,36 +241,35 @@ $lp = '?layout=' . $manual_pref;
                     <div class="w-full px-3 lg:px-6 flex items-center h-14 lg:h-16 justify-between">
                         <!-- Left: Logo + Desktop Nav -->
                         <div class="flex items-center gap-2 lg:gap-6 min-w-0 flex-shrink">
-                            <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-2 flex-shrink-0">
-                                <img src="<?= url('/public/logo.jpg') ?>" alt="Logo" class="h-8 w-8 lg:h-10 lg:w-10 object-cover rounded-full border-2 border-primary/20">
-                                <span class="font-black text-sm lg:text-base text-primary hidden sm:inline tracking-tight"><?= get_store_name() ?></span>
+                            <a href="<?= url('/' . $lp) ?>" class="flex items-center flex-shrink-0">
+                                <img src="<?= url('/public/logo.jpg') ?>" alt="Logo" class="h-9 w-9 lg:h-11 lg:w-11 rounded-full border-2 border-primary/20 shadow-sm">
                             </a>
                             
                             <nav class="hidden md:flex items-center gap-0.5 overflow-x-auto scrollbar-hide">
-                                <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
-                                    <span class="w-5 h-5 rounded-md bg-sky-100 flex items-center justify-center text-sky-600 text-[9px]"><i class="fas fa-home"></i></span>ສະຫຼຸບລາຍຮັບ-ລາຍຈ່າຍ
+                                <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap <?= is_menu_active('/') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                                    <span class="w-6 h-6 rounded-md bg-sky-100 flex items-center justify-center text-sky-600 text-[10px]"><i class="fas fa-home"></i></span>ສະຫຼຸບລາຍຮັບ-ລາຍຈ່າຍ
                                 </a>
-                                <a href="<?= url('/pos?layout=navbar') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/pos') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
-                                    <span class="w-5 h-5 rounded-md bg-emerald-100 flex items-center justify-center text-emerald-600 text-[9px]"><i class="fas fa-cash-register"></i></span>POS
+                                <a href="<?= url('/pos' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap <?= is_menu_active('/pos') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                                    <span class="w-6 h-6 rounded-md bg-emerald-100 flex items-center justify-center text-emerald-600 text-[10px]"><i class="fas fa-cash-register"></i></span>POS
                                 </a>
-                                <a href="<?= url('/rentals?layout=navbar') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/rentals') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
-                                    <span class="w-5 h-5 rounded-md bg-amber-100 flex items-center justify-center text-amber-600 text-[9px]"><i class="fas fa-receipt"></i></span>ບິນເຊົ່າ
-                                    <span class="ml-0.5 <?= get_active_rentals_count() > 0 ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-500' ?> text-[9px] font-black px-1.5 py-0.5 rounded-full"><?= get_active_rentals_count() ?></span>
+                                <a href="<?= url('/rentals' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap <?= is_menu_active('/rentals') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                                    <span class="w-6 h-6 rounded-md bg-amber-100 flex items-center justify-center text-amber-600 text-[10px]"><i class="fas fa-receipt"></i></span>ບິນເຊົ່າ
+                                    <span class="ml-0.5 <?= get_active_rentals_count() > 0 ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-500' ?> text-[10px] font-black px-1.5 py-0.5 rounded-full"><?= get_active_rentals_count() ?></span>
                                 </a> 
-                                <a href="<?= url('/inventory' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/inventory') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
-                                    <span class="w-5 h-5 rounded-md bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-[9px]"><i class="fas fa-tshirt"></i></span>ສາງຊຸດໄໝ
+                                <a href="<?= url('/inventory' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap <?= is_menu_active('/inventory') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                                    <span class="w-6 h-6 rounded-md bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-[10px]"><i class="fas fa-tshirt"></i></span>ສາງຊຸດໄໝ
                                 </a>
-                                <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/customers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
-                                    <span class="w-5 h-5 rounded-md bg-violet-100 flex items-center justify-center text-violet-600 text-[9px]"><i class="fas fa-users"></i></span>ລູກຄ້າ
+                                <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap <?= is_menu_active('/customers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                                    <span class="w-6 h-6 rounded-md bg-violet-100 flex items-center justify-center text-violet-600 text-[10px]"><i class="fas fa-users"></i></span>ລູກຄ້າ
                                 </a>
-                                <a href="<?= url('/expenses' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/expenses') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
-                                    <span class="w-5 h-5 rounded-md bg-rose-100 flex items-center justify-center text-rose-600 text-[9px]"><i class="fas fa-file-invoice-dollar"></i></span>ບັນທຶກລາຍຈ່າຍ
+                                <a href="<?= url('/expenses' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap <?= is_menu_active('/expenses') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                                    <span class="w-6 h-6 rounded-md bg-rose-100 flex items-center justify-center text-rose-600 text-[10px]"><i class="fas fa-file-invoice-dollar"></i></span>ບັນທຶກລາຍຈ່າຍ
                                 </a>
-                                <a href="<?= url('/staff' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/staff') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
-                                    <span class="w-5 h-5 rounded-md bg-orange-100 flex items-center justify-center text-orange-600 text-[9px]"><i class="fas fa-users-cog"></i></span>ພະນັກງານ
+                                <a href="<?= url('/staff' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap <?= is_menu_active('/staff') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                                    <span class="w-6 h-6 rounded-md bg-orange-100 flex items-center justify-center text-orange-600 text-[10px]"><i class="fas fa-users-cog"></i></span>ພະນັກງານ
                                 </a>
-                                <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/settings') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
-                                    <span class="w-5 h-5 rounded-md bg-gray-100 flex items-center justify-center text-gray-600 text-[9px]"><i class="fas fa-cog"></i></span>ຕັ້ງຄ່າ
+                                <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap <?= is_menu_active('/settings') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700' ?>">
+                                    <span class="w-6 h-6 rounded-md bg-gray-100 flex items-center justify-center text-gray-600 text-[10px]"><i class="fas fa-cog"></i></span>ຕັ້ງຄ່າ
                                 </a>
                             </nav>
                         </div>
@@ -276,10 +278,10 @@ $lp = '?layout=' . $manual_pref;
                         <div class="flex items-center gap-1.5 lg:gap-3 flex-shrink-0">
                             <!-- Layout Switcher (Now visible on mobile) -->
                             <div class="flex bg-gray-100/80 p-0.5 rounded-lg border border-gray-200/50">
-                                <a href="?layout=sidebar" class="px-2 lg:px-2.5 py-1 rounded-md text-[9px] font-black transition-all <?= $layout_pref === 'sidebar' ? 'bg-white shadow-sm text-primary' : 'text-gray-400 hover:text-gray-600' ?>">
+                                <a href="?layout=sidebar" class="px-2 lg:px-3 py-1 rounded-md text-xs font-black transition-all <?= $layout_pref === 'sidebar' ? 'bg-white shadow-sm text-primary' : 'text-gray-400 hover:text-gray-600' ?>">
                                     <i class="fas fa-columns mr-0.5"></i> SB
                                 </a>
-                                <a href="?layout=navbar" class="px-2 lg:px-2.5 py-1 rounded-md text-[9px] font-black transition-all <?= $layout_pref === 'navbar' ? 'bg-white shadow-sm text-primary' : 'text-gray-400 hover:text-gray-600' ?>">
+                                <a href="?layout=navbar" class="px-2 lg:px-3 py-1 rounded-md text-xs font-black transition-all <?= $layout_pref === 'navbar' ? 'bg-white shadow-sm text-primary' : 'text-gray-400 hover:text-gray-600' ?>">
                                     <i class="fas fa-window-maximize mr-0.5"></i> NB
                                 </a>
                             </div>
@@ -376,8 +378,8 @@ $lp = '?layout=' . $manual_pref;
                                     <div class="h-6 w-6 lg:h-7 lg:w-7 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
                                         <i class="fas fa-user text-[10px] lg:text-xs"></i>
                                     </div>
-                                    <span class="hidden sm:block text-xs font-bold text-gray-700 max-w-[120px] truncate"><?= $_SESSION['user']['username'] ?? 'Admin' ?></span>
-                                    <i class="fas fa-chevron-down text-[8px] text-gray-400 hidden sm:block"></i>
+                                    <span class="hidden sm:block text-sm font-bold text-gray-700 max-w-[120px] truncate"><?= $_SESSION['user']['username'] ?? 'Admin' ?></span>
+                                    <i class="fas fa-chevron-down text-[10px] text-gray-400 hidden sm:block"></i>
                                 </button>
                                 <div x-show="open" @click.away="open = false" class="absolute right-0 mt-1.5 w-80 bg-white rounded-xl border border-gray-100 shadow-xl p-2 z-50" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
                                     <div class="p-3 border-b mb-1">
@@ -408,30 +410,30 @@ $lp = '?layout=' . $manual_pref;
 
                     <!-- Mobile Nav Menu -->
                     <div x-show="sidebarOpen" class="md:hidden border-t border-gray-50 bg-white/95 backdrop-blur-md p-3 space-y-1 shadow-lg" @click.away="sidebarOpen = false">
-                        <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
-                            <span class="w-9 h-9 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-sm"><i class="fas fa-home"></i></span> ສະຫຼຸບລາຍຮັບ-ລາຍຈ່າຍ
+                        <a href="<?= url('/' . $lp) ?>" class="flex items-center gap-3 px-4 py-4 rounded-xl text-lg font-bold transition-all <?= is_menu_active('/') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                            <span class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 text-base"><i class="fas fa-home"></i></span> ສະຫຼຸບລາຍຮັບ-ລາຍຈ່າຍ
                         </a>
-                        <a href="<?= url('/pos?layout=navbar') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/pos') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
-                            <span class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-sm"><i class="fas fa-cash-register"></i></span> POS ລະບົບຂາຍ
+                        <a href="<?= url('/pos' . $lp) ?>" class="flex items-center gap-3 px-4 py-4 rounded-xl text-lg font-bold transition-all <?= is_menu_active('/pos') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                            <span class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-base"><i class="fas fa-cash-register"></i></span> POS ລະບົບຂາຍ
                         </a>
-                        <a href="<?= url('/rentals?layout=navbar') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/rentals') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
-                            <span class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-sm"><i class="fas fa-receipt"></i></span> ປະຫວັດບິນເຊົ່າ
-                            <span class="ml-auto <?= get_active_rentals_count() > 0 ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-500' ?> text-[10px] font-black px-2 py-0.5 rounded-full"><?= get_active_rentals_count() ?></span>
+                        <a href="<?= url('/rentals' . $lp) ?>" class="flex items-center gap-3 px-4 py-4 rounded-xl text-lg font-bold transition-all <?= is_menu_active('/rentals') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                            <span class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-base"><i class="fas fa-receipt"></i></span> ປະຫວັດບິນເຊົ່າ
+                            <span class="ml-auto <?= get_active_rentals_count() > 0 ? 'bg-red-500 text-white' : 'bg-gray-200 text-gray-500' ?> text-xs font-black px-2 py-0.5 rounded-full"><?= get_active_rentals_count() ?></span>
                         </a>
-                        <a href="<?= url('/inventory' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/inventory') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
-                            <span class="w-9 h-9 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-sm"><i class="fas fa-tshirt"></i></span> ສາງຊຸດໄໝ
+                        <a href="<?= url('/inventory' . $lp) ?>" class="flex items-center gap-3 px-4 py-4 rounded-xl text-lg font-bold transition-all <?= is_menu_active('/inventory') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                            <span class="w-10 h-10 rounded-xl bg-fuchsia-100 flex items-center justify-center text-fuchsia-600 text-base"><i class="fas fa-tshirt"></i></span> ສາງຊຸດໄໝ
                         </a>
-                        <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/customers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
-                            <span class="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-sm"><i class="fas fa-users"></i></span> ລູກຄ້າ
+                        <a href="<?= url('/customers' . $lp) ?>" class="flex items-center gap-3 px-4 py-4 rounded-xl text-lg font-bold transition-all <?= is_menu_active('/customers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                            <span class="w-10 h-10 rounded-xl bg-violet-100 flex items-center justify-center text-violet-600 text-base"><i class="fas fa-users"></i></span> ລູກຄ້າ
                         </a>
-                        <a href="<?= url('/expenses' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/expenses') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
-                            <span class="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-sm"><i class="fas fa-file-invoice-dollar"></i></span> ບັນທຶກລາຍຈ່າຍ
+                        <a href="<?= url('/expenses' . $lp) ?>" class="flex items-center gap-3 px-4 py-4 rounded-xl text-lg font-bold transition-all <?= is_menu_active('/expenses') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                            <span class="w-10 h-10 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-base"><i class="fas fa-file-invoice-dollar"></i></span> ບັນທຶກລາຍຈ່າຍ
                         </a>
-                        <a href="<?= url('/staff' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/staff') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
-                            <span class="w-9 h-9 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-sm"><i class="fas fa-users-cog"></i></span> ຈັດການພະນັກງານ
+                        <a href="<?= url('/staff' . $lp) ?>" class="flex items-center gap-3 px-4 py-4 rounded-xl text-lg font-bold transition-all <?= is_menu_active('/staff') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                            <span class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-base"><i class="fas fa-users-cog"></i></span> ຈັດການພະນັກງານ
                         </a>
-                        <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/settings') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
-                            <span class="w-9 h-9 rounded-xl <?= is_menu_active('/settings') ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600' ?> flex items-center justify-center text-sm"><i class="fas fa-cog"></i></span> ຕັ້ງຄ່າລະບົບ
+                        <a href="<?= url('/settings' . $lp) ?>" class="flex items-center gap-3 px-4 py-4 rounded-xl text-lg font-bold transition-all <?= is_menu_active('/settings') ? 'bg-primary/10 text-primary shadow-sm' : 'text-gray-600 hover:bg-gray-50' ?>">
+                            <span class="w-10 h-10 rounded-xl <?= is_menu_active('/settings') ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600' ?> flex items-center justify-center text-base"><i class="fas fa-cog"></i></span> ຕັ້ງຄ່າລະບົບ
                         </a>
                     </div>
                 </header>
@@ -446,11 +448,11 @@ $lp = '?layout=' . $manual_pref;
                         <button @click="sidebarOpen = !sidebarOpen" class="md:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg mr-2">
                             <i class="fas fa-bars"></i>
                         </button>
-                        <h2 class="font-semibold text-gray-800"><?= $title ?? 'ລະບົບຈັດການຊຸດໄໝ' ?></h2>
+                        <h2 class="font-bold text-gray-800 text-lg"><?= $title ?? 'ລະບົບຈັດການຊຸດໄໝ' ?></h2>
                     </div>
 
                     <div class="flex items-center space-x-4" x-data="notifications()">
-                        <button onclick="toggleFullscreen()" class="flex items-center gap-2 px-3 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors text-sm font-medium">
+                        <button onclick="toggleFullscreen()" class="flex items-center gap-2 px-4 py-2.5 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors text-sm font-bold">
                             <i class="fas fa-expand"></i>
                         </button>
                         <div class="relative">
@@ -668,53 +670,37 @@ $lp = '?layout=' . $manual_pref;
 
     <script>
     (function() {
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
-        if (localStorage.getItem('mc_install_dismissed') === 'true') return;
-
         var dPrompt = null;
         var banner = null;
         var autoTimer = null;
-
-        function showInstallInstructions() {
-            var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            if (isIOS) {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'ຕິດຕັ້ງ App Miss Clean',
-                    html: '<div style="text-align:left;font-size:14px"><p>1. ກົດປຸ່ມ <strong>Share</strong> (ຮູບລູກສອນຂຶ້ນ) ຢູ່ລຸ່ມສຸດຂອງ Browser</p><p>2. ເລື່ອນລົງແລ້ວກົດ <strong>Add to Home Screen</strong></p><p>3. ກົດ <strong>Add</strong> ຢູ່ມຸມຂວາເທິງ</p></div>',
-                    confirmButtonText: 'ຕົກລົງ',
-                    confirmButtonColor: '#0ea5e9',
-                    customClass: { popup: 'rounded-3xl' }
-                });
-            } else {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'ຕິດຕັ້ງ App Miss Clean',
-                    text: 'ກົດ ⋮ (ເມນູ) ແລ້ວກົດ ຕິດຕັ້ງແອັບ',
-                    confirmButtonText: 'ຕົກລົງ',
-                    confirmButtonColor: '#0ea5e9',
-                    customClass: { popup: 'rounded-3xl' }
-                });
-            }
-        }
+        var pendingInstall = false;
 
         function tryInstall() {
             if (dPrompt) {
-                try {
-                    dPrompt.prompt();
-                    dPrompt.userChoice.then(function(choice) {
-                        if (choice.outcome === 'accepted') {
-                            localStorage.setItem('mc_install_dismissed', 'true');
-                        }
-                        dPrompt = null;
-                    });
-                    return;
-                } catch(e) {
+                dPrompt.prompt();
+                dPrompt.userChoice.then(function(choice) {
+                    if (choice.outcome === 'accepted') {
+                        localStorage.setItem('mc_install_dismissed', 'true');
+                    }
                     dPrompt = null;
-                }
+                    pendingInstall = false;
+                });
             }
-            showInstallInstructions();
         }
+
+        window.installPWA = function() {
+            clearTimeout(autoTimer);
+            if (banner && banner.parentNode) banner.parentNode.removeChild(banner);
+            banner = null;
+            if (dPrompt) {
+                tryInstall();
+            } else {
+                pendingInstall = true;
+            }
+        };
+
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) return;
+        if (localStorage.getItem('mc_install_dismissed') === 'true') return;
 
         function createBanner() {
             if (banner) return;
@@ -722,7 +708,7 @@ $lp = '?layout=' . $manual_pref;
             banner.id = 'pwa-install-banner';
             banner.style.cssText = 'position:fixed;bottom:85px;left:50%;transform:translateX(-50%);z-index:9999;background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.15);padding:14px 18px;display:flex;align-items:center;gap:12px;width:calc(100% - 32px);max-width:400px;';
             banner.innerHTML =
-                '<img src="<?= url('/public/logo.jpg') ?>" alt="" width="44" height="44" style="border-radius:8px;flex-shrink:0;object-fit:cover;">' +
+                '<img src="<?= url('/public/logo.jpg') ?>" alt="" width="44" height="44" style="border-radius:8px;flex-shrink:0;">' +
                 '<div style="flex:1;min-width:0;">' +
                     '<p style="margin:0;font-size:15px;font-weight:bold;color:#1e293b;">ຕິດຕັ້ງ App Miss Clean</p>' +
                     '<p style="margin:0;font-size:13px;color:#64748b;">ຕິດຕັ້ງເພື່ອໃຊ້ງານໄດ້ງ່າຍຂຶ້ນ</p>' +
@@ -757,7 +743,10 @@ $lp = '?layout=' . $manual_pref;
         window.addEventListener('beforeinstallprompt', function(e) {
             e.preventDefault();
             dPrompt = e;
-            if (!banner) {
+            if (pendingInstall) {
+                tryInstall();
+                pendingInstall = false;
+            } else if (!banner) {
                 createBanner();
             }
         });
@@ -777,10 +766,44 @@ $lp = '?layout=' . $manual_pref;
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register('<?= url('/sw.js') ?>').catch(function(err) {
+                navigator.serviceWorker.register('<?= url('/sw.js') ?>').then(function(reg) {
+                    reg.addEventListener('updatefound', function() {
+                        var newSW = reg.installing;
+                        newSW.addEventListener('statechange', function() {
+                            if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'ມີອັບເດດໃໝ່',
+                                    text: 'ກົດ OK ເພື່ອໂຫຼດເວີຊັນລ່າສຸດ',
+                                    confirmButtonColor: '#0ea5e9',
+                                    confirmButtonText: 'OK',
+                                    customClass: { popup: 'rounded-3xl' }
+                                }).then(function() {
+                                    window.location.reload();
+                                });
+                            }
+                        });
+                    });
+                }).catch(function(err) {
                     console.log('SW reg failed', err);
                 });
             });
+
+            navigator.serviceWorker.addEventListener('controllerchange', function() {
+                window.location.reload();
+            });
+        }
+
+    })();
+
+    // Apply saved font size from localStorage
+    (function() {
+        var savedSize = localStorage.getItem('mc_font_size');
+        if (savedSize) {
+            var size = parseInt(savedSize, 10);
+            if (size >= 10 && size <= 30) {
+                document.documentElement.style.fontSize = size + 'px';
+            }
         }
     })();
     </script>

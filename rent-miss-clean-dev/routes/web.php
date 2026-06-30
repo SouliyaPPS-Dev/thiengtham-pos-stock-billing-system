@@ -9,6 +9,7 @@ return [
     '/inventory/edit' => ['InventoryController', 'edit'],
     '/inventory/delete' => ['InventoryController', 'delete'],
     '/inventory/update-stock' => ['InventoryController', 'updateStock'],
+    '/inventory/{id}/history' => ['InventoryController', 'rentalHistory'],
     '/settings' => ['SettingsController', 'index'],
     '/settings/update' => ['SettingsController', 'update'],
     '/settings/payment-method/add' => ['SettingsController', 'addPaymentMethod'],
@@ -47,10 +48,12 @@ return [
     '/category/delete' => ['CategoryController', 'delete'],
     '/rentals' => ['RentalController', 'index'],
     '/rentals/delete' => ['RentalController', 'delete'],
+    '/rentals/bulk-delete' => ['RentalController', 'bulkDelete'],
     '/rentals/update-status' => ['RentalController', 'updateStatus'],
     '/rentals/notifications' => ['RentalController', 'notifications'],
     '/rentals/{id}/items' => ['RentalController', 'getItems'],
     '/rentals/{id}/data' => ['RentalController', 'getData'],
-    '/print-invoice/{id}' => ['RentalController', 'show'],
+    '/print-invoice/{id}' => ['PublicController', 'showInvoice'],
+    '/sw.js' => ['ServiceWorkerController', 'serve'],
 ];
      

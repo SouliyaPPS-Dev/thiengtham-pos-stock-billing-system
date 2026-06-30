@@ -86,8 +86,8 @@ class POSController extends BaseController {
 
                 // 2. Insert into rental_items and update product status
                 $itemStmt = $db->prepare("
-                    INSERT INTO rental_items (rental_id, product_id, rental_price, deposit_price, qty)
-                    VALUES (?, ?, ?, ?, ?)
+                    INSERT INTO rental_items (rental_id, product_id, rental_price, qty)
+                    VALUES (?, ?, ?, ?)
                 ");
                 
                 $updateProductStmt = $db->prepare("UPDATE products SET status = 'Rented' WHERE id = ?");
@@ -98,7 +98,6 @@ class POSController extends BaseController {
                         $rentalId,
                         $item['id'],
                         $item['rental_price'],
-                        $item['deposit_price'],
                         $item['qty']
                     ]);
                     

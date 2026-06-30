@@ -41,7 +41,16 @@
                     <?php foreach($staff as $member): ?>
                     <tr class="hover:bg-gray-50 transition-colors" x-show="matchesSearch(<?= htmlspecialchars(json_encode($member)) ?>)">
                         <td class="px-6 py-4 font-bold text-gray-500">#<?= $member['id'] ?></td>
-                        <td class="px-6 py-4 font-medium text-gray-800"><?= $member['full_name'] ?></td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <?php if (!empty($member['avatar'])): ?>
+                                <img src="<?= htmlspecialchars($member['avatar']) ?>" alt="" class="w-8 h-8 rounded-full object-cover border cursor-pointer hover:scale-110 transition-transform" @click="previewImage('<?= htmlspecialchars($member['avatar']) ?>')">
+                                <?php else: ?>
+                                <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold"><?= strtoupper(mb_substr($member['full_name'], 0, 1)) ?></div>
+                                <?php endif; ?>
+                                <span class="font-medium text-gray-800"><?= $member['full_name'] ?></span>
+                            </div>
+                        </td>
                         <td class="px-6 py-4"><?= $member['phone'] ?? '-' ?></td>
                         <td class="px-6 py-4"><?= $member['username'] ?></td>
                         <td class="px-6 py-4">
@@ -64,14 +73,14 @@
                         </td>
                         <td class="px-6 py-4">
                             <div class="flex items-center justify-center gap-2">
-                                <button @click="viewStaff(<?= $member['id'] ?>)" class="w-10 h-10 flex items-center justify-center bg-sky-50 text-primary hover:bg-primary hover:text-white rounded-xl transition-all shadow-sm border border-sky-100" title="ເບິ່ງ">
-                                    <i class="fas fa-eye text-base"></i>
+                                <button @click="viewStaff(<?= $member['id'] ?>)" class="px-3 h-10 flex items-center justify-center gap-1.5 bg-sky-50 text-primary hover:bg-primary hover:text-white rounded-xl transition-all shadow-sm border border-sky-100 text-xs font-bold" title="ເບິ່ງ">
+                                    <i class="fas fa-eye"></i> ເບິ່ງ
                                 </button>
-                                <button @click="editStaff(<?= $member['id'] ?>)" class="w-10 h-10 flex items-center justify-center bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl transition-all shadow-sm border border-amber-100" title="ແກ້ໄຂ">
-                                    <i class="fas fa-edit text-base"></i>
+                                <button @click="editStaff(<?= $member['id'] ?>)" class="px-3 h-10 flex items-center justify-center gap-1.5 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl transition-all shadow-sm border border-amber-100 text-xs font-bold" title="ແກ້ໄຂ">
+                                    <i class="fas fa-edit"></i> ແກ້ໄຂ
                                 </button>
-                                <button @click="deleteStaff(<?= $member['id'] ?>, '<?= $member['full_name'] ?>')" class="w-10 h-10 flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm border border-red-100" title="ລົບ">
-                                    <i class="fas fa-trash-alt text-base"></i>
+                                <button @click="deleteStaff(<?= $member['id'] ?>, '<?= $member['full_name'] ?>')" class="px-3 h-10 flex items-center justify-center gap-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm border border-red-100 text-xs font-bold" title="ລົບ">
+                                    <i class="fas fa-trash-alt"></i> ລົບ
                                 </button>
                             </div>
                         </td>
@@ -87,9 +96,13 @@
             <div class="bg-white rounded-2xl border p-4 space-y-4 shadow-sm" x-show="matchesSearch(<?= htmlspecialchars(json_encode($member)) ?>)">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400">
+                        <?php if (!empty($member['avatar'])): ?>
+                        <img src="<?= htmlspecialchars($member['avatar']) ?>" alt="" class="w-10 h-10 rounded-xl object-cover border cursor-pointer hover:scale-110 transition-transform" @click="previewImage('<?= htmlspecialchars($member['avatar']) ?>')">
+                        <?php else: ?>
+                        <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400">
                             <i class="fas fa-user"></i>
                         </div>
+                        <?php endif; ?>
                         <div @click="viewStaff(<?= $member['id'] ?>)">
                             <div class="font-bold text-gray-800"><?= $member['full_name'] ?></div>
                             <div class="text-xs text-gray-400">@<?= $member['username'] ?> • <?= $member['phone'] ?? '-' ?></div>
@@ -118,13 +131,13 @@
                         ID: #<?= $member['id'] ?> • <?= date('d/m/Y', strtotime($member['created_at'])) ?>
                     </div>
                     <div class="flex gap-2">
-                        <button @click="viewStaff(<?= $member['id'] ?>)" class="flex-1 px-3 py-2 bg-sky-50 text-primary rounded-xl text-xs font-bold hover:bg-primary/10 transition-all text-center">
+                        <button @click="viewStaff(<?= $member['id'] ?>)" class="flex-1 px-3 py-2 bg-sky-50 text-primary rounded-xl text-xs font-bold hover:bg-primary/10 transition-all text-center" title="ເບິ່ງ">
                             <i class="fas fa-eye mr-1"></i>ເບິ່ງ
                         </button>
-                        <button @click="editStaff(<?= $member['id'] ?>)" class="flex-1 px-3 py-2 bg-amber-50 text-amber-600 rounded-xl text-xs font-bold hover:bg-amber-100 transition-all text-center">
+                        <button @click="editStaff(<?= $member['id'] ?>)" class="flex-1 px-3 py-2 bg-amber-50 text-amber-600 rounded-xl text-xs font-bold hover:bg-amber-100 transition-all text-center" title="ແກ້ໄຂ">
                             <i class="fas fa-edit mr-1"></i>ແກ້ໄຂ
                         </button>
-                        <button @click="deleteStaff(<?= $member['id'] ?>, '<?= $member['full_name'] ?>')" class="flex-1 px-3 py-2 bg-red-50 text-red-500 rounded-xl text-xs font-bold hover:bg-red-100 transition-all text-center">
+                        <button @click="deleteStaff(<?= $member['id'] ?>, '<?= $member['full_name'] ?>')" class="flex-1 px-3 py-2 bg-red-50 text-red-500 rounded-xl text-xs font-bold hover:bg-red-100 transition-all text-center" title="ລົບ">
                             <i class="fas fa-trash-alt mr-1"></i>ລົບ
                         </button>
                     </div>
@@ -143,8 +156,25 @@
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
-            <form @submit.prevent="saveStaff" class="space-y-4">
+            <form @submit.prevent="saveStaff" class="space-y-4" enctype="multipart/form-data">
                 <input type="hidden" name="id" x-model="formData.id">
+                <div class="flex items-center gap-4 mb-2">
+                    <div class="relative w-16 h-16 rounded-full border-2 border-dashed border-gray-300 overflow-hidden flex-shrink-0 bg-gray-50">
+                        <template x-if="avatarPreview">
+                            <img :src="avatarPreview" class="w-full h-full object-cover">
+                        </template>
+                        <template x-if="!avatarPreview">
+                            <div class="w-full h-full flex items-center justify-center text-gray-400">
+                                <i class="fas fa-camera text-lg"></i>
+                            </div>
+                        </template>
+                        <input type="file" name="avatar" @change="handleAvatarPreview($event)" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer">
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-gray-700">ຮູບປະຈຳໂຕ</p>
+                        <p class="text-[10px] text-gray-400">ຄລິກເພື່ອເລືອກຮູບ (ບໍ່ມີກໍໄດ້)</p>
+                    </div>
+                </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">ຊື່ ແລະ ນາມສະກຸນ *</label>
                     <input type="text" name="full_name" x-model="formData.full_name" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none">
@@ -180,7 +210,10 @@
                 </div>
                 <div class="flex gap-3 pt-4">
                     <button type="button" @click="showModal = false" class="flex-1 px-4 py-2 border rounded-lg font-bold text-gray-600 hover:bg-gray-50 transition-colors">ຍົກເລີກ</button>
-                    <button type="submit" class="flex-1 px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors">ບັນທຶກ</button>
+                    <button type="submit" :disabled="loading" class="flex-1 px-4 py-2 rounded-lg font-bold text-white transition-colors" :class="loading ? 'bg-sky-500 opacity-60 cursor-not-allowed' : 'bg-sky-500 hover:bg-sky-600'">
+                        <i x-show="loading" class="fas fa-spinner fa-spin mr-1"></i>
+                        <span x-text="loading ? 'ກຳລັງບັນທຶກ...' : 'ບັນທຶກ'"></span>
+                    </button>
                 </div>
             </form>
         </div>
@@ -190,9 +223,17 @@
     <div x-show="viewModal" x-cloak class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl mx-4 my-auto max-h-[90vh] overflow-y-auto" @click.away="viewModal = false">
             <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-800" x-text="viewData.full_name || 'ລາຍລະອຽດພະນັກງານ'"></h2>
-                    <p class="text-sm text-gray-500" x-text="'@' + viewData.username || ''"></p>
+                <div class="flex items-center gap-4">
+                    <template x-if="viewData.avatar">
+                        <img :src="viewData.avatar" class="w-14 h-14 rounded-full object-cover border cursor-pointer hover:opacity-80 transition-opacity" @click="previewImage(viewData.avatar)">
+                    </template>
+                    <template x-if="!viewData.avatar">
+                        <div class="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xl font-bold" x-text="(viewData.full_name || '?')[0]"></div>
+                    </template>
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800" x-text="viewData.full_name || 'ລາຍລະອຽດພະນັກງານ'"></h2>
+                        <p class="text-sm text-gray-500" x-text="'@' + viewData.username || ''"></p>
+                    </div>
                 </div>
                 <button @click="viewModal = false" class="text-gray-400 hover:text-gray-600">
                     <i class="fas fa-times text-xl"></i>
@@ -250,6 +291,9 @@ function staffModal() {
         search: '',
         formData: {},
         viewData: {},
+        avatarPreview: null,
+        avatarFile: null,
+        loading: false,
         staff: <?= json_encode(array_column($staff ?? [], null, 'id')) ?>,
 
         matchesSearch(member) {
@@ -266,18 +310,8 @@ function staffModal() {
                 id: '', full_name: '', phone: '', username: '',
                 password: '', role: 'staff', status: 'Active'
             };
-            this.showModal = true;
-        },
-
-        editStaff(id) {
-            const s = this.staff[id] || {};
-            this.modalTitle = 'ແກ້ໄຂຂໍ້ມູນພະນັກງານ';
-            this.formData = {
-                id: id, full_name: s.full_name || '', phone: s.phone || '',
-                username: s.username || '', password: '', 
-                role: s.role || 'staff', status: s.status || 'Active'
-            };
-            this.viewModal = false;
+            this.avatarPreview = null;
+            this.avatarFile = null;
             this.showModal = true;
         },
 
@@ -286,27 +320,51 @@ function staffModal() {
             this.viewModal = true;
         },
 
+        editStaff(id) {
+            const s = this.staff[id] || {};
+            this.modalTitle = 'ແກ້ໄຂຂໍ້ມູນພະນັກງານ';
+            this.formData = {
+                id: id, full_name: s.full_name || '', phone: s.phone || '',
+                username: s.username || '', password: '',
+                role: s.role || 'staff', status: s.status || 'Active'
+            };
+            this.avatarPreview = s.avatar || null;
+            this.avatarFile = null;
+            this.viewModal = false;
+            this.showModal = true;
+        },
+
+        handleAvatarPreview(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            this.avatarFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => { this.avatarPreview = e.target.result; };
+            reader.readAsDataURL(file);
+        },
+
         saveStaff() {
+            this.loading = true;
             const isEdit = !!this.formData.id;
             const url = isEdit ? '<?= url("/staff/edit") ?>' : '<?= url("/staff/add") ?>';
 
-            const params = new URLSearchParams();
+            const fd = new FormData();
             Object.keys(this.formData).forEach(key => {
-                params.append(key, this.formData[key]);
+                fd.append(key, this.formData[key]);
             });
+            if (this.avatarFile) {
+                fd.append('avatar', this.avatarFile);
+            }
 
             fetch(url, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: params.toString()
+                body: fd
             })
             .then(res => {
                 if (res.ok) {
                     window.location.href = '<?= url("/staff") ?>' + (isEdit ? '?updated=1' : '?success=1');
                 } else {
+                    this.loading = false;
                     Swal.fire({
                         icon: 'error',
                         title: 'ເກີດຂໍ້ຜິດພາດ',
@@ -316,6 +374,7 @@ function staffModal() {
                 }
             })
             .catch(() => {
+                this.loading = false;
                 Swal.fire({
                     icon: 'error',
                     title: 'ເກີດຂໍ້ຜິດພາດ',

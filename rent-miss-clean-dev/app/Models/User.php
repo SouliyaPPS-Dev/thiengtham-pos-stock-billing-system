@@ -46,18 +46,24 @@ class User {
     
     public function create($data) {
         if (!$this->db) return false;
-        
-        $stmt = $this->db->prepare("INSERT INTO users (username, password, full_name, phone, role, status) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $data['username'], $data['password'], $data['full_name'], $data['phone'], $data['role'], $data['status']);
+
+        $avatar = $data['avatar'] ?? null;
+        $stmt = $this->db->prepare("INSERT INTO users (username, password, full_name, phone, avatar, role, status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sssssss", $data['username'], $data['password'], $data['full_name'], $data['phone'], $avatar, $data['role'], $data['status']);
         return $stmt->execute();
     }
     
     public function update($id, $data) {
         if (!$this->db) return false;
-        
+
+        $avatar = $data['avatar'] ?? null;
+
         if (isset($data['password']) && !empty($data['password'])) {
-            $stmt = $this->db->prepare("UPDATE users SET username = ?, password = ?, full_name = ?, phone = ?, role = ?, status = ? WHERE id = ?");
-            $stmt->bind_param("ssssssi", $data['username'], $data['password'], $data['full_name'], $data['phone'], $data['role'], $data['status'], $id);
+            $stmt = $this->db->prepare("UPDATE users SET username = ?, password = ?, full_name = ?, phone = ?, avatar = ?, role = ?, status = ? WHERE id = ?");
+            $stmt->bind_param("sssssssi", $data['username'], $data['password'], $data['full_name'], $data['phone'], $avatar, $data['role'], $data['status'], $id);
+        } elseif (array_key_exists('avatar', $data)) {
+            $stmt = $this->db->prepare("UPDATE users SET username = ?, full_name = ?, phone = ?, avatar = ?, role = ?, status = ? WHERE id = ?");
+            $stmt->bind_param("ssssssi", $data['username'], $data['full_name'], $data['phone'], $avatar, $data['role'], $data['status'], $id);
         } else {
             $stmt = $this->db->prepare("UPDATE users SET username = ?, full_name = ?, phone = ?, role = ?, status = ? WHERE id = ?");
             $stmt->bind_param("sssssi", $data['username'], $data['full_name'], $data['phone'], $data['role'], $data['status'], $id);

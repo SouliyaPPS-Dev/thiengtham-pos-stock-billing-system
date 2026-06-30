@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\Customer as CustomerModel;
 use App\Models\CustomerType as CustomerTypeModel;
+use App\Helpers\ImageKit;
 
 class CustomerController extends BaseController {
     public function index() {
@@ -76,6 +77,13 @@ class CustomerController extends BaseController {
                 'notes' => !empty($_POST['notes']) ? $_POST['notes'] : null
             ];
             
+            if (!empty($_FILES['avatar']['name'])) {
+                $avatarUrl = ImageKit::upload('avatar', '/rent_miss_clean/customers');
+                if ($avatarUrl) {
+                    $data['avatar'] = $avatarUrl;
+                }
+            }
+
             $errors = $customerModel->validateCustomer($data);
             
             if (empty($errors)) {
@@ -146,6 +154,13 @@ class CustomerController extends BaseController {
                 'notes' => !empty($_POST['notes']) ? $_POST['notes'] : null
             ];
             
+            if (!empty($_FILES['avatar']['name'])) {
+                $avatarUrl = ImageKit::upload('avatar', '/rent_miss_clean/customers');
+                if ($avatarUrl) {
+                    $data['avatar'] = $avatarUrl;
+                }
+            }
+
             $errors = $customerModel->validateCustomer($data, $id);
             
             if (empty($errors)) {

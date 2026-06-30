@@ -56,7 +56,6 @@
                             <h3 class="text-sm font-bold text-gray-800 truncate" x-text="p.name"></h3>
                             <div class="flex items-baseline justify-between pt-1">
                                 <span class="text-xs font-black text-primary" x-text="formatPrice(p.rental_price)"></span>
-                                <span class="text-[9px] text-gray-400">ມັດຈຳ: <span x-text="formatPrice(p.deposit_price)"></span></span>
                             </div>
                         </div>
                     </div>
@@ -183,7 +182,7 @@
                             </div>
                             <div class="text-right">
                                 <p class="text-xs font-black text-primary" x-text="formatPrice(item.rental_price * item.qty)"></p>
-                                <p class="text-[9px] text-gray-400">ມັດຈຳ: <span x-text="formatPrice(item.deposit_price * item.qty)"></span></p>
+
                             </div>
                         </div>
                     </div>
@@ -218,7 +217,7 @@
                     <span class="text-xs font-bold text-gray-600">ສຳມະໂນຄົວ</span>
                 </label>
                 <label class="flex items-center gap-2 p-3 bg-gray-50 rounded-xl border cursor-pointer hover:bg-gray-100 transition-all">
-                    <input type="checkbox" x-model="guarantee.cash" class="w-4 h-4 rounded text-primary focus:ring-primary">
+                    <input type="checkbox" x-model="guarantee.cash" @change="calculateGrandTotal()" class="w-4 h-4 rounded text-primary focus:ring-primary">
                     <span class="text-xs font-bold text-gray-600">ມັດຈຳເງິນ</span>
                 </label>
             </div>
@@ -231,23 +230,21 @@
                     <span>ຄ່າເຊົ່າທັງໝົດ</span>
                     <span x-text="formatPrice(subtotal())"></span>
                 </div>
-                <div class="flex justify-between items-center text-xs font-bold text-gray-500" x-data="{ editingDeposit: false }">
-                    <span>ຄ່າມັດຈຳທັງໝົດ</span>
-                    <template x-if="!editingDeposit">
-                        <span @click="editingDeposit = true" class="cursor-pointer text-xs font-black text-primary px-2 py-1 rounded hover:bg-gray-100" x-text="formatPrice(deposit)"></span>
-                    </template>
-                    <template x-if="editingDeposit">
-                        <input type="number" x-model="deposit" @input="calculateGrandTotal(true)" @blur="editingDeposit = false" @keydown.enter="editingDeposit = false" x-ref="depositInput" x-init="$nextTick(() => $refs.depositInput.focus())" class="w-32 px-2 py-1 bg-gray-50 border border-gray-100 rounded-lg text-right text-xs font-black text-primary focus:ring-1 focus:ring-primary outline-none">
-                    </template>
-                </div>
+                <template x-if="guarantee.cash">
+                    <div class="flex justify-between items-center text-xs font-bold text-gray-500">
+                        <span>ຄ່າມັດຈຳທັງໝົດ</span>
+                        <input type="number" x-model="deposit" @input="calculateGrandTotal()" class="w-32 px-2 py-1 bg-gray-50 border border-gray-100 rounded-lg text-right text-xs font-black text-primary focus:ring-1 focus:ring-primary outline-none">
+                    </div>
+                </template>
                 <div class="flex justify-between items-center text-xs font-bold text-gray-500">
                     <span>ສ່ວນຫຼຸດ</span>
-                    <input type="number" x-model="discount" @input="calculateGrandTotal(true)" class="w-32 px-2 py-1 bg-gray-50 border border-gray-100 rounded-lg text-right text-xs font-black text-primary focus:ring-1 focus:ring-primary outline-none">
+                    <input type="number" x-model="discount" @input="calculateGrandTotal()" class="w-32 px-2 py-1 bg-gray-50 border border-gray-100 rounded-lg text-right text-xs font-black text-primary focus:ring-1 focus:ring-primary outline-none">
                 </div>
                 <div class="pt-2 border-t border-dashed flex justify-between items-end">
                     <span class="text-sm font-black text-gray-800 uppercase">ຍອດລວມຄ່າເຊົ່າ</span>
-                    <span class="text-2xl font-black text-primary" x-text="formatPrice(grandTotal)"></span>
+                    <span class="text-2xl font-black text-green-600" x-text="formatPrice(grandTotal)"></span>
                 </div>
+
             </div> 
 
             <div class="space-y-4">
@@ -322,7 +319,6 @@ function posSystem() {
         discount: 0,
         deposit: 0,
         paidAmount: 0,
-        isManualDeposit: false,
         paymentStatus: 'Paid',
         selectedPaymentMethodId: '<?= $paymentMethods[0]['id'] ?? '' ?>',
         grandTotal: 0,
@@ -360,7 +356,6 @@ function posSystem() {
                 discount: this.discount,
                 deposit: this.deposit,
                 paidAmount: this.paidAmount,
-                isManualDeposit: this.isManualDeposit,
                 paymentStatus: this.paymentStatus,
                 selectedPaymentMethodId: this.selectedPaymentMethodId,
                 guarantee: { ...this.guarantee }
@@ -382,7 +377,6 @@ function posSystem() {
                 if (data.discount !== undefined) this.discount = data.discount;
                 if (data.deposit !== undefined) this.deposit = data.deposit;
                 if (data.paidAmount !== undefined) this.paidAmount = data.paidAmount;
-                if (data.isManualDeposit !== undefined) this.isManualDeposit = data.isManualDeposit;
                 if (data.paymentStatus) this.paymentStatus = data.paymentStatus;
                 if (data.selectedPaymentMethodId) this.selectedPaymentMethodId = data.selectedPaymentMethodId;
                 if (data.guarantee) this.guarantee = data.guarantee;
@@ -453,7 +447,6 @@ function posSystem() {
                     image: product.image,
                     size: product.size,
                     rental_price: parseFloat(product.rental_price),
-                    deposit_price: parseFloat(product.deposit_price),
                     qty: 1
                 });
             }
@@ -492,7 +485,7 @@ function posSystem() {
 
         clearCart() {
             this.cart = [];
-            this.isManualDeposit = false;
+            this.deposit = 0;
             this.calculateGrandTotal();
             this.saveState();
         },
@@ -501,25 +494,16 @@ function posSystem() {
             return this.cart.reduce((sum, item) => sum + (item.rental_price * item.qty), 0);
         },
 
-        totalDeposit() {
-            return this.cart.reduce((sum, item) => sum + (item.deposit_price * item.qty), 0);
-        },
-
-        calculateGrandTotal(isManual = false) {
-            if (isManual) {
-                this.isManualDeposit = true;
+        calculateGrandTotal() {
+            if (this.guarantee.cash) {
+                this.grandTotal = this.subtotal() - parseFloat(this.discount || 0) + parseFloat(this.deposit || 0);
+            } else {
+                this.deposit = 0;
+                this.grandTotal = this.subtotal() - parseFloat(this.discount || 0);
             }
 
-            if (!this.isManualDeposit) {
-                this.deposit = this.totalDeposit();
-            }
-
-            // Grand Total should only be Rental Fee minus Discount (Deposit is separate)
-            this.grandTotal = this.subtotal() - parseFloat(this.discount || 0);
-            
-            // Auto-fill paid amount based on Deposit (instead of grandTotal)
-            if (this.paidAmount === 0 || this.paidAmount != this.deposit) {
-                this.paidAmount = this.deposit;
+            if (this.paidAmount === 0 || this.paidAmount != this.grandTotal) {
+                this.paidAmount = this.grandTotal;
             }
         },
 
@@ -536,6 +520,7 @@ function posSystem() {
             if (!this.returnDate) missing.push('ກຳນົດວັນທີສົ່ງ');
             const hasGuarantee = this.guarantee.idCard || this.guarantee.passport || this.guarantee.familyBook || this.guarantee.cash;
             if (!hasGuarantee) missing.push('ເລືອກເອກະສານຄ້ຳປະກັນຢ່າງໜ້ອຍ 1 ຢ່າງ');
+            if (this.guarantee.cash && (!this.deposit || parseFloat(this.deposit) <= 0)) missing.push('ກະລຸນາປ້ອນຈຳນວນ ຄ່າມັດຈຳທັງໝົດ');
 
             if (missing.length > 0) {
                 Swal.fire({
@@ -574,11 +559,11 @@ function posSystem() {
                         </div>
                         <div class="flex justify-between items-center px-1">
                             <span class="text-gray-500">ວັນທີຮັບ</span>
-                            <span class="font-bold">${this.pickupDate}</span>
+                            <span class="font-bold">${this.formatDate(this.pickupDate)}</span>
                         </div>
                         <div class="flex justify-between items-center px-1">
                             <span class="text-gray-500">ວັນທີສົ່ງ</span>
-                            <span class="font-bold">${this.returnDate}</span>
+                            <span class="font-bold">${this.formatDate(this.returnDate)}</span>
                         </div>
                       </div>`,
                 icon: 'question',
@@ -676,8 +661,15 @@ function posSystem() {
             return texts[status] || status;
         },
 
+        formatDate(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            return parts[2] + '/' + parts[1] + '/' + parts[0];
+        },
+
         formatPrice(price) {
-            return new Intl.NumberFormat().format(price) + ' ' + (this.settings?.currency || '₭');
+            return new Intl.NumberFormat().format(price) + ' ' + (this.settings?.currency || 'ກີບ');
         }
     };
 }

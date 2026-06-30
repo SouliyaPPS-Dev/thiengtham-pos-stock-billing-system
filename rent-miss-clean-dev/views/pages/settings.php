@@ -30,13 +30,13 @@
                             </div>
                             <div class="space-y-2">
                                 <label class="text-sm font-semibold text-gray-700">ສະກຸນເງິນຫຼັກ</label>
-                                <div class="relative" x-data="{ open: false, selected: '<?= htmlspecialchars($settings['currency'] ?? '₭') ?>' }">
+                                <div class="relative" x-data="{ open: false, selected: '<?= htmlspecialchars($settings['currency'] ?? 'ກີບ') ?>' }">
                                     <div class="flex gap-2">
                                         <select @change="selected = $event.target.value; if($event.target.value === 'other') { selected = ''; $nextTick(() => $refs.customCurrency.focus()) }" class="w-1/3 px-2 py-2 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
-                                            <option value="₭" <?= ($settings['currency'] ?? '₭') === '₭' ? 'selected' : '' ?>>₭ (LAK)</option>
+                                            <option value="ກີບ" <?= ($settings['currency'] ?? 'ກີບ') === 'ກີບ' ? 'selected' : '' ?>>ກີບ (LAK)</option>
                                             <option value="฿" <?= ($settings['currency'] ?? '') === '฿' ? 'selected' : '' ?>>฿ (THB)</option>
                                             <option value="$" <?= ($settings['currency'] ?? '') === '$' ? 'selected' : '' ?>>$ (USD)</option>
-                                            <option value="other" <?= !in_array($settings['currency'] ?? '', ['₭', '฿', '$']) ? 'selected' : '' ?>>ອື່ນໆ...</option>
+                                            <option value="other" <?= !in_array($settings['currency'] ?? '', ['ກີບ', '฿', '$']) ? 'selected' : '' ?>>ອື່ນໆ...</option>
                                         </select>
                                         <input type="text" name="currency" x-model="selected" x-ref="customCurrency" placeholder="ລະບຸສະກຸນເງິນ" class="flex-1 px-2 py-2 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                                     </div>
@@ -127,13 +127,13 @@
                                         <td class="px-6 py-4 text-gray-500"><?= htmlspecialchars($method['details']) ?></td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex justify-end gap-2">
-                                                <button onclick="openEditPaymentModal(<?= htmlspecialchars(json_encode($method)) ?>)" class="w-10 h-10 flex items-center justify-center bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl transition-all shadow-sm border border-amber-100" title="ແກ້ໄຂ">
-                                                    <i class="fas fa-edit"></i>
+                                                <button onclick="openEditPaymentModal(<?= htmlspecialchars(json_encode($method)) ?>)" class="px-3 h-10 flex items-center justify-center gap-1.5 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-xl transition-all shadow-sm border border-amber-100 text-xs font-bold" title="ແກ້ໄຂ">
+                                                    <i class="fas fa-edit"></i> ແກ້ໄຂ
                                                 </button>
                                                 <form action="<?= url('/settings/payment-method/delete') ?>" method="POST" class="inline" onsubmit="return confirm('ຕ້ອງການລຶບແທ້ບໍ່?')">
                                                     <input type="hidden" name="id" value="<?= $method['id'] ?>">
-                                                    <button type="submit" class="w-10 h-10 flex items-center justify-center bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm border border-red-100" title="ລຶບ">
-                                                        <i class="fas fa-trash-alt"></i>
+                                                    <button type="submit" class="px-3 h-10 flex items-center justify-center gap-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm border border-red-100 text-xs font-bold" title="ລຶບ">
+                                                        <i class="fas fa-trash-alt"></i> ລຶບ
                                                     </button>
                                                 </form>
                                             </div>
@@ -177,6 +177,40 @@
                                 <span class="font-semibold text-gray-700">ປ່ຽນລະຫັດຜ່ານແອັດມິນ</span>
                             </div>
                             <i class="fas fa-chevron-right text-gray-300"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card: ປັບຂະໜາດຕົວອັກສອນ -->
+                <div class="bg-white rounded-2xl border shadow-sm overflow-hidden" x-data="fontSizeControl()">
+                    <div class="p-6 border-b">
+                        <h3 class="font-bold text-gray-800 leading-none">ປັບຂະໜາດຕົວອັກສອນ</h3>
+                        <p class="text-sm text-gray-500 mt-1">ປ່ຽນຂະໜາດຂໍ້ຄວາມໃນລະບົບ</p>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <button @click="decrease" class="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition-all text-gray-600 font-bold text-lg">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <div class="flex-1 relative">
+                                <input type="number" x-model="size" @input="update" min="10" max="30" class="w-full px-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-center font-bold text-lg">
+                            </div>
+                            <button @click="increase" class="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition-all text-gray-600 font-bold text-lg">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div class="flex items-center justify-between text-sm text-gray-500">
+                            <span>10px</span>
+                            <span class="font-bold text-primary" x-text="size + 'px'"></span>
+                            <span>30px</span>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+                            <p class="text-gray-700 font-medium transition-all" :style="'font-size: ' + size + 'px'">
+                                <i class="fas fa-font mr-2 text-primary"></i> ຕົວຢ່າງຂໍ້ຄວາມ
+                            </p>
+                        </div>
+                        <button @click="resetSize" class="w-full flex items-center justify-center gap-2 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-sm font-bold text-gray-600 transition-all">
+                            <i class="fas fa-undo-alt"></i> ຣີເຊັດຄ່າເລີ່ມຕົ້ນ
                         </button>
                     </div>
                 </div>
@@ -328,6 +362,28 @@
 </div>
 
 <script>
+function fontSizeControl() {
+    return {
+        size: parseInt(localStorage.getItem('mc_font_size')) || 14,
+        update() {
+            if (this.size < 10) this.size = 10;
+            if (this.size > 30) this.size = 30;
+            localStorage.setItem('mc_font_size', this.size);
+            document.documentElement.style.fontSize = this.size + 'px';
+        },
+        increase() {
+            if (this.size < 30) { this.size++; this.update(); }
+        },
+        decrease() {
+            if (this.size > 10) { this.size--; this.update(); }
+        },
+        resetSize() {
+            this.size = 14;
+            this.update();
+        }
+    }
+}
+
 function toggleModal(id) {
     const modal = document.getElementById(id);
     if (modal.classList.contains('hidden')) {

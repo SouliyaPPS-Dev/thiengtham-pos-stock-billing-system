@@ -37,7 +37,6 @@ class Product {
                 'color' => $row['color'],
                 'price' => $row['rental_price'],
                 'rental_price' => $row['rental_price'],
-                'deposit_price' => $row['deposit_price'],
                 'status' => $row['status'],
                 'stock' => $row['stock'] ?? 0,
                 'image' => $row['image'] ?? 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&h=400&fit=crop',
@@ -115,7 +114,7 @@ class Product {
 
         // 7. Recent Rentals
         $stmt = $this->db->query("
-            SELECT r.*, c.fullname as customer_name
+            SELECT r.*, c.fullname as customer_name, c.avatar as customer_avatar
             FROM rentals r
             JOIN customers c ON r.customer_id = c.id
             ORDER BY r.created_at DESC
