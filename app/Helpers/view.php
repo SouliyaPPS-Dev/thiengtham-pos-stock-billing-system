@@ -1,25 +1,16 @@
 <?php
 
 function get_layout_preference() {
-    $currentPath = $_SERVER['REQUEST_URI'] ?? '';
-    $isForcedNavbar = (
-        strpos($currentPath, '/admin/pos') !== false ||
-        strpos($currentPath, '/admin/sales') !== false
-    );
-
     if (isset($_GET['layout'])) {
-        $layout = $_GET['layout'];
-        if (!($isForcedNavbar && $layout === 'navbar')) {
-            $_SESSION['layout_pref'] = $layout;
-        }
-        return $isForcedNavbar ? 'navbar' : $layout;
+        $_SESSION['layout_pref'] = $_GET['layout'];
+        return $_GET['layout'];
     }
 
-    if ($isForcedNavbar) {
-        return 'navbar';
+    if (!isset($_SESSION['layout_pref'])) {
+        $_SESSION['layout_pref'] = 'sidebar';
     }
 
-    return $_SESSION['layout_pref'] ?? 'sidebar';
+    return $_SESSION['layout_pref'];
 }
 
 function is_admin_route() {
