@@ -130,23 +130,31 @@ body {
 
 /* ===== Icon Action Buttons (ref: rent-miss-clean) ===== */
 .icon-btn {
-    @apply w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm border text-base;
-}
-
-.icon-btn-edit {
-    @apply bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white border-amber-100;
-}
-
-.icon-btn-delete {
-    @apply bg-red-50 text-red-600 hover:bg-red-600 hover:text-white border-red-100;
+    @apply w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-sm border text-sm font-bold;
 }
 
 .icon-btn-view {
-    @apply bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white border-blue-100;
+    @apply bg-sky-100 text-sky-700 hover:bg-sky-600 hover:text-white border-sky-200 hover:border-sky-600 shadow-sky-100;
+}
+
+.icon-btn-edit {
+    @apply bg-amber-100 text-amber-700 hover:bg-amber-500 hover:text-white border-amber-200 hover:border-amber-500 shadow-amber-100;
+}
+
+.icon-btn-delete {
+    @apply bg-red-100 text-red-700 hover:bg-red-500 hover:text-white border-red-200 hover:border-red-500 shadow-red-100;
 }
 
 .icon-btn-print {
-    @apply bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white border-emerald-100;
+    @apply bg-emerald-100 text-emerald-700 hover:bg-emerald-500 hover:text-white border-emerald-200 hover:border-emerald-500 shadow-emerald-100;
+}
+
+.icon-btn-cart {
+    @apply bg-violet-100 text-violet-700 hover:bg-violet-500 hover:text-white border-violet-200 hover:border-violet-500 shadow-violet-100;
+}
+
+.icon-btn-info {
+    @apply bg-cyan-100 text-cyan-700 hover:bg-cyan-500 hover:text-white border-cyan-200 hover:border-cyan-500 shadow-cyan-100;
 }
 
 /* ===== Stat Cards (ref: rent-miss-clean) ===== */

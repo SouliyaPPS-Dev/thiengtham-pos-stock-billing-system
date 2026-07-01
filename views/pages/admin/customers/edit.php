@@ -15,7 +15,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="space-y-1.5">
                     <label class="text-sm font-bold text-gray-700">ຊື່ ແລະ ນາມສະກຸນ <span class="text-red-400">*</span></label>
-                    <input type="text" name="fullname" required value="<?= htmlspecialchars($customer['name']) ?>"
+                    <input type="text" name="fullname" required value="<?= htmlspecialchars($customer['fullname'] ?? '') ?>"
                            class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
                            placeholder="ຊື່ ແລະ ນາມສະກຸນ">
                 </div>

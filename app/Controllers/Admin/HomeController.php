@@ -16,12 +16,14 @@ class HomeController extends \App\Controllers\BaseController
         $customerModel = new Customer();
         $supplierModel = new Supplier();
 
-        $fromDate = $_GET['from_date'] ?? date('Y-m-01');
-        $toDate = $_GET['to_date'] ?? date('Y-m-t');
-        $thirtyDaysAgo = date('Y-m-d', strtotime('-30 days'));
+        $hasFrom = !empty($_GET['from_date']);
+        $hasTo = !empty($_GET['to_date']);
 
-        $chartFrom = $fromDate && $_GET['from_date'] ? $fromDate : $thirtyDaysAgo;
-        $chartTo = $toDate && $_GET['to_date'] ? $toDate : date('Y-m-d');
+        $fromDate = $hasFrom ? $_GET['from_date'] : date('Y-m-01');
+        $toDate = $hasTo ? $_GET['to_date'] : date('Y-m-t');
+
+        $chartFrom = $hasFrom ? $fromDate : date('Y-m-d', strtotime('-30 days'));
+        $chartTo = $hasTo ? $toDate : date('Y-m-d');
 
         $stats = [
             'total_products' => $productModel->getTotalProducts(),

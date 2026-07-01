@@ -1,4 +1,4 @@
-const CACHE_NAME = "pos-stock-v1";
+const CACHE_NAME = "pos-stock-v2";
 
 const STATIC_ASSETS = [
   "./public/css/app.css",
