@@ -46,7 +46,7 @@
                                         <i class="fas fa-file-invoice text-2xl"></i>
                                     </div>
                                     <p class="text-base font-bold text-gray-600">ຍັງບໍ່ມີໃບສະເໜີລາຄາ</p>
-                                    <p class="text-sm text-gray-400 mt-1">ສ້າງໃບສະເໜີລາ�າໃໝ່ໄດ້ທີ່ປຸ່ມ "ສ້າງໃບສະເໜີລາຄາ"</p>
+                                    <p class="text-sm text-gray-400 mt-1">ສ້າງໃບສະເໜີລາຄາໃໝ່ໄດ້ທີ່ປຸ່ມ "ສ້າງໃບສະເໜີລາຄາ"</p>
                                 </div>
                             </td>
                         </tr>

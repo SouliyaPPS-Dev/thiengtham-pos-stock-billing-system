@@ -199,7 +199,7 @@
                     <div class="flex items-center justify-end gap-3">
                         <a href="<?= url('/admin/quotations') ?>" class="px-5 py-2.5 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">ຍົກເລີກ</a>
                         <button type="submit" name="action" value="save" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200">ບັນທຶກ</button>
-                        <button type="submit" name="action" value="save_print" class="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl font-bold text-sm hover:from-emerald-600 hover:to-emerald-700 transition-all shadow-lg shadow-emerald-200">
+                        <button type="submit" name="action" value="save_print" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200">
                             <i class="fas fa-print"></i> ບັນທຶກ ແລະ ພິມ
                         </button>
                     </div>
