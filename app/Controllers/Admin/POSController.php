@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Sale;
+use App\Core\Database;
 
 class POSController extends \App\Controllers\BaseController
 {
@@ -15,11 +16,15 @@ class POSController extends \App\Controllers\BaseController
         $categories = (new Category())->all();
         $customers = (new Customer())->all();
 
+        $db = Database::getInstance()->getConnection();
+        $paymentMethods = $db->query("SELECT * FROM payment_methods WHERE is_active = 1")->fetchAll();
+
         return view('pages.admin.pos.index', [
             'title' => 'ຂາຍສິນຄ້າ',
             'products' => $products,
             'categories' => $categories,
             'customers' => $customers,
+            'paymentMethods' => $paymentMethods,
         ]);
     }
 
@@ -48,13 +53,14 @@ class POSController extends \App\Controllers\BaseController
                 }
             }
 
-            $saleId = (new Sale())->create($data, $data['items']);
+            $sale = (new Sale())->create($data, $data['items']);
 
             $this->json([
                 'success' => true,
                 'message' => 'ບັນທຶກການຂາຍສຳເລັດ',
-                'sale_id' => $saleId,
-                'invoice_url' => url('/admin/invoices/' . $saleId),
+                'sale_id' => $sale['id'],
+                'invoice_number' => $sale['invoice_number'],
+                'invoice_url' => url('/admin/invoices/' . $sale['id']),
             ]);
         } catch (\Exception $e) {
             $this->json(['success' => false, 'message' => 'ເກີດຂໍ້ຜິດພາດ: ' . $e->getMessage()], 500);

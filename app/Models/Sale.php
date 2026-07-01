@@ -131,8 +131,8 @@ class Sale
                 }
             }
 
-            $stmt = $this->db()->prepare("INSERT INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at, updated_at)
-                                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
+            $stmt = $this->db()->prepare("INSERT INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at)
+                                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
             $stmt->execute([
                 $invoiceNo,
                 $data['customer_id'] ?? null,
@@ -141,7 +141,7 @@ class Sale
                 $data['customer_address'] ?? '',
                 $data['subtotal'] ?? 0,
                 $data['discount'] ?? 0,
-                $data['discount_type'] ?? 'percentage',
+                $data['discount_type'] ?? 'percent',
                 $data['tax_percent'] ?? 0,
                 $data['tax_amount'] ?? 0,
                 $data['grand_total'] ?? 0,
@@ -149,7 +149,7 @@ class Sale
                 $data['amount_paid'] ?? 0,
                 $data['change_amount'] ?? 0,
                 $data['notes'] ?? '',
-                $data['status'] ?? 'completed',
+                $data['status'] ?? 'Completed',
                 $data['created_by'] ?? ($_SESSION['user']['id'] ?? null),
             ]);
 
@@ -172,8 +172,12 @@ class Sale
                 $stmtStock->execute([$item['quantity'], $item['product_id']]);
             }
 
+            $stmt = $this->db()->prepare("SELECT id, invoice_number FROM sales WHERE id = ?");
+            $stmt->execute([$saleId]);
+            $sale = $stmt->fetch();
+
             $this->db()->commit();
-            return $saleId;
+            return $sale;
         } catch (\Exception $e) {
             $this->db()->rollBack();
             throw $e;

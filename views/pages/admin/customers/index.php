@@ -64,9 +64,9 @@
                             <td class="py-3 px-2">
                                 <div class="flex items-center gap-2">
                                     <div class="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
-                                        <?= mb_substr($c['name'], 0, 1) ?>
+                                        <?= mb_substr($c['fullname'], 0, 1) ?>
                                     </div>
-                                    <span class="font-medium text-gray-800"><?= htmlspecialchars($c['name']) ?></span>
+                                    <span class="font-medium text-gray-800"><?= htmlspecialchars($c['fullname']) ?></span>
                                 </div>
                             </td>
                             <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($c['phone'] ?? '-') ?></td>

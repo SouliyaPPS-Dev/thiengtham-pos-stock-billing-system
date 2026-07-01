@@ -14,23 +14,9 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                fontFamily: {
-                    sans: ['Noto Sans Lao', 'sans-serif'],
-                },
-                colors: {
-                    primary: '#0ea5e9',
-                    'primary-dark': '#0284c7',
-                }
-            }
-        }
-    }
-    </script>
+    <link rel="stylesheet" href="<?= url('/public/css/app.css') ?>?v=<?= filemtime(dirname(__DIR__, 2) . '/public/css/app.css') ?>">
 
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -111,8 +97,7 @@
                             <i class="fas fa-shopping-cart text-lg"></i>
                             <span id="cart-count-badge"
                                   x-text="cartBadgeCount"
-                                  class="absolute -top-1 -right-1 min-w-[20px] h-5 px-1.5 rounded-full bg-sky-500 text-white text-[10px] font-black flex items-center justify-center shadow-sm">
-                            </span>
+                                  class="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-sky-500 text-white text-[11px] font-black flex items-center justify-center shadow-sm shadow-sky-200"><?= (int)($cartCount ?? 0) ?></span>
                         </a>
                     </div>
 

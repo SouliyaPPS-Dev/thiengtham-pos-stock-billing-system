@@ -80,10 +80,10 @@
                         <span class="text-[10px] font-bold <?= $stockColor ?>"><?= $stock ?> ຊິ້ນ</span>
                     </div>
                     <div class="mt-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <a href="<?= url('/admin/products/' . $p['id'] . '/edit') ?>" class="flex-1 text-center py-1.5 bg-sky-50 text-sky-600 rounded-lg text-[10px] font-bold hover:bg-sky-100 transition-all">
+                        <a href="<?= url('/admin/products/' . $p['id'] . '/edit') ?>" class="flex-1 text-center py-1.5 bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold hover:bg-amber-500 hover:text-white transition-all shadow-sm shadow-amber-100">
                             <i class="fas fa-pen"></i> ແກ້ໄຂ
                         </a>
-                        <a href="<?= url('/admin/products/' . $p['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="flex-1 text-center py-1.5 bg-red-50 text-red-600 rounded-lg text-[10px] font-bold hover:bg-red-100 transition-all">
+                        <a href="<?= url('/admin/products/' . $p['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="flex-1 text-center py-1.5 bg-red-100 text-red-700 rounded-lg text-[10px] font-bold hover:bg-red-500 hover:text-white transition-all shadow-sm shadow-red-100">
                             <i class="fas fa-trash"></i> ລຶບ
                         </a>
                     </div>
@@ -161,12 +161,14 @@
                                 <?php endif; ?>
                             </td>
                             <td class="py-3 px-2">
-                                <div class="flex items-center gap-1">
-                                    <a href="<?= url('/admin/products/' . $p['id'] . '/edit') ?>" class="icon-btn icon-btn-edit" title="ແກ້ໄຂ">
+                                <div class="flex items-center gap-1.5">
+                                    <a href="<?= url('/admin/products/' . $p['id'] . '/edit') ?>" class="icon-btn icon-btn-edit w-auto gap-1.5 px-3" title="ແກ້ໄຂ">
                                         <i class="fas fa-pen text-xs"></i>
+                                        <span class="text-[10px] hidden lg:inline">ແກ້ໄຂ</span>
                                     </a>
-                                    <a href="<?= url('/admin/products/' . $p['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="icon-btn icon-btn-delete" title="ລຶບ">
+                                    <a href="<?= url('/admin/products/' . $p['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="icon-btn icon-btn-delete w-auto gap-1.5 px-3" title="ລຶບ">
                                         <i class="fas fa-trash text-xs"></i>
+                                        <span class="text-[10px] hidden lg:inline">ລຶບ</span>
                                     </a>
                                 </div>
                             </td>

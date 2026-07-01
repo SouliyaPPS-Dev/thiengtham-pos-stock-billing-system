@@ -238,14 +238,33 @@
             </tbody>
         </table>
 
+        <?php
+            $items = $invoice['items'] ?? [];
+            $calcSubtotal = 0;
+            foreach ($items as $item) {
+                $calcSubtotal += (float)($item['subtotal'] ?? 0);
+            }
+        ?>
         <div class="totals">
             <div>
                 <span>ລວມຍ່ອຍ</span>
-                <span><?= number_format($invoice['total'], 0) ?> ກີບ</span>
+                <span><?= number_format($calcSubtotal, 0) ?> ກີບ</span>
             </div>
+            <?php if (!empty($invoice['discount']) && (float)$invoice['discount'] > 0): ?>
+            <div>
+                <span>ສ່ວນຫຼຸດ</span>
+                <span>-<?= number_format($invoice['discount'], 0) ?> ກີບ</span>
+            </div>
+            <?php endif; ?>
+            <?php if (!empty($invoice['tax_amount']) && (float)$invoice['tax_amount'] > 0): ?>
+            <div>
+                <span>ພາສີ (<?= (float)$invoice['tax_percent'] ?>%)</span>
+                <span><?= number_format($invoice['tax_amount'], 0) ?> ກີບ</span>
+            </div>
+            <?php endif; ?>
             <div class="grand-total">
                 <span>ລວມທັງໝົດ</span>
-                <span><?= number_format($invoice['total'], 0) ?> ກີບ</span>
+                <span><?= number_format($invoice['grand_total'] ?: $calcSubtotal, 0) ?> ກີບ</span>
             </div>
         </div>
 

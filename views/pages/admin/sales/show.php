@@ -41,7 +41,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($sale['items'] as $i => $item): ?>
+                                <?php foreach ($sale['items'] ?? [] as $i => $item): ?>
                                 <tr class="border-b border-gray-50 last:border-0">
                                     <td class="py-3 px-2 text-gray-600"><?= $i + 1 ?></td>
                                     <td class="py-3 px-2 font-medium text-gray-800"><?= htmlspecialchars($item['product_name']) ?></td>
@@ -87,22 +87,35 @@
                             <h2 class="text-base font-extrabold text-gray-800">ລວມຍອດ</h2>
                         </div>
                     </div>
+                    <?php
+                        $items = $sale['items'] ?? [];
+                        $calcSubtotal = 0;
+                        foreach ($items as $item) {
+                            $calcSubtotal += (float)$item['subtotal'];
+                        }
+                        $showDiscount = !empty($sale['discount']) && (float)$sale['discount'] > 0;
+                        $showTax = !empty($sale['tax_amount']) && (float)$sale['tax_amount'] > 0;
+                    ?>
                     <div class="space-y-3">
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">ລວມຍ່ອຍ</span>
-                            <span class="font-medium"><?= number_format($sale['subtotal'] ?? $sale['total'], 0) ?> ກີບ</span>
+                            <span class="font-medium"><?= number_format($sale['subtotal'] ?: $calcSubtotal, 0) ?> ກີບ</span>
                         </div>
+                        <?php if ($showDiscount): ?>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">ສ່ວນຫຼຸດ</span>
-                            <span class="font-medium text-red-500">-<?= number_format($sale['discount'] ?? 0, 0) ?> ກີບ</span>
+                            <span class="font-medium text-red-500">-<?= number_format($sale['discount'], 0) ?> ກີບ</span>
                         </div>
+                        <?php endif; ?>
+                        <?php if ($showTax): ?>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">ອາກອນ</span>
-                            <span class="font-medium"><?= number_format($sale['tax'] ?? 0, 0) ?> ກີບ</span>
+                            <span class="font-medium"><?= number_format($sale['tax_amount'], 0) ?> ກີບ</span>
                         </div>
+                        <?php endif; ?>
                         <div class="flex justify-between text-base font-bold pt-3 border-t">
                             <span>ລວມທັງໝົດ</span>
-                            <span class="text-primary"><?= number_format($sale['grand_total'] ?? $sale['total'], 0) ?> ກີບ</span>
+                            <span class="text-primary"><?= number_format($sale['grand_total'] ?: $calcSubtotal, 0) ?> ກີບ</span>
                         </div>
                     </div>
                 </div>
@@ -127,15 +140,15 @@
                             <span class="font-medium"><?= number_format($sale['amount_paid'], 0) ?> ກີບ</span>
                         </div>
                         <?php endif; ?>
-                        <?php if (!empty($sale['change'])): ?>
+                        <?php if (!empty($sale['change_amount'])): ?>
                         <div class="flex justify-between text-sm">
                             <span class="text-gray-500">ເງິນທອນ</span>
-                            <span class="font-medium text-green-600"><?= number_format($sale['change'], 0) ?> ກີບ</span>
+                            <span class="font-medium text-green-600"><?= number_format($sale['change_amount'], 0) ?> ກີບ</span>
                         </div>
                         <?php endif; ?>
                         <div class="flex justify-between text-sm pt-3 border-t">
                             <span class="text-gray-500">ສະຖານະ</span>
-                            <?php $st = $sale['status'] ?? 'completed'; ?>
+                            <?php $st = strtolower($sale['status'] ?? 'Completed'); ?>
                             <?php if ($st === 'completed'): ?>
                             <span class="status-badge status-badge-green"><span class="dot"></span> ສຳເລັດ</span>
                             <?php elseif ($st === 'refunded'): ?>
