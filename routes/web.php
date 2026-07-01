@@ -39,6 +39,7 @@ return [
     '/admin/products/{id}/edit' => ['Admin\ProductController', 'edit'],
     '/admin/products/{id}/update' => ['Admin\ProductController', 'update'],
     '/admin/products/{id}/delete' => ['Admin\ProductController', 'delete'],
+    '/admin/products/{id}/toggle-status' => ['Admin\ProductController', 'toggleStatus'],
     '/admin/products/{id}'      => ['Admin\ProductController', 'show'],
 
     // Categories
@@ -94,6 +95,16 @@ return [
     '/admin/users/{id}/edit' => ['Admin\UserController', 'edit'],
     '/admin/users/{id}/update' => ['Admin\UserController', 'update'],
     '/admin/users/{id}/delete' => ['Admin\UserController', 'delete'],
+
+    // Quotations
+    '/admin/quotations'                 => ['Admin\QuotationController', 'index'],
+    '/admin/quotations/create'          => ['Admin\QuotationController', 'create'],
+    '/admin/quotations/store'           => ['Admin\QuotationController', 'store'],
+    '/admin/quotations/{id}'            => ['Admin\QuotationController', 'show'],
+    '/admin/quotations/{id}/edit'       => ['Admin\QuotationController', 'edit'],
+    '/admin/quotations/{id}/update'     => ['Admin\QuotationController', 'update'],
+    '/admin/quotations/{id}/delete'     => ['Admin\QuotationController', 'delete'],
+    '/admin/quotations/{id}/print'      => ['Admin\QuotationController', 'printView'],
 
     // Settings
     '/admin/settings'              => ['Admin\SettingsController', 'index'],

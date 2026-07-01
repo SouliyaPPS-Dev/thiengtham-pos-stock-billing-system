@@ -2,11 +2,9 @@
 -- Database: pos_stock_db
 -- Supports two systems: /admin (POS) and / (E-commerce)
 
-CREATE DATABASE IF NOT EXISTS pos_stock_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+DROP DATABASE IF EXISTS pos_stock_db;
+CREATE DATABASE pos_stock_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE pos_stock_db;
-
--- Drop existing tables to apply fresh schema
-DROP TABLE IF EXISTS banners, cart_items, order_items, orders, sale_items, sales, product_images, products, categories, customer_addresses, customers, suppliers, expenses, expense_categories, payment_methods, settings, users;
 
 -- Users / Staff (Admin POS only)
 CREATE TABLE users (
@@ -417,6 +415,49 @@ INSERT INTO expenses (expense_date, category_id, amount, description, created_by
 INSERT INTO banners (title, subtitle, image, link, sort_order, status) VALUES
     ('ສິນຄ້າໃໝ່ມາຮອດແລ້ວ!', 'ສິນຄ້າຄຸນນະພາບສູງ ລາຄາຖືກ ສົ່ງທົ່ວປະເທດ', 'https://picsum.photos/id/10/1200/400', '/products', 1, 'Active'),
     ('ໂປຣໂມຊັ້ນພິເສດ', 'ຊື້ 5 ຂຶ້ນໄປ ຮັບສ່ວນຫຼຸດ 10%', 'https://picsum.photos/id/11/1200/400', '/products?category=drinks', 2, 'Active');
+
+-- ==========================================================================
+-- Quotations System (Quotation/Bill templates from Excel files)
+-- ==========================================================================
+DROP TABLE IF EXISTS quotation_items, quotations;
+
+CREATE TABLE quotations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quotation_number VARCHAR(50) NOT NULL UNIQUE,
+    company_template VARCHAR(50) NOT NULL DEFAULT 'luang-prabarg',
+    supplier_id INT DEFAULT NULL,
+    supplier_name VARCHAR(200) DEFAULT NULL,
+    supplier_contact VARCHAR(200) DEFAULT NULL,
+    ref_no VARCHAR(100) DEFAULT NULL,
+    date DATE DEFAULT NULL,
+    subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
+    discount DECIMAL(12,2) NOT NULL DEFAULT 0,
+    tax_percent DECIMAL(5,2) DEFAULT 10.00,
+    tax_amount DECIMAL(12,2) DEFAULT 0,
+    grand_total DECIMAL(12,2) NOT NULL DEFAULT 0,
+    notes TEXT,
+    terms TEXT,
+    status ENUM('Draft', 'Sent', 'Approved', 'Rejected') NOT NULL DEFAULT 'Draft',
+    created_by INT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_quotation_number (quotation_number)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE quotation_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quotation_id INT NOT NULL,
+    product_id INT DEFAULT NULL,
+    product_name VARCHAR(255) NOT NULL,
+    quantity DECIMAL(12,2) NOT NULL DEFAULT 1,
+    unit VARCHAR(50) DEFAULT 'SET',
+    unit_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+    amount DECIMAL(12,2) NOT NULL DEFAULT 0,
+    FOREIGN KEY (quotation_id) REFERENCES quotations(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- ==========================================================================
 -- Migration for existing databases: add supplier columns to sales table

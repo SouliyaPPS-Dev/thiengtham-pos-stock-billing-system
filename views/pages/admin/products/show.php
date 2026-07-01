@@ -39,11 +39,12 @@
                             if (!empty($img['image'])) $allImages[] = $img['image'];
                         }
                     }
+                    $imagesJson = json_encode($allImages);
                     ?>
-                    <div x-data="{ activeImage: 0, images: <?= json_encode($allImages) ?> }">
+                    <div x-data="{ activeImage: 0, images: <?= $imagesJson ?> }">
                         <div class="aspect-square bg-gray-50 rounded-2xl overflow-hidden mb-4">
                             <template x-if="images.length > 0">
-                                <img :src="images[activeImage]" alt="<?= htmlspecialchars($product['name']) ?>" class="w-full h-full object-cover">
+                                <img :src="images[activeImage]" alt="<?= htmlspecialchars($product['name']) ?>" class="w-full h-full object-cover" @error="$el.classList.add('hidden'); $el.nextElementSibling?.classList.remove('hidden')">
                             </template>
                             <template x-if="images.length === 0">
                                 <div class="w-full h-full flex items-center justify-center text-gray-300">
@@ -54,10 +55,10 @@
                         <template x-if="images.length > 1">
                             <div class="flex gap-2 overflow-x-auto pb-1">
                                 <template x-for="(img, i) in images" :key="i">
-                                    <button @click="activeImage = i"
+                                    <button @click.prevent="activeImage = i"
                                             class="flex-shrink-0 h-16 w-16 rounded-xl overflow-hidden border-2 transition-all"
                                             :class="activeImage === i ? 'border-sky-500 shadow-sm' : 'border-gray-100 hover:border-gray-300'">
-                                        <img :src="img" class="h-full w-full object-cover">
+                                        <img :src="img" class="h-full w-full object-cover" @error="$el.classList.add('hidden')">
                                     </button>
                                 </template>
                             </div>
@@ -134,18 +135,18 @@
                         </div>
                         <div class="flex items-center justify-between py-3">
                             <span class="text-sm text-gray-500">ສະຖານະ</span>
-                            <?php if (($product['status'] ?? 'active') === 'active'): ?>
-                            <span class="px-3 py-1 rounded-lg bg-green-100 text-green-700 text-xs font-bold">
-                                <i class="fas fa-circle text-[6px] mr-1"></i> ເປີດໃຊ້
-                            </span>
-                            <?php else: ?>
-                            <span class="px-3 py-1 rounded-lg bg-gray-100 text-gray-500 text-xs font-bold">
-                                <i class="fas fa-circle text-[6px] mr-1"></i> ປິດໃຊ້
-                            </span>
-                            <?php endif; ?>
+                            <div class="flex items-center gap-2">
+                                <?php $isActive = strtolower($product['status'] ?? 'active') === 'active'; ?>
+                                <span class="px-3 py-1 rounded-lg text-xs font-bold <?= $isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' ?>">
+                                    <i class="fas fa-circle text-[6px] mr-1"></i> <?= $isActive ? 'ເປີດໃຊ້' : 'ປິດໃຊ້ງານ' ?>
+                                </span>
+                                <button type="button" onclick="confirmToggleStatus(<?= $product['id'] ?>, <?= $isActive ? 'true' : 'false' ?>)" class="px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all <?= $isActive ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-green-100 text-green-700 hover:bg-green-200' ?>">
+                                    <i class="fas <?= $isActive ? 'fa-toggle-off' : 'fa-toggle-on' ?>"></i>
+                                    <?= $isActive ? 'ປິດ' : 'ເປີດ' ?>
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <?php if ($stock > 0): ?>
                     <div class="mt-6 pt-4 border-t border-gray-50">
                         <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
                             <span>ສະຕ໋ອກ</span>
@@ -160,10 +161,8 @@
                             <div class="<?= $barColor ?> h-full rounded-full transition-all duration-500" style="width: <?= $stockPercent ?>%"></div>
                         </div>
                     </div>
-                    <?php endif; ?>
                 </div>
 
-                <?php if (!empty($product['description'])): ?>
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                         <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">
@@ -174,9 +173,12 @@
                             <p class="text-xs text-gray-400">ລາຍລະອຽດເພີ່ມເຕີມ</p>
                         </div>
                     </div>
+                    <?php if (!empty($product['description'])): ?>
                     <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line"><?= nl2br(htmlspecialchars($product['description'])) ?></p>
+                    <?php else: ?>
+                    <p class="text-sm text-gray-400 italic">ບໍ່ມີລາຍລະອຽດ</p>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
 
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
@@ -203,3 +205,24 @@
         </div>
     </div>
 </div>
+
+<script>
+function confirmToggleStatus(id, isActive) {
+    const action = isActive ? 'ປິດໃຊ້ງານ' : 'ເປີດໃຊ້ງານ';
+    Swal.fire({
+        title: 'ຕ້ອງການ' + action + 'ສິນຄ້ານີ້?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: isActive ? '#ef4444' : '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'ແມ່ນ, ' + action,
+        cancelButtonText: 'ຍົກເລີກ',
+        reverseButtons: true,
+        customClass: { popup: 'rounded-3xl' }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '<?= url('/admin/products') ?>/' + id + '/toggle-status';
+        }
+    });
+}
+</script>
