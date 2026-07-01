@@ -363,6 +363,14 @@ $adminPrefix = '/admin';
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
+                    <div class="flex bg-gray-100/80 p-0.5 rounded-lg border border-gray-200/50">
+                        <a href="?layout=sidebar" class="px-2 lg:px-2.5 py-1 rounded-md text-[9px] font-black transition-all <?= $layout_pref === 'sidebar' ? 'bg-white shadow-sm text-primary' : 'text-gray-400 hover:text-gray-600' ?>">
+                            <i class="fas fa-columns mr-0.5"></i> SB
+                        </a>
+                        <a href="?layout=navbar" class="px-2 lg:px-2.5 py-1 rounded-md text-[9px] font-black transition-all <?= $layout_pref === 'navbar' ? 'bg-white shadow-sm text-primary' : 'text-gray-400 hover:text-gray-600' ?>">
+                            <i class="fas fa-window-maximize mr-0.5"></i> NB
+                        </a>
+                    </div>
                     <button onclick="toggleFullscreen()" class="h-9 w-9 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all" title="ເຕັມຈໍ">
                         <i class="fas fa-expand text-xs"></i>
                     </button>

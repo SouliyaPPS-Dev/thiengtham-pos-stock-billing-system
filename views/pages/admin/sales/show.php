@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-sky-50/30 p-4 md:p-8">
+<div class="bg-gradient-to-br from-gray-50 via-white to-sky-50/30 p-4 md:p-8 min-h-full">
     <div class="max-w-4xl mx-auto space-y-6 animate-fade-in">
 
             <div class="flex items-center justify-between">
