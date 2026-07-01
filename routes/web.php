@@ -52,8 +52,10 @@ return [
     '/admin/pos/checkout'   => ['Admin\POSController', 'checkout'],
 
     // Sales
-    '/admin/sales'      => ['Admin\SaleController', 'index'],
-    '/admin/sales/{id}' => ['Admin\SaleController', 'show'],
+    '/admin/sales'                    => ['Admin\SaleController', 'index'],
+    '/admin/sales/{id}'               => ['Admin\SaleController', 'show'],
+    '/admin/sales/{id}/update-status' => ['Admin\SaleController', 'updateStatus'],
+    '/admin/sales/{id}/delete'        => ['Admin\SaleController', 'delete'],
 
     // Customers
     '/admin/customers'           => ['Admin\CustomerController', 'index'],

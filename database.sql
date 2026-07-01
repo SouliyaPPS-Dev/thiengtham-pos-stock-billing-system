@@ -129,6 +129,8 @@ CREATE TABLE sales (
     customer_name VARCHAR(200) DEFAULT NULL,
     customer_phone VARCHAR(20) DEFAULT NULL,
     customer_address TEXT,
+    supplier_id INT DEFAULT NULL,
+    supplier_name VARCHAR(200) DEFAULT NULL,
     subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
     discount DECIMAL(12,2) NOT NULL DEFAULT 0,
     discount_type ENUM('percent', 'fixed') DEFAULT 'fixed',
@@ -143,6 +145,7 @@ CREATE TABLE sales (
     created_by INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
+    FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_invoice (invoice_number),
     INDEX idx_date (created_at)
@@ -414,3 +417,11 @@ INSERT INTO expenses (expense_date, category_id, amount, description, created_by
 INSERT INTO banners (title, subtitle, image, link, sort_order, status) VALUES
     ('ສິນຄ້າໃໝ່ມາຮອດແລ້ວ!', 'ສິນຄ້າຄຸນນະພາບສູງ ລາຄາຖືກ ສົ່ງທົ່ວປະເທດ', 'https://picsum.photos/id/10/1200/400', '/products', 1, 'Active'),
     ('ໂປຣໂມຊັ້ນພິເສດ', 'ຊື້ 5 ຂຶ້ນໄປ ຮັບສ່ວນຫຼຸດ 10%', 'https://picsum.photos/id/11/1200/400', '/products?category=drinks', 2, 'Active');
+
+-- ==========================================================================
+-- Migration for existing databases: add supplier columns to sales table
+-- ==========================================================================
+-- ALTER TABLE sales
+--   ADD COLUMN supplier_id INT DEFAULT NULL AFTER customer_address,
+--   ADD COLUMN supplier_name VARCHAR(200) DEFAULT NULL AFTER supplier_id,
+--   ADD FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL;

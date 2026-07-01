@@ -165,10 +165,19 @@ class ProductController extends \App\Controllers\BaseController
         $product = (new Product())->find($id);
 
         if (!$product) {
-            $this->json(['error' => 'ບໍ່ພົບສິນຄ້າ'], 404);
+            $this->redirect('/admin/products', [
+                'error' => 1,
+                'error_msg' => 'ບໍ່ພົບສິນຄ້າ',
+            ]);
         }
 
-        $this->json($product);
+        $images = (new Product())->getProductImages($id);
+
+        return view('pages.admin.products.show', [
+            'title' => $product['name'],
+            'product' => $product,
+            'images' => $images,
+        ]);
     }
 
     public function search()

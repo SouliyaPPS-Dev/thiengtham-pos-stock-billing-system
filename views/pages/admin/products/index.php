@@ -80,6 +80,9 @@
                         <span class="text-[10px] font-bold <?= $stockColor ?>"><?= $stock ?> ຊິ້ນ</span>
                     </div>
                     <div class="mt-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <a href="<?= url('/admin/products/' . $p['id']) ?>" class="flex-1 text-center py-1.5 bg-sky-100 text-sky-700 rounded-lg text-[10px] font-bold hover:bg-sky-500 hover:text-white transition-all shadow-sm shadow-sky-100">
+                            <i class="fas fa-eye"></i> ເບິ່ງ
+                        </a>
                         <a href="<?= url('/admin/products/' . $p['id'] . '/edit') ?>" class="flex-1 text-center py-1.5 bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold hover:bg-amber-500 hover:text-white transition-all shadow-sm shadow-amber-100">
                             <i class="fas fa-pen"></i> ແກ້ໄຂ
                         </a>
@@ -104,6 +107,7 @@
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-gray-100">
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຮູບ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່ສິນຄ້າ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">SKU</th>
@@ -117,7 +121,7 @@
                     <tbody>
                         <?php if (empty($products)): ?>
                         <tr>
-                            <td colspan="8" class="py-3 px-2">
+                            <td colspan="9" class="py-3 px-2">
                                 <div class="flex flex-col items-center justify-center py-12 text-center">
                                     <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                         <i class="fas fa-box-open text-2xl"></i>
@@ -128,8 +132,10 @@
                             </td>
                         </tr>
                         <?php else: ?>
-                        <?php foreach ($products as $p): ?>
+                        <?php $i = 0; ?>
+                        <?php foreach ($products as $p): $i++; ?>
                         <tr class="border-b border-gray-50 last:border-0">
+                            <td class="py-3 px-2 text-gray-400 text-sm text-center"><?= $i ?></td>
                             <td class="py-3 px-2">
                                 <div class="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 overflow-hidden">
                                     <?php if (!empty($p['image'])): ?>
@@ -162,9 +168,13 @@
                             </td>
                             <td class="py-3 px-2">
                                 <div class="flex items-center gap-1.5">
+                                    <a href="<?= url('/admin/products/' . $p['id']) ?>" class="icon-btn icon-btn-info w-auto gap-1.5 px-3" title="ເບິ່ງລາຍລະອຽດ">
+                                        <i class="fas fa-eye text-xs"></i>
+                                        <span class="text-[10px] hidden lg:inline">ເບິ່ງ</span>
+                                    </a>
                                     <a href="<?= url('/admin/products/' . $p['id'] . '/edit') ?>" class="icon-btn icon-btn-edit w-auto gap-1.5 px-3" title="ແກ້ໄຂ">
                                         <i class="fas fa-pen text-xs"></i>
-                                        <span class="text-[10px] hidden lg:inline">ແກ້ໄຂ</span>
+                                        <span class="text-[10px] hidden lg:inline">ແກ້ໂຂ</span>
                                     </a>
                                     <a href="<?= url('/admin/products/' . $p['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="icon-btn icon-btn-delete w-auto gap-1.5 px-3" title="ລຶບ">
                                         <i class="fas fa-trash text-xs"></i>

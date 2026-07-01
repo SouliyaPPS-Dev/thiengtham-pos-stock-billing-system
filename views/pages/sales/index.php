@@ -23,6 +23,7 @@
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-gray-100">
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ໃບບິນ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວັນທີ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລູກຄ້າ</th>
@@ -35,7 +36,7 @@
                     <tbody>
                         <?php if (empty($sales)): ?>
                         <tr>
-                            <td colspan="7" class="py-3 px-2">
+                            <td colspan="8" class="py-3 px-2">
                                 <div class="flex flex-col items-center justify-center py-12 text-center">
                                     <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                         <i class="fas fa-receipt text-2xl"></i>
@@ -46,8 +47,10 @@
                             </td>
                         </tr>
                         <?php else: ?>
-                        <?php foreach ($sales as $s): ?>
+                        <?php $i = 0; ?>
+                        <?php foreach ($sales as $s): $i++; ?>
                         <tr class="cursor-pointer border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors" onclick="window.location.href='<?= url('/sales/' . $s['id']) ?>'">
+                            <td class="py-3 px-2 text-gray-400 text-sm text-center"><?= $i ?></td>
                             <td class="py-3 px-2 font-mono font-bold text-gray-800">#<?= htmlspecialchars($s['invoice_number'] ?? str_pad($s['id'], 6, '0', STR_PAD_LEFT)) ?></td>
                             <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars(date('d/m/Y H:i', strtotime($s['created_at']))) ?></td>
                             <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></td>

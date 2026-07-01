@@ -33,6 +33,7 @@
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-gray-100">
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ໃບບິນ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວັນທີ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລູກຄ້າ</th>
@@ -46,7 +47,7 @@
                     <tbody>
                         <?php if (empty($sales)): ?>
                         <tr>
-                            <td colspan="8" class="py-3 px-2">
+                            <td colspan="9" class="py-3 px-2">
                                 <div class="flex flex-col items-center justify-center py-12 text-center">
                                     <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                         <i class="fas fa-receipt text-2xl"></i>
@@ -57,34 +58,55 @@
                             </td>
                         </tr>
                         <?php else: ?>
-                        <?php foreach ($sales as $s): ?>
-                        <tr class="cursor-pointer border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors" onclick="window.location.href='<?= url('/admin/sales/' . $s['id']) ?>'">
-                            <td class="py-3 px-2 font-mono font-bold text-gray-800">#<?= htmlspecialchars($s['invoice_number'] ?? str_pad($s['id'], 6, '0', STR_PAD_LEFT)) ?></td>
+                        <?php $i = 0; ?>
+                        <?php foreach ($sales as $s): $i++; ?>
+                        <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                            <td class="py-3 px-2 text-gray-400 text-sm text-center"><?= $i ?></td>
+                            <td class="py-3 px-2">
+                                <a href="<?= url('/admin/sales/' . $s['id']) ?>" class="font-mono font-bold text-gray-800 hover:text-primary">#<?= htmlspecialchars($s['invoice_number'] ?? str_pad($s['id'], 6, '0', STR_PAD_LEFT)) ?></a>
+                            </td>
                             <td class="py-3 px-2 text-gray-600"><?= date('d/m/Y H:i', strtotime($s['created_at'])) ?></td>
                             <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></td>
                             <td class="py-3 px-2 text-gray-600"><?= (int)($s['items_count'] ?? 0) ?></td>
                             <td class="py-3 px-2">
-                                <?php $pm = $s['payment_method'] ?? 'cash'; ?>
+                                <?php $pm = strtolower($s['payment_method'] ?? 'cash'); ?>
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold <?= $pm === 'cash' ? 'bg-green-50 text-green-600' : ($pm === 'transfer' ? 'bg-blue-50 text-blue-600' : ($pm === 'qr' ? 'bg-purple-50 text-purple-600' : 'bg-gray-50 text-gray-600')) ?>">
                                     <i class="fas fa-<?= $pm === 'cash' ? 'money-bill' : ($pm === 'transfer' ? 'exchange-alt' : ($pm === 'qr' ? 'qrcode' : 'credit-card')) ?>"></i>
                                     <?= $pm === 'cash' ? 'ເງິນສົດ' : ($pm === 'transfer' ? 'ໂອນ' : ($pm === 'qr' ? 'QR' : 'ກູ້')) ?>
                                 </span>
                             </td>
-                            <td class="py-3 px-2 font-medium text-gray-800"><?= number_format($s['grand_total'] ?? $s['total'], 0) ?> ກີບ</td>
+                            <td class="py-3 px-2 font-medium text-gray-800"><?= number_format($s['grand_total'] ?: 0, 0) ?> ກີບ</td>
                             <td class="py-3 px-2">
-                                <?php $st = $s['status'] ?? 'completed'; ?>
+                                <?php $st = strtolower($s['status'] ?? 'Completed'); ?>
                                 <?php if ($st === 'completed'): ?>
                                 <span class="status-badge status-badge-green"><span class="dot"></span> ສຳເລັດ</span>
                                 <?php elseif ($st === 'refunded'): ?>
                                 <span class="status-badge status-badge-red"><span class="dot"></span> ຄືນເງິນ</span>
-                                <?php else: ?>
+                                <?php elseif ($st === 'cancelled'): ?>
                                 <span class="status-badge status-badge-gray"><span class="dot"></span> ຍົກເລີກ</span>
+                                <?php else: ?>
+                                <span class="status-badge status-badge-gray"><?= htmlspecialchars($s['status']) ?></span>
                                 <?php endif; ?>
                             </td>
                             <td class="py-3 px-2">
-                                <a href="<?= url('/admin/sales/' . $s['id']) ?>" class="icon-btn icon-btn-view">
-                                    <i class="fas fa-eye text-xs"></i>
-                                </a>
+                                <div class="flex items-center gap-1">
+                                    <a href="<?= url('/admin/sales/' . $s['id']) ?>" class="icon-btn icon-btn-view" title="ເບິ່ງລາຍລະອຽດ">
+                                        <i class="fas fa-eye text-xs"></i>
+                                    </a>
+                                    <a href="<?= url('/admin/invoices/' . $s['id'] . '/print') ?>" target="_blank" class="icon-btn icon-btn-print" title="ພິມໃບບິນ">
+                                        <i class="fas fa-print text-xs"></i>
+                                    </a>
+                                    <?php if (strtolower($s['status'] ?? '') === 'completed'): ?>
+                                    <button type="button" class="icon-btn icon-btn-warning" title="ຄືນເງິນ"
+                                        onclick="confirmRefund(<?= $s['id'] ?>)">
+                                        <i class="fas fa-undo text-xs"></i>
+                                    </button>
+                                    <?php endif; ?>
+                                    <button type="button" class="icon-btn icon-btn-danger" title="ລົບ"
+                                        onclick="confirmDelete(<?= $s['id'] ?>)">
+                                        <i class="fas fa-trash text-xs"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach; ?>
@@ -95,3 +117,48 @@
         </div>
     </div>
 </div>
+
+<form id="form-refund" method="POST" action="" class="hidden">
+    <input type="hidden" name="status" value="Refunded">
+</form>
+<form id="form-delete" method="POST" action="" class="hidden"></form>
+
+<script>
+function confirmRefund(id) {
+    Swal.fire({
+        title: 'ຄືນເງິນໃບບິນ?',
+        text: 'ທ່ານຕ້ອງການປ່ຽນສະຖານະເປັນ ຄືນເງິນ ບໍ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#f59e0b',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'ແມ່ນ, ຄືນເງິນ',
+        cancelButtonText: 'ຍົກເລີກ'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const form = document.getElementById('form-refund');
+            form.action = '<?= url('/admin/sales') ?>/' + id + '/update-status';
+            form.submit();
+        }
+    });
+}
+
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'ລົບໃບບິນ?',
+        text: 'ທ່ານຕ້ອງການລົບໃບບິນນີ້ ບໍ? ການກະທຳນີ້ບໍ່ສາມາດກັບຄືນໄດ້',
+        icon: 'error',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'ແມ່ນ, ລົບ',
+        cancelButtonText: 'ຍົກເລີກ'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const form = document.getElementById('form-delete');
+            form.action = '<?= url('/admin/sales') ?>/' + id + '/delete';
+            form.submit();
+        }
+    });
+}
+</script>

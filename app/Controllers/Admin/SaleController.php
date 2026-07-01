@@ -48,4 +48,58 @@ class SaleController extends \App\Controllers\BaseController
             'sale' => $sale,
         ]);
     }
+
+    public function updateStatus($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/sales');
+        }
+
+        $sale = (new Sale())->find($id);
+        if (!$sale) {
+            $this->redirect('/admin/sales', [
+                'error' => 1,
+                'error_msg' => 'ບໍ່ພົບບິນ',
+            ]);
+        }
+
+        $status = $_POST['status'] ?? '';
+        $allowed = ['Completed', 'Refunded', 'Cancelled'];
+
+        if (!in_array($status, $allowed)) {
+            $this->redirect('/admin/sales/' . $id, [
+                'error' => 1,
+                'error_msg' => 'ສະຖານະບໍ່ຖືກຕ້ອງ',
+            ]);
+        }
+
+        (new Sale())->updateStatus($id, $status);
+
+        $this->redirect('/admin/sales/' . $id, [
+            'success' => 1,
+            'success_msg' => 'ອັບເດດສະຖານະສຳເລັດ',
+        ]);
+    }
+
+    public function delete($id)
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/sales');
+        }
+
+        $sale = (new Sale())->find($id);
+        if (!$sale) {
+            $this->redirect('/admin/sales', [
+                'error' => 1,
+                'error_msg' => 'ບໍ່ພົບບິນ',
+            ]);
+        }
+
+        (new Sale())->delete($id);
+
+        $this->redirect('/admin/sales', [
+            'success' => 1,
+            'success_msg' => 'ລົບບິນສຳເລັດ',
+        ]);
+    }
 }

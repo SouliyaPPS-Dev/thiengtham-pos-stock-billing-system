@@ -59,6 +59,7 @@
                         <table class="w-full text-sm">
                             <thead>
                                 <tr class="border-b border-gray-100">
+                                    <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                                     <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່ໝວດ</th>
                                     <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລາຍລະອຽດ</th>
                                     <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຈຳນວນສິນຄ້າ</th>
@@ -68,7 +69,7 @@
                             <tbody>
                                 <?php if (empty($categories)): ?>
                                 <tr>
-                                <td colspan="4" class="py-3 px-2">
+                                <td colspan="5" class="py-3 px-2">
                                     <div class="flex flex-col items-center justify-center py-12 text-center">
                                         <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                             <i class="fas fa-tags text-2xl"></i>
@@ -79,8 +80,10 @@
                                 </td>
                                 </tr>
                                 <?php else: ?>
-                                <?php foreach ($categories as $cat): ?>
+                                <?php $i = 0; ?>
+                                <?php foreach ($categories as $cat): $i++; ?>
                                 <tr class="border-b border-gray-50 last:border-0">
+                                    <td class="py-3 px-2 text-gray-400 text-sm text-center"><?= $i ?></td>
                                     <td class="py-3 px-2 font-medium text-gray-800"><?= htmlspecialchars($cat['name']) ?></td>
                                     <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($cat['description'] ?? '-') ?></td>
                                     <td class="py-3 px-2 text-gray-600"><?= (int)($cat['product_count'] ?? 0) ?></td>

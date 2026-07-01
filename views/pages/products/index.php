@@ -35,6 +35,7 @@
             <table class="w-full text-sm">
                 <thead>
                     <tr>
+                        <th style="width:48px">#</th>
                         <th>ຮູບ</th>
                         <th>ຊື່ສິນຄ້າ</th>
                         <th>SKU</th>
@@ -48,7 +49,7 @@
                 <tbody>
                     <?php if (empty($products)): ?>
                     <tr>
-                        <td colspan="8">
+                        <td colspan="9">
                             <div class="empty-state">
                                 <div class="empty-state-icon">
                                     <i class="fas fa-box-open"></i>
@@ -59,8 +60,10 @@
                         </td>
                     </tr>
                     <?php else: ?>
-                    <?php foreach ($products as $p): ?>
+                    <?php $i = 0; ?>
+                    <?php foreach ($products as $p): $i++; ?>
                     <tr>
+                        <td class="text-gray-400 text-sm text-center"><?= $i ?></td>
                         <td>
                             <div class="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 overflow-hidden">
                                 <?php if (!empty($p['image'])): ?>

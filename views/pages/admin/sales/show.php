@@ -1,21 +1,33 @@
 <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-sky-50/30 p-4 md:p-8">
     <div class="max-w-4xl mx-auto space-y-6 animate-fade-in">
 
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <a href="<?= url('/admin/sales') ?>" class="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all">
-                    <i class="fas fa-arrow-left"></i>
-                </a>
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">ໃບເກັບເງິນ #<?= htmlspecialchars($sale['invoice_number'] ?? str_pad($sale['id'], 6, '0', STR_PAD_LEFT)) ?></h1>
-                    <p class="text-sm text-gray-500 mt-0.5">ລາຍລະອຽດການຂາຍ</p>
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <a href="<?= url('/admin/sales') ?>" class="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">ໃບເກັບເງິນ #<?= htmlspecialchars($sale['invoice_number'] ?? str_pad($sale['id'], 6, '0', STR_PAD_LEFT)) ?></h1>
+                        <p class="text-sm text-gray-500 mt-0.5">ລາຍລະອຽດການຂາຍ</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="<?= url('/admin/invoices/' . $sale['id'] . '/print') ?>" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-100 text-emerald-700 rounded-xl font-bold text-sm hover:bg-emerald-200 transition-all shadow-lg shadow-emerald-200 active:scale-[0.97]">
+                        <i class="fas fa-print"></i>
+                        <span class="hidden sm:inline">ພິມ</span>
+                    </a>
+                    <?php if (strtolower($sale['status'] ?? '') === 'completed'): ?>
+                    <button type="button" onclick="confirmRefund(<?= $sale['id'] ?>)" class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-100 text-amber-700 rounded-xl font-bold text-sm hover:bg-amber-200 transition-all shadow-lg shadow-amber-200 active:scale-[0.97]">
+                        <i class="fas fa-undo"></i>
+                        <span class="hidden sm:inline">ຄືນເງິນ</span>
+                    </button>
+                    <?php endif; ?>
+                    <button type="button" onclick="confirmDelete(<?= $sale['id'] ?>)" class="inline-flex items-center gap-2 px-4 py-2.5 bg-red-100 text-red-700 rounded-xl font-bold text-sm hover:bg-red-200 transition-all shadow-lg shadow-red-200 active:scale-[0.97]">
+                        <i class="fas fa-trash"></i>
+                        <span class="hidden sm:inline">ລົບ</span>
+                    </button>
                 </div>
             </div>
-            <a href="<?= url('/admin/invoices/' . $sale['id'] . '/print') ?>" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
-                <i class="fas fa-print"></i>
-                <span class="hidden sm:inline">ພິມໃບບິນ</span>
-            </a>
-        </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 space-y-6">
@@ -63,16 +75,20 @@
                             <i class="fas fa-user text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-extrabold text-gray-800">ຂໍ້ມູນລູກຄ້າ</h2>
+                            <h2 class="text-base font-extrabold text-gray-800"><?= !empty($sale['supplier_name']) ? 'ຂໍ້ມູນຜູ້ສະໜອງ' : 'ຂໍ້ມູນລູກຄ້າ' ?></h2>
                         </div>
                     </div>
                     <div class="space-y-3">
+                        <?php if (!empty($sale['supplier_name'])): ?>
+                        <p class="text-sm font-bold text-gray-800"><i class="fas fa-truck mr-2 text-amber-500"></i><?= htmlspecialchars($sale['supplier_name']) ?></p>
+                        <?php else: ?>
                         <p class="text-sm font-bold text-gray-800"><?= htmlspecialchars($sale['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></p>
                         <?php if (!empty($sale['customer_phone'])): ?>
                         <p class="text-sm text-gray-500"><i class="fas fa-phone mr-2"></i><?= htmlspecialchars($sale['customer_phone']) ?></p>
                         <?php endif; ?>
                         <?php if (!empty($sale['customer_address'])): ?>
                         <p class="text-sm text-gray-500"><i class="fas fa-map-marker-alt mr-2"></i><?= htmlspecialchars($sale['customer_address']) ?></p>
+                        <?php endif; ?>
                         <?php endif; ?>
                         <p class="text-xs text-gray-400"><i class="far fa-calendar mr-1"></i><?= date('d/m/Y H:i', strtotime($sale['created_at'])) ?></p>
                     </div>
@@ -163,3 +179,48 @@
         </div>
     </div>
 </div>
+
+<form id="form-refund" method="POST" action="" class="hidden">
+    <input type="hidden" name="status" value="Refunded">
+</form>
+<form id="form-delete" method="POST" action="" class="hidden"></form>
+
+<script>
+function confirmRefund(id) {
+    Swal.fire({
+        title: 'ຄືນເງິນໃບບິນ?',
+        text: 'ທ່ານຕ້ອງການປ່ຽນສະຖານະເປັນ ຄືນເງິນ ບໍ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#f59e0b',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'ແມ່ນ, ຄືນເງິນ',
+        cancelButtonText: 'ຍົກເລີກ'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const form = document.getElementById('form-refund');
+            form.action = '<?= url('/admin/sales') ?>/' + id + '/update-status';
+            form.submit();
+        }
+    });
+}
+
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'ລົບໃບບິນ?',
+        text: 'ທ່ານຕ້ອງການລົບໃບບິນນີ້ ບໍ? ການກະທຳນີ້ບໍ່ສາມາດກັບຄືນໄດ້',
+        icon: 'error',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'ແມ່ນ, ລົບ',
+        cancelButtonText: 'ຍົກເລີກ'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const form = document.getElementById('form-delete');
+            form.action = '<?= url('/admin/sales') ?>/' + id + '/delete';
+            form.submit();
+        }
+    });
+}
+</script>

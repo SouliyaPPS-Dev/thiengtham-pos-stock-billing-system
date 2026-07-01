@@ -5,6 +5,7 @@ namespace App\Controllers\Admin;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Customer;
+use App\Models\Supplier;
 use App\Models\Sale;
 use App\Core\Database;
 
@@ -15,6 +16,7 @@ class POSController extends \App\Controllers\BaseController
         $products = (new Product())->getAll('', [], 0, 0);
         $categories = (new Category())->all();
         $customers = (new Customer())->all();
+        $suppliers = (new Supplier())->all();
 
         $db = Database::getInstance()->getConnection();
         $paymentMethods = $db->query("SELECT * FROM payment_methods WHERE is_active = 1")->fetchAll();
@@ -24,6 +26,7 @@ class POSController extends \App\Controllers\BaseController
             'products' => $products,
             'categories' => $categories,
             'customers' => $customers,
+            'suppliers' => $suppliers,
             'paymentMethods' => $paymentMethods,
         ]);
     }
