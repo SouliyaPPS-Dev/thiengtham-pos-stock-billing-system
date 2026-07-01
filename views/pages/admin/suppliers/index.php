@@ -29,6 +29,7 @@
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-gray-100">
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່ຜູ້ສະໜອງ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຜູ້ຕິດຕໍ່</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ເບີໂທ</th>
@@ -40,7 +41,7 @@
                     <tbody>
                         <?php if (empty($suppliers)): ?>
                         <tr>
-                            <td colspan="6" class="py-3 px-2">
+                            <td colspan="7" class="py-3 px-2">
                                 <div class="flex flex-col items-center justify-center py-12 text-center">
                                     <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                         <i class="fas fa-truck text-2xl"></i>
@@ -51,8 +52,10 @@
                             </td>
                         </tr>
                         <?php else: ?>
-                        <?php foreach ($suppliers as $s): ?>
+                        <?php $i = 0; ?>
+                        <?php foreach ($suppliers as $s): $i++; ?>
                         <tr class="border-b border-gray-50 last:border-0">
+                            <td class="py-3 px-2 text-gray-400 text-sm text-center"><?= $i ?></td>
                             <td class="py-3 px-2 font-medium text-gray-800"><?= htmlspecialchars($s['name']) ?></td>
                             <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['contact_person'] ?? '-') ?></td>
                             <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['phone'] ?? '-') ?></td>

@@ -13,7 +13,8 @@ class Sale
 
     public function getAll($where = '', $params = [], $limit = 0, $offset = 0)
     {
-        $sql = "SELECT s.*
+        $sql = "SELECT s.*,
+                       (SELECT COUNT(*) FROM sale_items WHERE sale_id = s.id) AS items_count
                 FROM sales s";
 
         if (!empty($where)) {
@@ -131,14 +132,25 @@ class Sale
                 }
             }
 
-            $stmt = $this->db()->prepare("INSERT INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at)
-                                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+            if (!empty($data['supplier_id']) && empty($data['supplier_name'])) {
+                $stmt = $this->db()->prepare("SELECT name FROM suppliers WHERE id = ?");
+                $stmt->execute([$data['supplier_id']]);
+                $sup = $stmt->fetch();
+                if ($sup) {
+                    $data['supplier_name'] = $sup['name'];
+                }
+            }
+
+            $stmt = $this->db()->prepare("INSERT INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, supplier_id, supplier_name, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at)
+                                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
             $stmt->execute([
                 $invoiceNo,
                 $data['customer_id'] ?? null,
                 $data['customer_name'] ?? '',
                 $data['customer_phone'] ?? '',
                 $data['customer_address'] ?? '',
+                $data['supplier_id'] ?? null,
+                $data['supplier_name'] ?? '',
                 $data['subtotal'] ?? 0,
                 $data['discount'] ?? 0,
                 $data['discount_type'] ?? 'percent',
@@ -257,5 +269,26 @@ class Sale
                                        WHERE si.sale_id = ?");
         $stmt->execute([$id]);
         return $stmt->fetchAll();
+    }
+
+    public function updateStatus($id, $status)
+    {
+        $stmt = $this->db()->prepare("UPDATE sales SET status = ? WHERE id = ?");
+        return $stmt->execute([$status, $id]);
+    }
+
+    public function delete($id)
+    {
+        $this->db()->beginTransaction();
+        try {
+            $items = $this->getItems($id);
+            $stmt = $this->db()->prepare("DELETE FROM sales WHERE id = ?");
+            $stmt->execute([$id]);
+            $this->db()->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db()->rollBack();
+            throw $e;
+        }
     }
 }

@@ -30,6 +30,7 @@
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-gray-100">
+                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວັນທີ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ໝວດ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລາຍການ</th>
@@ -40,7 +41,7 @@
                     <tbody>
                         <template x-if="expenses.length === 0">
                             <tr>
-                                <td colspan="5" class="py-3 px-2">
+                                <td colspan="6" class="py-3 px-2">
                                     <div class="flex flex-col items-center justify-center py-12 text-center">
                                         <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                             <i class="fas fa-money-bill-wave text-2xl"></i>
@@ -53,6 +54,7 @@
                         </template>
                         <template x-for="(expense, index) in expenses" :key="expense.id">
                             <tr class="border-b border-gray-50 last:border-0">
+                                <td class="py-3 px-2 text-gray-400 text-sm text-center" x-text="index + 1"></td>
                                 <td class="py-3 px-2 text-gray-600" x-text="expense.date"></td>
                                 <td class="py-3 px-2">
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold"

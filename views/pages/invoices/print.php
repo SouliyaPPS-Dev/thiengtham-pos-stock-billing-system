@@ -203,6 +203,12 @@
                 <label>ວັນທີ</label>
                 <span><?= htmlspecialchars(date('d/m/Y H:i', strtotime($invoice['created_at']))) ?></span>
             </div>
+            <?php if (!empty($invoice['supplier_name'])): ?>
+            <div class="meta-item">
+                <label>ຜູ້ສະໜອງ</label>
+                <span><?= htmlspecialchars($invoice['supplier_name']) ?></span>
+            </div>
+            <?php else: ?>
             <div class="meta-item">
                 <label>ລູກຄ້າ</label>
                 <span><?= htmlspecialchars($invoice['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></span>
@@ -212,6 +218,7 @@
                 <label>ເບີໂທລູກຄ້າ</label>
                 <span><?= htmlspecialchars($invoice['customer_phone']) ?></span>
             </div>
+            <?php endif; ?>
             <?php endif; ?>
         </div>
 

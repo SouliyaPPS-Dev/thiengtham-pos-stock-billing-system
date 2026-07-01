@@ -100,9 +100,23 @@
             </div>
         </div>
 
-        <!-- Customer Search -->
-        <div class="p-3 md:p-4 border-b bg-gray-50/30">
-            <div class="relative" x-data="{ open: false, cSearch: '' }" @click.away="open = false">
+        <!-- Bill Party: Customer / Supplier Toggle -->
+        <div class="p-3 md:p-4 border-b bg-gray-50/30 space-y-3">
+            <div class="flex bg-gray-100 p-0.5 rounded-xl border border-gray-200">
+                <button @click="billParty = 'customer'; selectedSupplier = null; sSearch = ''; saveState()"
+                        :class="billParty === 'customer' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'"
+                        class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5">
+                    <i class="fas fa-user"></i> ລູກຄ້າ
+                </button>
+                <button @click="billParty = 'supplier'; selectedCustomer = null; cSearch = ''; saveState()"
+                        :class="billParty === 'supplier' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'"
+                        class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5">
+                    <i class="fas fa-truck"></i> ຜູ້ສະໜອງ
+                </button>
+            </div>
+
+            <!-- Customer Search (shown when billParty === 'customer') -->
+            <div x-show="billParty === 'customer'" x-data="{ open: false }" @click.away="open = false">
                 <div class="relative">
                     <input type="text"
                            x-model="cSearch"
@@ -120,7 +134,8 @@
                      x-transition:enter="transition ease-out duration-100"
                      x-transition:enter-start="opacity-0 transform scale-95"
                      x-transition:enter-end="opacity-100 transform scale-100"
-                     class="absolute left-0 right-0 mt-1 bg-white border rounded-2xl shadow-xl z-50 max-h-48 overflow-y-auto">
+                     class="absolute left-0 right-0 mt-1 bg-white border rounded-2xl shadow-xl z-50 max-h-48 overflow-y-auto"
+                     :style="{ left: $el.parentElement.parentElement.offsetLeft + 'px', right: $el.parentElement.parentElement.offsetLeft + 'px', width: $el.parentElement.parentElement.offsetWidth + 'px' }">
                     <template x-for="c in customers.filter(c => c.fullname.toLowerCase().includes(cSearch.toLowerCase()) || (c.phone || '').includes(cSearch))" :key="c.id">
                         <div @click="selectedCustomer = c; cSearch = c.fullname; open = false; saveState()"
                              class="p-2.5 hover:bg-gray-50 cursor-pointer border-b last:border-0 flex items-center justify-between">
@@ -134,18 +149,65 @@
                         <div class="p-3 text-center text-xs text-gray-400">ບໍ່ພົບລູກຄ້າ</div>
                     </template>
                 </div>
-            </div>
-            <template x-if="selectedCustomer">
-                <div class="flex items-center gap-2 bg-primary/5 p-2 rounded-xl border border-primary/10 mt-2">
-                    <div class="w-7 h-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary text-xs">
-                        <i class="fas fa-user-check"></i>
+                <template x-if="selectedCustomer">
+                    <div class="flex items-center gap-2 bg-primary/5 p-2 rounded-xl border border-primary/10 mt-2">
+                        <div class="w-7 h-7 bg-primary/10 rounded-lg flex items-center justify-center text-primary text-xs">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-bold text-gray-800 truncate" x-text="selectedCustomer.fullname"></p>
+                            <p class="text-[10px] text-gray-500" x-text="selectedCustomer.phone || ''"></p>
+                        </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <p class="text-xs font-bold text-gray-800 truncate" x-text="selectedCustomer.fullname"></p>
-                        <p class="text-[10px] text-gray-500" x-text="selectedCustomer.phone || ''"></p>
+                </template>
+            </div>
+
+            <!-- Supplier Search (shown when billParty === 'supplier') -->
+            <div x-show="billParty === 'supplier'" x-data="{ open: false }" @click.away="open = false">
+                <div class="relative">
+                    <input type="text"
+                           x-model="sSearch"
+                           @focus="open = true"
+                           placeholder="ຄົ້ນຫາຊື່ຜູ້ສະໜອງ..."
+                           class="w-full pl-9 pr-8 py-2.5 bg-white border border-gray-100 rounded-2xl text-xs font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                        <i class="fas fa-search text-xs"></i>
+                    </div>
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" x-show="selectedSupplier" @click="selectedSupplier = null; sSearch = ''" style="display:none">
+                        <i class="fas fa-times-circle cursor-pointer hover:text-red-500"></i>
                     </div>
                 </div>
-            </template>
+                <div x-show="open"
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100"
+                     class="absolute left-0 right-0 mt-1 bg-white border rounded-2xl shadow-xl z-50 max-h-48 overflow-y-auto"
+                     :style="{ left: $el.parentElement.parentElement.offsetLeft + 'px', right: $el.parentElement.parentElement.offsetLeft + 'px', width: $el.parentElement.parentElement.offsetWidth + 'px' }">
+                    <template x-for="s in suppliers.filter(s => s.name.toLowerCase().includes(sSearch.toLowerCase()) || (s.phone || '').includes(sSearch))" :key="s.id">
+                        <div @click="selectedSupplier = s; sSearch = s.name; open = false; saveState()"
+                             class="p-2.5 hover:bg-gray-50 cursor-pointer border-b last:border-0 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-bold text-gray-800" x-text="s.name"></div>
+                                <div class="text-[10px] text-gray-400" x-text="s.contact_person ? (s.contact_person + (s.phone ? ' | ' + s.phone : '')) : (s.phone || '')"></div>
+                            </div>
+                        </div>
+                    </template>
+                    <template x-if="suppliers.filter(s => s.name.toLowerCase().includes(sSearch.toLowerCase()) || (s.phone || '').includes(sSearch)).length === 0">
+                        <div class="p-3 text-center text-xs text-gray-400">ບໍ່ພົບຜູ້ສະໜອງ</div>
+                    </template>
+                </div>
+                <template x-if="selectedSupplier">
+                    <div class="flex items-center gap-2 bg-amber-50 p-2 rounded-xl border border-amber-200 mt-2">
+                        <div class="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 text-xs">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs font-bold text-gray-800 truncate" x-text="selectedSupplier.name"></p>
+                            <p class="text-[10px] text-gray-500" x-text="selectedSupplier.contact_person || selectedSupplier.phone || ''"></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
 
         <!-- Cart Items -->
@@ -256,10 +318,15 @@ function posSystem() {
         categoryFilter: 'all',
         products: <?= json_encode($products ?? []) ?>,
         customers: <?= json_encode($customers ?? []) ?>,
+        suppliers: <?= json_encode($suppliers ?? []) ?>,
         paymentMethods: <?= json_encode($paymentMethods ?? []) ?>,
 
         cart: [],
+        billParty: 'customer',
         selectedCustomer: null,
+        selectedSupplier: null,
+        cSearch: '',
+        sSearch: '',
         discount: 0,
         paidAmount: 0,
         grandTotal: 0,
@@ -285,7 +352,9 @@ function posSystem() {
         saveState() {
             const data = {
                 cart: this.cart,
+                billParty: this.billParty,
                 selectedCustomerId: this.selectedCustomer?.id || null,
+                selectedSupplierId: this.selectedSupplier?.id || null,
                 discount: this.discount,
                 paidAmount: this.paidAmount,
                 selectedPaymentMethod: this.selectedPaymentMethod,
@@ -299,8 +368,12 @@ function posSystem() {
             try {
                 const data = JSON.parse(saved);
                 if (data.cart) this.cart = data.cart;
+                if (data.billParty) this.billParty = data.billParty;
                 if (data.selectedCustomerId) {
                     this.selectedCustomer = this.customers.find(c => c.id == data.selectedCustomerId) || null;
+                }
+                if (data.selectedSupplierId) {
+                    this.selectedSupplier = this.suppliers.find(s => s.id == data.selectedSupplierId) || null;
                 }
                 if (data.discount !== undefined) this.discount = data.discount;
                 if (data.paidAmount !== undefined) this.paidAmount = data.paidAmount;
@@ -429,15 +502,24 @@ function posSystem() {
             }
 
             const changeAmount = Math.max(0, this.paidAmount - this.grandTotal);
-            const customerName = this.selectedCustomer?.fullname || 'ລູກຄ້າທົ່ວໄປ';
-            const customerPhone = this.selectedCustomer?.phone || '';
+            let partyLabel = 'ລູກຄ້າ';
+            let partyName = 'ລູກຄ້າທົ່ວໄປ';
+            let partyDetail = '';
+            if (this.billParty === 'supplier' && this.selectedSupplier) {
+                partyLabel = 'ຜູ້ສະໜອງ';
+                partyName = this.selectedSupplier.name;
+                partyDetail = this.selectedSupplier.contact_person ? (this.selectedSupplier.contact_person + (this.selectedSupplier.phone ? ' | ' + this.selectedSupplier.phone : '')) : (this.selectedSupplier.phone || '');
+            } else if (this.selectedCustomer) {
+                partyName = this.selectedCustomer.fullname;
+                partyDetail = this.selectedCustomer.phone || '';
+            }
 
             Swal.fire({
                 title: 'ຢືນຢັນການຊຳລະ?',
                 html: `<div class="text-left text-sm space-y-2">
                         <div class="bg-gray-50 p-3 rounded-xl">
-                            <p class="text-gray-500 text-xs">ລູກຄ້າ</p>
-                            <p class="font-bold text-gray-800">${customerName}${customerPhone ? ' (' + customerPhone + ')' : ''}</p>
+                            <p class="text-gray-500 text-xs">${partyLabel}</p>
+                            <p class="font-bold text-gray-800">${partyName}${partyDetail ? ' (' + partyDetail + ')' : ''}</p>
                         </div>
                         <div class="flex justify-between px-1">
                             <span class="text-gray-500">ຍອດລວມ</span>
@@ -479,9 +561,11 @@ function posSystem() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    customer_id: this.selectedCustomer?.id || null,
-                    customer_name: this.selectedCustomer?.fullname || '',
-                    customer_phone: this.selectedCustomer?.phone || '',
+                    customer_id: this.billParty === 'customer' ? (this.selectedCustomer?.id || null) : null,
+                    customer_name: this.billParty === 'customer' ? (this.selectedCustomer?.fullname || '') : '',
+                    customer_phone: this.billParty === 'customer' ? (this.selectedCustomer?.phone || '') : '',
+                    supplier_id: this.billParty === 'supplier' ? (this.selectedSupplier?.id || null) : null,
+                    supplier_name: this.billParty === 'supplier' ? (this.selectedSupplier?.name || '') : '',
                     discount: Number(this.discount),
                     payment_method: this.selectedPaymentMethod,
                     amount_paid: Number(this.paidAmount),
