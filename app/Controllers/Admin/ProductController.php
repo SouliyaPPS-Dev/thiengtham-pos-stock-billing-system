@@ -160,6 +160,26 @@ class ProductController extends \App\Controllers\BaseController
         $this->redirect('/admin/products', ['deleted' => 1]);
     }
 
+    public function toggleStatus($id)
+    {
+        $productModel = new Product();
+        $product = $productModel->find($id);
+
+        if (!$product) {
+            $this->redirect('/admin/products', [
+                'error' => 1,
+                'error_msg' => 'ບໍ່ພົບສິນຄ້າ',
+            ]);
+        }
+
+        $currentStatus = strtolower($product['status'] ?? 'active');
+        $newStatus = $currentStatus === 'active' ? 'inactive' : 'active';
+
+        $productModel->update($id, ['status' => $newStatus]);
+
+        $this->redirect('/admin/products/' . $id, ['status_updated' => 1]);
+    }
+
     public function show($id)
     {
         $product = (new Product())->find($id);
