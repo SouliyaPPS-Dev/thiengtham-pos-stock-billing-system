@@ -124,6 +124,17 @@ function get_menu_active_class($routePath, $activeClass = 'menu-active-box', $de
     return is_menu_active($routePath) ? $activeClass : $defaultClass;
 }
 
+function get_store_logo() {
+    try {
+        $db = \App\Core\Database::getInstance()->getConnection();
+        $stmt = $db->query("SELECT store_logo FROM settings LIMIT 1");
+        if ($stmt && $row = $stmt->fetch()) {
+            return $row['store_logo'] ?: '';
+        }
+    } catch (\Exception $e) {}
+    return '';
+}
+
 function get_store_name() {
     try {
         $db = \App\Core\Database::getInstance()->getConnection();

@@ -41,9 +41,15 @@
                         <i class="fas fa-bars text-lg"></i>
                     </button>
                     <a href="<?= url('/') ?>" class="flex items-center gap-2.5 flex-shrink-0">
+                        <?php $__logo = get_store_logo(); if ($__logo): ?>
+                        <div class="h-10 w-10 rounded-xl overflow-hidden flex-shrink-0 bg-white border border-gray-100">
+                            <img src="<?= htmlspecialchars($__logo) ?>" class="h-full w-full object-cover">
+                        </div>
+                        <?php else: ?>
                         <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white shadow-lg shadow-sky-200">
                             <i class="fas fa-store text-sm"></i>
                         </div>
+                        <?php endif; ?>
                         <span class="font-black text-lg text-gray-800 hidden sm:block"><?= htmlspecialchars(get_store_name()) ?></span>
                     </a>
                 </div>
@@ -218,7 +224,7 @@
                     <p class="text-lg md:text-xl text-sky-100 mb-8 max-w-2xl mx-auto md:mx-0"><?= htmlspecialchars($banner['subtitle']) ?></p>
                     <?php endif; ?>
                     <?php if (!empty($banner['link'])): ?>
-                    <a href="<?= htmlspecialchars($banner['link']) ?>" class="inline-flex items-center gap-2 bg-white text-sky-700 font-bold px-8 py-3.5 rounded-xl hover:bg-sky-50 transition-all shadow-lg">
+                    <a href="<?= url('/products') ?>" class="inline-flex items-center gap-2 bg-white text-sky-700 font-bold px-8 py-3.5 rounded-xl hover:bg-sky-50 transition-all shadow-lg">
                         ສັ່ງຊື້ເລີຍ <i class="fas fa-arrow-right"></i>
                     </a>
                     <?php endif; ?>

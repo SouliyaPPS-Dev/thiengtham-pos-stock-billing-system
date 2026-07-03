@@ -76,6 +76,26 @@
                             <option value="A4" <?= (($settings['paper_size'] ?? '') === 'A4') ? 'selected' : '' ?>>A4</option>
                         </select>
                     </div>
+                    <div class="md:col-span-2 pt-2">
+                        <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
+                            <i class="fas fa-save"></i>
+                            <span>ບັນທຶກຂໍ້ມູນ</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                        <i class="fas fa-info-circle text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-extrabold text-gray-800">ຂໍ້ມູນເພີ່ມເຕີມ</h2>
+                        <p class="text-xs text-gray-400">ຂໍ້ມູນຕິດຕໍ່ ແລະ ຂໍ້ຄວາມໃບບິນ</p>
+                    </div>
+                </div>
+                <form action="<?= url('/admin/settings/update') ?>" method="POST" class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div class="space-y-1.5 md:col-span-2">
                         <label class="text-sm font-bold text-gray-700">ທີ່ຢູ່ຮ້ານ</label>
                         <input type="text" name="store_address" value="<?= htmlspecialchars($settings['store_address'] ?? '') ?>"

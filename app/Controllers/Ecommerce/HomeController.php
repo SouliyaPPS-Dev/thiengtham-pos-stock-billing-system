@@ -80,6 +80,8 @@ class HomeController
             $this->redirect('/');
         }
 
+        $cartCount = $this->getCartCount();
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email'] ?? '');
             $phone = trim($_POST['phone'] ?? '');
@@ -90,6 +92,7 @@ class HomeController
                     'layout' => 'ecommerce',
                     'title' => 'ເຂົ້າສູ່ລະບົບ',
                     'error' => 'ກະລຸນາປ້ອນອີເມວ/ເບີໂທ ແລະ ລະຫັດຜ່ານ',
+                    'cartCount' => $cartCount,
                 ]);
             }
 
@@ -124,12 +127,14 @@ class HomeController
                 'layout' => 'ecommerce',
                 'title' => 'ເຂົ້າສູ່ລະບົບ',
                 'error' => 'ອີເມວ/ເບີໂທ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ',
+                'cartCount' => $cartCount,
             ]);
         }
 
         return view('pages.ecommerce.login', [
             'layout' => 'ecommerce',
             'title' => 'ເຂົ້າສູ່ລະບົບ',
+            'cartCount' => $cartCount,
         ]);
     }
 
@@ -138,6 +143,8 @@ class HomeController
         if (isset($_SESSION['customer'])) {
             $this->redirect('/');
         }
+
+        $cartCount = $this->getCartCount();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fullname = trim($_POST['fullname'] ?? '');
@@ -173,6 +180,7 @@ class HomeController
                     'title' => 'ສະໝັກສະມາຊິກ',
                     'errors' => $errors,
                     'old' => $_POST,
+                    'cartCount' => $cartCount,
                 ]);
             }
 
@@ -207,6 +215,7 @@ class HomeController
         return view('pages.ecommerce.register', [
             'layout' => 'ecommerce',
             'title' => 'ສະໝັກສະມາຊິກ',
+            'cartCount' => $cartCount,
         ]);
     }
 

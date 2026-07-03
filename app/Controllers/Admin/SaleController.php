@@ -20,9 +20,12 @@ class SaleController extends \App\Controllers\BaseController
         $total = $saleModel->countAll($search, $fromDate, $toDate);
         $totalPages = max(1, ceil($total / $perPage));
 
+        $saleIds = array_map('strval', array_column($sales, 'id'));
+
         return view('pages.admin.sales.index', [
             'title' => 'ປະຫວັດການຂາຍ',
             'sales' => $sales,
+            'saleIds' => $saleIds,
             'search' => $search,
             'fromDate' => $fromDate,
             'toDate' => $toDate,
@@ -101,5 +104,42 @@ class SaleController extends \App\Controllers\BaseController
             'success' => 1,
             'success_msg' => 'ລົບບິນສຳເລັດ',
         ]);
+    }
+
+    public function bulkDelete()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/sales');
+        }
+
+        $ids = $_POST['ids'] ?? [];
+        if (empty($ids) || !is_array($ids)) {
+            $this->redirect('/admin/sales', [
+                'error' => 1,
+                'error_msg' => 'ກະລຸນາເລືອກບິນທີ່ຕ້ອງການລົບ',
+            ]);
+        }
+
+        $ids = array_map('intval', $ids);
+        $db = \App\Core\Database::getInstance()->getConnection();
+
+        try {
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $db->prepare("DELETE FROM sales WHERE id IN ($placeholders)");
+            $stmt->execute($ids);
+            $db->commit();
+
+            $this->redirect('/admin/sales', [
+                'success' => 1,
+                'success_msg' => 'ລົບ ' . count($ids) . ' ບິນສຳເລັດ',
+            ]);
+        } catch (\Exception $e) {
+            $db->rollBack();
+            $this->redirect('/admin/sales', [
+                'error' => 1,
+                'error_msg' => 'ເກີດຂໍ້ຜິດພາດ: ' . $e->getMessage(),
+            ]);
+        }
     }
 }

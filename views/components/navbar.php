@@ -2,9 +2,15 @@
     <div class="container flex h-16 items-center mx-auto px-4">
         <div class="flex flex-1 items-center justify-between">
             <a class="flex items-center space-x-2" href="<?= url('/') ?>">
+                <?php $__logo = get_store_logo(); if ($__logo): ?>
+                <div class="h-10 w-10 rounded-full overflow-hidden flex-shrink-0 bg-white border border-gray-100">
+                    <img src="<?= htmlspecialchars($__logo) ?>" class="h-full w-full object-cover">
+                </div>
+                <?php else: ?>
                 <div class="h-10 w-10 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-sm shadow-lg shadow-sky-200">
                     <i class="fas fa-cash-register"></i>
                 </div>
+                <?php endif; ?>
                 <span class="font-bold"><?= get_store_name() ?></span>
             </a>
 

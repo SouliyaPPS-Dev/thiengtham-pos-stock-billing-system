@@ -35,6 +35,7 @@ class QuotationController extends \App\Controllers\BaseController
         $products = (new Product())->getAll('', [], 0, 0);
         $suppliers = (new Supplier())->all();
         $templates = Quotation::templates();
+        $settings = (new \App\Models\Settings())->getAll();
 
         return view('pages.admin.quotations.create', [
             'title' => 'ສ້າງໃບສະເໜີລາຄາໃໝ່',
@@ -42,6 +43,7 @@ class QuotationController extends \App\Controllers\BaseController
             'suppliers' => $suppliers,
             'templates' => $templates,
             'quotation' => null,
+            'settings' => $settings,
         ]);
     }
 
@@ -128,6 +130,7 @@ class QuotationController extends \App\Controllers\BaseController
         $products = (new Product())->getAll('', [], 0, 0);
         $suppliers = (new Supplier())->all();
         $templates = Quotation::templates();
+        $settings = (new \App\Models\Settings())->getAll();
 
         return view('pages.admin.quotations.create', [
             'title' => 'ແກ້ໄຂໃບສະເໜີລາຄາ',
@@ -135,6 +138,7 @@ class QuotationController extends \App\Controllers\BaseController
             'suppliers' => $suppliers,
             'templates' => $templates,
             'quotation' => $quotation,
+            'settings' => $settings,
         ]);
     }
 
@@ -221,10 +225,13 @@ class QuotationController extends \App\Controllers\BaseController
         $templates = Quotation::templates();
         $template = $templates[$quotation['company_template']] ?? $templates['luang-prabarg'];
 
+        $settings = (new \App\Models\Settings())->getAll();
+
         return view('pages.admin.quotations.print', [
             'title' => 'ພິມໃບສະເໜີລາຄາ',
             'quotation' => $quotation,
             'template' => $template,
+            'settings' => $settings,
             'layout' => false,
         ]);
     }

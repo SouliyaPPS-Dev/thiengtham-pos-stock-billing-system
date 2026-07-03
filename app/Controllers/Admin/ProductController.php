@@ -210,4 +210,33 @@ class ProductController extends \App\Controllers\BaseController
         $products = (new Product())->search($query);
         $this->json($products);
     }
+
+    public function jsonList()
+    {
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = (int)($_GET['per_page'] ?? 30);
+        $search = $_GET['search'] ?? '';
+        $model = new Product();
+
+        if ($search) {
+            $q = "%{$search}%";
+            $where = "p.name LIKE ? OR p.sku LIKE ? OR p.barcode LIKE ?";
+            $params = [$q, $q, $q];
+            $total = $model->getTotalProducts($where, $params);
+        } else {
+            $where = '';
+            $params = [];
+            $total = $model->countAll();
+        }
+
+        $offset = ($page - 1) * $perPage;
+        $products = $model->getAll($where, $params, $perPage, $offset);
+
+        $this->json([
+            'products' => $products,
+            'hasMore' => ($offset + $perPage) < $total,
+            'total' => $total,
+            'page' => $page,
+        ]);
+    }
 }

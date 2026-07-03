@@ -249,8 +249,11 @@
             $items = $invoice['items'] ?? [];
             $calcSubtotal = 0;
             foreach ($items as $item) {
-                $calcSubtotal += (float)($item['subtotal'] ?? 0);
+                $qty = (int)($item['quantity'] ?? $item['qty'] ?? 1);
+                $price = (float)($item['unit_price'] ?? $item['price'] ?? 0);
+                $calcSubtotal += (float)($item['subtotal'] ?? ($price * $qty));
             }
+            $calcGrandTotal = (float)($invoice['grand_total'] ?: $invoice['subtotal'] ?: $calcSubtotal);
         ?>
         <div class="totals">
             <div>
@@ -271,7 +274,7 @@
             <?php endif; ?>
             <div class="grand-total">
                 <span>ລວມທັງໝົດ</span>
-                <span><?= number_format($invoice['grand_total'] ?: $calcSubtotal, 0) ?> ກີບ</span>
+                <span><?= number_format($calcGrandTotal, 0) ?> ກີບ</span>
             </div>
         </div>
 

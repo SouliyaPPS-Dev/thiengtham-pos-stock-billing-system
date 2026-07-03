@@ -39,14 +39,14 @@
                             if (!empty($img['image'])) $allImages[] = $img['image'];
                         }
                     }
-                    $imagesJson = json_encode($allImages);
+                    $xData = htmlspecialchars('{ activeImage: 0, imageError: false, images: ' . json_encode($allImages) . ' }', ENT_QUOTES, 'UTF-8');
                     ?>
-                    <div x-data="{ activeImage: 0, images: <?= $imagesJson ?> }">
+                    <div x-data="<?= $xData ?>">
                         <div class="aspect-square bg-gray-50 rounded-2xl overflow-hidden mb-4">
-                            <template x-if="images.length > 0">
-                                <img :src="images[activeImage]" alt="<?= htmlspecialchars($product['name']) ?>" class="w-full h-full object-cover" @error="$el.classList.add('hidden'); $el.nextElementSibling?.classList.remove('hidden')">
+                            <template x-if="images.length > 0 && !imageError">
+                                <img :src="images[activeImage]" alt="<?= htmlspecialchars($product['name']) ?>" class="w-full h-full object-cover" @error="imageError = true" @load="imageError = false">
                             </template>
-                            <template x-if="images.length === 0">
+                            <template x-if="images.length === 0 || imageError">
                                 <div class="w-full h-full flex items-center justify-center text-gray-300">
                                     <i class="fas fa-box fa-6x"></i>
                                 </div>
@@ -55,7 +55,7 @@
                         <template x-if="images.length > 1">
                             <div class="flex gap-2 overflow-x-auto pb-1">
                                 <template x-for="(img, i) in images" :key="i">
-                                    <button @click.prevent="activeImage = i"
+                                    <button @click.prevent="activeImage = i; imageError = false"
                                             class="flex-shrink-0 h-16 w-16 rounded-xl overflow-hidden border-2 transition-all"
                                             :class="activeImage === i ? 'border-sky-500 shadow-sm' : 'border-gray-100 hover:border-gray-300'">
                                         <img :src="img" class="h-full w-full object-cover" @error="$el.classList.add('hidden')">
@@ -165,7 +165,7 @@
 
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
-                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-orange-400 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-orange-200">
+                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center text-white shadow-lg shadow-red-200">
                             <i class="fas fa-align-left text-sm"></i>
                         </div>
                         <div>
@@ -182,7 +182,7 @@
 
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
-                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white shadow-lg shadow-gray-200">
+                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-200">
                             <i class="fas fa-clock text-sm"></i>
                         </div>
                         <div>

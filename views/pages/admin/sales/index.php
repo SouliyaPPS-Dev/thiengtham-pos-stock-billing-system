@@ -6,6 +6,8 @@
             <p class="text-sm text-gray-500 mt-0.5">ບັນທຶກການຂາຍທັງໝົດ</p>
         </div>
 
+        <?php $saleIds = $saleIds ?? []; ?>
+
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
             <form method="GET" action="<?= url('/admin/sales') ?>" class="flex flex-col sm:flex-row gap-3 mb-6">
                 <div class="flex items-center gap-2">
@@ -29,10 +31,13 @@
                 </button>
             </form>
 
-            <div class="overflow-x-auto">
+            <div x-data="salesBulkDelete()" class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-gray-100">
+                            <th class="py-3 px-2 text-center" style="width:40px">
+                                <input type="checkbox" @click="toggleAll" :checked="allSelected" class="rounded border-gray-300 text-primary focus:ring-primary cursor-pointer">
+                            </th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ໃບບິນ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວັນທີ</th>
@@ -47,7 +52,7 @@
                     <tbody>
                         <?php if (empty($sales)): ?>
                         <tr>
-                            <td colspan="9" class="py-3 px-2">
+                            <td colspan="10" class="py-3 px-2">
                                 <div class="flex flex-col items-center justify-center py-12 text-center">
                                     <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                         <i class="fas fa-receipt text-2xl"></i>
@@ -61,6 +66,9 @@
                         <?php $i = 0; ?>
                         <?php foreach ($sales as $s): $i++; ?>
                         <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                            <td class="py-3 px-2 text-center">
+                                <input type="checkbox" :value="<?= $s['id'] ?>" x-model="selected" class="rounded border-gray-300 text-primary focus:ring-primary cursor-pointer">
+                            </td>
                             <td class="py-3 px-2 text-gray-400 text-sm text-center"><?= $i ?></td>
                             <td class="py-3 px-2">
                                 <a href="<?= url('/admin/sales/' . $s['id']) ?>" class="font-mono font-bold text-gray-800 hover:text-primary">#<?= htmlspecialchars($s['invoice_number'] ?? str_pad($s['id'], 6, '0', STR_PAD_LEFT)) ?></a>
@@ -112,7 +120,38 @@
                         <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
+                    <?php if (!empty($sales)): ?>
+                    <tfoot x-show="selected.length > 0">
+                        <tr>
+                            <td colspan="10" class="px-2 py-0">
+                                <div class="border border-red-200 bg-red-50/80 rounded-xl px-5 py-3 flex items-center justify-between transition-all">
+                                    <span class="text-sm font-bold text-red-700">
+                                        <i class="fas fa-check-circle mr-1.5"></i>
+                                        ເລືອກ <span x-text="selected.length" class="text-red-600 text-base"></span> ລາຍການ
+                                    </span>
+                                    <button @click="confirmBulkDelete" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all shadow-sm" style="background:#dc2626">
+                                        <i class="fas fa-trash-alt"></i>
+                                        ລຶບທັງໝົດ
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                    <?php endif; ?>
                 </table>
+            </div>
+
+            <!-- Mobile Bulk Action Bar -->
+            <div x-show="selected.length > 0" class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-2xl px-4 py-3 z-50 md:hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-bold text-gray-600">
+                        ເລືອກ <span x-text="selected.length" class="text-primary font-black"></span> ລາຍການ
+                    </span>
+                    <button @click="confirmBulkDelete" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all shadow-lg" style="background:#dc2626">
+                        <i class="fas fa-trash-alt"></i>
+                        ລຶບທັງໝົດ
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -160,5 +199,51 @@ function confirmDelete(id) {
             form.submit();
         }
     });
+}
+
+function salesBulkDelete() {
+    return {
+        selected: [],
+        allIds: <?= json_encode($saleIds) ?>,
+        get allSelected() {
+            return this.allIds.length > 0 && this.selected.length === this.allIds.length;
+        },
+        toggleAll() {
+            if (this.allSelected) {
+                this.selected = [];
+            } else {
+                this.selected = [...this.allIds];
+            }
+        },
+        confirmBulkDelete() {
+            if (this.selected.length === 0) return;
+            Swal.fire({
+                title: 'ທ່ານແນ່ໃຈບໍ່?',
+                text: 'ທ່ານຕ້ອງການລົບ ' + this.selected.length + ' ບິນນີ້ແທ້ບໍ່? ການກະທຳນີ້ບໍ່ສາມາດກັບຄືນໄດ້.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'ແມ່ນ, ລົບ',
+                cancelButtonText: 'ຍົກເລີກ',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '<?= url('/admin/sales/bulk-delete') ?>';
+                    this.selected.forEach(id => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = id;
+                        form.appendChild(input);
+                    });
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+    };
 }
 </script>

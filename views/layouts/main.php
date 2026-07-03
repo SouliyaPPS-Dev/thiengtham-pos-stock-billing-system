@@ -130,9 +130,15 @@ $adminPrefix = '/admin';
                    class="fixed inset-y-0 left-0 z-50 w-64 bg-white/95 backdrop-blur-xl border-r border-gray-100 transition-all duration-300 ease-out transform md:translate-x-0 md:static md:inset-0 flex-shrink-0 flex flex-col">
                 <div class="flex items-center justify-between h-16 px-4 border-b border-gray-100 flex-shrink-0">
                     <a href="<?= url($adminPrefix . $lp) ?>" class="flex items-center gap-2.5">
+                        <?php $__logo = get_store_logo(); if ($__logo): ?>
+                        <div class="h-9 w-9 rounded-xl overflow-hidden flex-shrink-0 bg-white border border-gray-100">
+                            <img src="<?= htmlspecialchars($__logo) ?>" class="h-full w-full object-cover">
+                        </div>
+                        <?php else: ?>
                         <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white shadow-lg shadow-sky-200">
                             <i class="fas fa-cash-register text-sm"></i>
                         </div>
+                        <?php endif; ?>
                         <span class="font-black text-base text-gray-800 tracking-tight"><?= get_store_name() ?></span>
                     </a>
                     <button @click="sidebarOpen = false" class="md:hidden h-8 w-8 rounded-lg flex items-center justify-center text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors">
@@ -220,9 +226,15 @@ $adminPrefix = '/admin';
                 <div class="w-full px-3 lg:px-6 flex items-center h-14 lg:h-16 justify-between">
                     <div class="flex items-center gap-2 lg:gap-6 min-w-0 flex-shrink">
                         <a href="<?= url($adminPrefix . $lp) ?>" class="flex items-center gap-2 flex-shrink-0">
+                            <?php $__logo = get_store_logo(); if ($__logo): ?>
+                            <div class="h-8 w-8 lg:h-10 lg:w-10 rounded-full overflow-hidden flex-shrink-0 bg-white border border-gray-100">
+                                <img src="<?= htmlspecialchars($__logo) ?>" class="h-full w-full object-cover">
+                            </div>
+                            <?php else: ?>
                             <div class="h-8 w-8 lg:h-10 lg:w-10 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xs lg:text-sm shadow-lg shadow-sky-200">
                                 <i class="fas fa-cash-register"></i>
                             </div>
+                            <?php endif; ?>
                             <span class="font-black text-sm lg:text-base text-primary hidden sm:inline tracking-tight"><?= get_store_name() ?></span>
                         </a>
 

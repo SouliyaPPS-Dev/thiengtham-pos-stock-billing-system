@@ -28,6 +28,10 @@ class SettingsController extends \App\Controllers\BaseController
         $keys = [
             'store_name', 'store_phone', 'store_address', 'store_email',
             'currency', 'tax_percent', 'paper_size', 'receipt_footer',
+            'invoice_terms',
+            'bill_logo_width', 'bill_logo_height', 'bill_logo_position',
+            'bill_signature_width', 'bill_signature_height', 'bill_signature_position',
+            'bill_terms',
         ];
 
         foreach ($keys as $key) {
@@ -40,6 +44,20 @@ class SettingsController extends \App\Controllers\BaseController
             $logoUrl = ImageKit::upload('store_logo', '/pos-stock');
             if ($logoUrl) {
                 $settingsModel->set('store_logo', $logoUrl);
+            }
+        }
+
+        if (!empty($_FILES['bill_logo']['name'])) {
+            $billLogoUrl = ImageKit::upload('bill_logo', '/pos-stock/bill');
+            if ($billLogoUrl) {
+                $settingsModel->set('bill_logo', $billLogoUrl);
+            }
+        }
+
+        if (!empty($_FILES['bill_signature']['name'])) {
+            $signatureUrl = ImageKit::upload('bill_signature', '/pos-stock/bill');
+            if ($signatureUrl) {
+                $settingsModel->set('bill_signature', $signatureUrl);
             }
         }
 

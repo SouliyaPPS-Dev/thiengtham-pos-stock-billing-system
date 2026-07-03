@@ -56,8 +56,8 @@ class Supplier
 
     public function create($data)
     {
-        $stmt = $this->db()->prepare("INSERT INTO suppliers (name, contact_person, phone, email, address, notes, created_at, updated_at)
-                                      VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
+        $stmt = $this->db()->prepare("INSERT INTO suppliers (name, contact_person, phone, email, address, notes, tax_percent, created_at, updated_at)
+                                      VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
         $stmt->execute([
             $data['name'],
             $data['contact_person'] ?? '',
@@ -65,6 +65,7 @@ class Supplier
             $data['email'] ?? '',
             $data['address'] ?? '',
             $data['notes'] ?? '',
+            $data['tax_percent'] ?? 0,
         ]);
 
         return $this->db()->lastInsertId();

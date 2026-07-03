@@ -56,7 +56,7 @@
                 </div>
                 <?php else: ?>
                 <?php foreach ($products as $p): ?>
-                <div class="group relative bg-white rounded-xl border border-gray-100 hover:border-primary/20 hover:shadow-lg transition-all p-3">
+                <div class="group relative bg-white rounded-xl border border-gray-100 hover:border-primary/20 hover:shadow-lg transition-all p-3 cursor-pointer" onclick="window.location.href='<?= url('/admin/products/' . $p['id']) ?>'">
                     <div class="h-24 w-full rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center text-gray-300 mb-3 overflow-hidden relative">
                         <?php if (!empty($p['image'])): ?>
                         <img src="<?= htmlspecialchars($p['image']) ?>" class="h-full w-full object-cover">
@@ -79,14 +79,14 @@
                         ?>
                         <span class="text-[10px] font-bold <?= $stockColor ?>"><?= $stock ?> ຊິ້ນ</span>
                     </div>
-                    <div class="mt-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="mt-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onclick="event.stopPropagation()">
                         <a href="<?= url('/admin/products/' . $p['id']) ?>" class="flex-1 text-center py-1.5 bg-sky-100 text-sky-700 rounded-lg text-[10px] font-bold hover:bg-sky-500 hover:text-white transition-all shadow-sm shadow-sky-100">
                             <i class="fas fa-eye"></i> ເບິ່ງ
                         </a>
                         <a href="<?= url('/admin/products/' . $p['id'] . '/edit') ?>" class="flex-1 text-center py-1.5 bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold hover:bg-amber-500 hover:text-white transition-all shadow-sm shadow-amber-100">
                             <i class="fas fa-pen"></i> ແກ້ໄຂ
                         </a>
-                        <a href="<?= url('/admin/products/' . $p['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="flex-1 text-center py-1.5 bg-red-100 text-red-700 rounded-lg text-[10px] font-bold hover:bg-red-500 hover:text-white transition-all shadow-sm shadow-red-100">
+                        <a href="<?= url('/admin/products/' . $p['id'] . '/delete') ?>" onclick="event.stopPropagation(); confirmDelete(event, this.href)" class="flex-1 text-center py-1.5 bg-red-100 text-red-700 rounded-lg text-[10px] font-bold hover:bg-red-500 hover:text-white transition-all shadow-sm shadow-red-100">
                             <i class="fas fa-trash"></i> ລຶບ
                         </a>
                     </div>

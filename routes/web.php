@@ -34,6 +34,7 @@ return [
 
     // Products
     '/admin/products'           => ['Admin\ProductController', 'index'],
+    '/admin/products/json'      => ['Admin\ProductController', 'jsonList'],
     '/admin/products/create'    => ['Admin\ProductController', 'create'],
     '/admin/products/store'     => ['Admin\ProductController', 'store'],
     '/admin/products/{id}/edit' => ['Admin\ProductController', 'edit'],
@@ -57,6 +58,7 @@ return [
     '/admin/sales/{id}'               => ['Admin\SaleController', 'show'],
     '/admin/sales/{id}/update-status' => ['Admin\SaleController', 'updateStatus'],
     '/admin/sales/{id}/delete'        => ['Admin\SaleController', 'delete'],
+    '/admin/sales/bulk-delete'        => ['Admin\SaleController', 'bulkDelete'],
 
     // Customers
     '/admin/customers'           => ['Admin\CustomerController', 'index'],

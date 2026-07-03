@@ -45,6 +45,12 @@
             </div>
 
             <div class="space-y-1.5">
+                <label class="text-sm font-bold text-gray-700">ອາກອນມູນຄ່າເພີ່ມ (VAT %)</label>
+                <input type="number" name="tax_percent" step="0.01" min="0" max="100" value="<?= htmlspecialchars($_POST['tax_percent'] ?? '10') ?>"
+                       class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                       placeholder="10">
+            </div>
+            <div class="space-y-1.5">
                 <label class="text-sm font-bold text-gray-700">ຫມາຍເຫດ</label>
                 <textarea name="notes" rows="2" class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none" placeholder="ຫມາຍເຫດ"><?= htmlspecialchars($_POST['notes'] ?? '') ?></textarea>
             </div>
