@@ -124,15 +124,21 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             text-align: left;
+            border-right: 1px solid rgba(255,255,255,0.2);
+        }
+        table.items thead th:last-child {
+            border-right: none;
+            border-radius: 0 6px 0 0;
+            text-align: right;
         }
         table.items thead th:first-child { border-radius: 6px 0 0 0; }
-        table.items thead th:last-child { border-radius: 0 6px 0 0; text-align: right; }
         table.items tbody td {
             padding: 9px 8px;
-            border-bottom: 1px solid #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
             font-size: 13px;
         }
-        table.items tbody td:last-child { text-align: right; font-weight: 600; }
+        table.items tbody td:last-child { border-right: none; text-align: right; font-weight: 600; }
         table.items tbody td:nth-child(3),
         table.items tbody td:nth-child(4) { text-align: center; }
         table.items tbody td:nth-child(5) { text-align: right; }
@@ -370,22 +376,18 @@
                 </div>
             </div>
 
+            <?php if (!empty($quotation['terms'])): ?>
             <!-- Terms -->
             <div class="terms">
                 <h4>ເງື່ອນໄຂ / Terms &amp; Conditions</h4>
                 <ul>
-                    <?php if (!empty($quotation['terms'])): ?>
-                        <?php foreach (explode("\n", $quotation['terms']) as $term): ?>
-                        <?php $t = trim($term); if (empty($t)) continue; ?>
-                        <li><?= htmlspecialchars($t) ?></li>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <?php foreach ($template['terms'] as $term): ?>
-                        <li><?= htmlspecialchars($term) ?></li>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                    <?php foreach (explode("\n", $quotation['terms']) as $term): ?>
+                    <?php $t = trim($term); if (empty($t)) continue; ?>
+                    <li><?= htmlspecialchars($t) ?></li>
+                    <?php endforeach; ?>
                 </ul>
             </div>
+            <?php endif; ?>
 
             <!-- Bill Terms + Signature Row -->
             <div class="bill-terms-row">
