@@ -208,7 +208,7 @@
                                 <button @click="openProductBrowser()" type="button" class="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-all">
                                     <i class="fas fa-box"></i> ລາຍການສິນຄ້າ
                                 </button>
-                                <button @click="addItem()" type="button" class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary/10 text-primary rounded-xl text-xs font-bold hover:bg-primary/20 transition-all">
+                                <button @click="addItem()" type="button" class="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl text-xs font-bold hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
                                     <i class="fas fa-plus"></i> ເພີ່ມລາຍການ
                                 </button>
                             </div>

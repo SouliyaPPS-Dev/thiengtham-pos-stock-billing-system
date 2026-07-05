@@ -31,9 +31,29 @@
                     </div>
                     <div>
                         <label class="text-sm font-bold text-gray-700 mb-1.5 block">ເບີໂທລະສັບ <span class="text-red-500">*</span></label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-phone"></i></span>
-                            <input type="text" name="phone" required value="<?= htmlspecialchars($old['phone'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                        <div class="flex gap-2">
+                            <select name="phone_prefix" class="w-[110px] px-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm bg-white">
+                                <option value="+856" <?= (($old['phone_prefix'] ?? '+856') === '+856') ? 'selected' : '' ?>>🇱🇦 +856</option>
+                                <option value="+66" <?= (($old['phone_prefix'] ?? '') === '+66') ? 'selected' : '' ?>>🇹🇭 +66</option>
+                                <option value="+84" <?= (($old['phone_prefix'] ?? '') === '+84') ? 'selected' : '' ?>>🇻🇳 +84</option>
+                                <option value="+855" <?= (($old['phone_prefix'] ?? '') === '+855') ? 'selected' : '' ?>>🇰🇭 +855</option>
+                                <option value="+95" <?= (($old['phone_prefix'] ?? '') === '+95') ? 'selected' : '' ?>>🇲🇲 +95</option>
+                                <option value="+86" <?= (($old['phone_prefix'] ?? '') === '+86') ? 'selected' : '' ?>>🇨🇳 +86</option>
+                                <option value="+1" <?= (($old['phone_prefix'] ?? '') === '+1') ? 'selected' : '' ?>>🇺🇸 +1</option>
+                                <option value="+44" <?= (($old['phone_prefix'] ?? '') === '+44') ? 'selected' : '' ?>>🇬🇧 +44</option>
+                                <option value="+81" <?= (($old['phone_prefix'] ?? '') === '+81') ? 'selected' : '' ?>>🇯🇵 +81</option>
+                                <option value="+82" <?= (($old['phone_prefix'] ?? '') === '+82') ? 'selected' : '' ?>>🇰🇷 +82</option>
+                                <option value="+65" <?= (($old['phone_prefix'] ?? '') === '+65') ? 'selected' : '' ?>>🇸🇬 +65</option>
+                                <option value="+60" <?= (($old['phone_prefix'] ?? '') === '+60') ? 'selected' : '' ?>>🇲🇾 +60</option>
+                                <option value="+62" <?= (($old['phone_prefix'] ?? '') === '+62') ? 'selected' : '' ?>>🇮🇩 +62</option>
+                                <option value="+63" <?= (($old['phone_prefix'] ?? '') === '+63') ? 'selected' : '' ?>>🇵🇭 +63</option>
+                                <option value="+91" <?= (($old['phone_prefix'] ?? '') === '+91') ? 'selected' : '' ?>>🇮🇳 +91</option>
+                                <option value="+61" <?= (($old['phone_prefix'] ?? '') === '+61') ? 'selected' : '' ?>>🇦🇺 +61</option>
+                            </select>
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-phone"></i></span>
+                                <input type="text" name="phone" required value="<?= htmlspecialchars($old['phone'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            </div>
                         </div>
                     </div>
                     <div>

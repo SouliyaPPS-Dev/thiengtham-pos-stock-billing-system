@@ -183,7 +183,7 @@
 
             <div id="payment-methods" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                 <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
-                    <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-green-400 to-green-500 flex items-center justify-center text-white shadow-lg shadow-green-200">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-200">
                         <i class="fas fa-credit-card text-sm"></i>
                     </div>
                     <div>
@@ -211,7 +211,7 @@
                             <input type="checkbox" name="is_active" checked class="rounded border-gray-300 text-primary focus:ring-primary">
                             <span class="text-sm text-gray-600">ເປີດໃຊ້</span>
                         </label>
-                        <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold text-sm hover:from-green-600 hover:to-green-700 transition-all shadow-lg shadow-green-200 active:scale-[0.97] whitespace-nowrap">
+                        <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97] whitespace-nowrap">
                             <i class="fas fa-plus"></i>
                             <span>ເພີ່ມ</span>
                         </button>

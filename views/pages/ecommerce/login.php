@@ -28,11 +28,31 @@
                 </div>
                 <div>
                     <label class="text-sm font-bold text-gray-700 mb-1.5 block">ຫຼື ເບີໂທລະສັບ</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
-                            <i class="fas fa-phone"></i>
-                        </span>
-                        <input type="text" name="phone" placeholder="ເບີໂທລະສັບ" class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                    <div class="flex gap-2">
+                        <select name="phone_prefix" class="w-[110px] px-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm bg-white">
+                            <option value="+856" selected>🇱🇦 +856</option>
+                            <option value="+66">🇹🇭 +66</option>
+                            <option value="+84">🇻🇳 +84</option>
+                            <option value="+855">🇰🇭 +855</option>
+                            <option value="+95">🇲🇲 +95</option>
+                            <option value="+86">🇨🇳 +86</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+81">🇯🇵 +81</option>
+                            <option value="+82">🇰🇷 +82</option>
+                            <option value="+65">🇸🇬 +65</option>
+                            <option value="+60">🇲🇾 +60</option>
+                            <option value="+62">🇮🇩 +62</option>
+                            <option value="+63">🇵🇭 +63</option>
+                            <option value="+91">🇮🇳 +91</option>
+                            <option value="+61">🇦🇺 +61</option>
+                        </select>
+                        <div class="relative flex-1">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                                <i class="fas fa-phone"></i>
+                            </span>
+                            <input type="text" name="phone" placeholder="ເບີໂທລະສັບ" class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                        </div>
                     </div>
                 </div>
                 <div>

@@ -84,7 +84,7 @@ class HomeController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $email = trim($_POST['email'] ?? '');
-            $phone = trim($_POST['phone'] ?? '');
+            $phone = trim(($_POST['phone_prefix'] ?? '+856') . ' ' . ($_POST['phone'] ?? ''));
             $password = $_POST['password'] ?? '';
 
             if ((empty($email) && empty($phone)) || empty($password)) {
@@ -148,7 +148,7 @@ class HomeController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fullname = trim($_POST['fullname'] ?? '');
-            $phone = trim($_POST['phone'] ?? '');
+            $phone = trim(($_POST['phone_prefix'] ?? '+856') . ' ' . ($_POST['phone'] ?? ''));
             $email = trim($_POST['email'] ?? '');
             $password = $_POST['password'] ?? '';
             $confirm = $_POST['confirm_password'] ?? '';

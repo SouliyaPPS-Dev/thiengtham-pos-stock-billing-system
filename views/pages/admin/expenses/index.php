@@ -94,7 +94,7 @@
             <form action="<?= url('/admin/expenses/categories/store') ?>" method="POST" class="flex gap-3 mb-4">
                 <input type="text" name="name" required placeholder="ຊື່ໝວດລາຍຈ່າຍໃໝ່"
                        class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
-                <button type="submit" class="px-5 py-2.5 bg-purple-50 text-purple-600 rounded-xl font-bold text-sm hover:bg-purple-100 transition-all">
+                <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-bold text-sm hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-[0.97]">
                     <i class="fas fa-plus"></i> ເພີ່ມ
                 </button>
             </form>
