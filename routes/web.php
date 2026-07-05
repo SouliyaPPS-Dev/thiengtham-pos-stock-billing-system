@@ -114,6 +114,10 @@ return [
     '/admin/settings/update'             => ['Admin\SettingsController', 'update'],
     '/admin/settings/change-password'    => ['Admin\SettingsController', 'changePassword'],
 
+    // Database Backup / Restore
+    '/admin/settings/database/export'    => ['Admin\DatabaseController', 'export'],
+    '/admin/settings/database/import'    => ['Admin\DatabaseController', 'import'],
+
     // Payment Methods
     '/admin/payment-methods/store'       => ['Admin\PaymentMethodController', 'store'],
     '/admin/payment-methods/{id}/update' => ['Admin\PaymentMethodController', 'update'],

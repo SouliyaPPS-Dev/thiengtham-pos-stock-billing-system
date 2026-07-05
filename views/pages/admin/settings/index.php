@@ -13,7 +13,9 @@
 
         <div class="space-y-6">
 
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div class="md:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                 <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                     <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center text-white shadow-lg shadow-sky-200">
                         <i class="fas fa-store text-sm"></i>
@@ -83,6 +85,30 @@
                         </button>
                     </div>
                 </form>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center text-white shadow-lg shadow-sky-200">
+                        <i class="fas fa-database text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-extrabold text-gray-800">ສຳຮອງຂໍ້ມູນ (Backup / Restore)</h2>
+                        <p class="text-xs text-gray-400">ສົ່ງອອກ ຫຼື ກູ້ຄືນຂໍ້ມູນຖານຂໍ້ມູນ</p>
+                    </div>
+                </div>
+                <div class="space-y-3">
+                    <a href="<?= url('/admin/settings/database/export') ?>"
+                       class="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold text-sm hover:from-green-600 hover:to-green-700 transition-all shadow-lg shadow-green-300 active:scale-[0.97]">
+                        <i class="fas fa-download"></i> ສົ່ງອອກຂໍ້ມູນ (Backup)
+                    </a>
+                    <button onclick="toggleImportModal()"
+                            class="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
+                        <i class="fas fa-upload"></i> ກູ້ຄືນຂໍ້ມູນ (Restore)
+                    </button>
+                </div>
+            </div>
+
             </div>
 
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
@@ -321,6 +347,42 @@
                 }
                 </script>
             </div>
+
+            <!-- Import Modal -->
+            <div id="importModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 overflow-y-auto p-4" onclick="if(event.target===this) toggleImportModal()">
+                <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl my-auto max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                    <div class="p-6 border-b flex justify-between items-center">
+                        <h3 class="font-bold text-gray-800">ກູ້ຄືນຂໍ້ມູນ (Restore Database)</h3>
+                        <button onclick="toggleImportModal()" class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <form action="<?= url('/admin/settings/database/import') ?>" method="POST" enctype="multipart/form-data" class="p-6 space-y-4" onsubmit="return confirm('ທ່ານແນ່ໃຈບໍ່? ຂໍ້ມູນປັດຈຸບັນຈະຖືກແທນທີ່ທັງໝົດ!')">
+                        <div class="p-4 bg-amber-50 rounded-xl border border-amber-200">
+                            <p class="text-xs text-amber-700 leading-relaxed">
+                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                ເລືອກໄຟລ໌ສຳຮອງ (.sql) ທີ່ຕ້ອງການກູ້ຄືນ. ຂໍ້ມູນທີ່ມີຢູ່ຈະຖືກແທນທີ່ທັງໝົດ.
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-semibold text-gray-700">ເລືອກໄຟລ໌ SQL *</label>
+                            <input type="file" name="backup_file" accept=".sql" required
+                                   class="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-sky-50 file:text-sky-600 hover:file:bg-sky-100 border border-gray-200 rounded-xl p-2">
+                        </div>
+                        <button type="submit"
+                                class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
+                            <i class="fas fa-upload"></i> ເລີ່ມການກູ້ຄືນ
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <script>
+            function toggleImportModal() {
+                document.getElementById('importModal').classList.toggle('hidden');
+                document.getElementById('importModal').classList.toggle('flex');
+            }
+            </script>
 
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                 <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
