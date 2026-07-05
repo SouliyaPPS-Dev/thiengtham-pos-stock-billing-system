@@ -198,7 +198,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          @keydown.window.escape="showAddModal = false"
-         class="fixed inset-0 z-50 overflow-y-auto p-4 flex items-center justify-center bg-black/50 backdrop-blur-sm" x-cloak>
+         class="fixed inset-0 z-[9999] overflow-y-auto p-4 flex items-center justify-center bg-black/50 backdrop-blur-sm" x-cloak>
         <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl my-auto max-h-[90vh] overflow-y-auto" @click.away="showAddModal = false">
             <div class="p-6 border-b flex items-center justify-between sticky top-0 bg-white z-10">
                 <h3 class="text-xl font-black text-gray-800">ເພີ່ມລາຍຈ່າຍໃໝ່</h3>
@@ -253,7 +253,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          @keydown.window.escape="showEditModal = false"
-         class="fixed inset-0 z-50 overflow-y-auto p-4 flex items-center justify-center bg-black/50 backdrop-blur-sm" x-cloak>
+         class="fixed inset-0 z-[9999] overflow-y-auto p-4 flex items-center justify-center bg-black/50 backdrop-blur-sm" x-cloak>
         <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl my-auto max-h-[90vh] overflow-y-auto" @click.away="showEditModal = false">
             <div class="p-6 border-b flex items-center justify-between sticky top-0 bg-white z-10">
                 <h3 class="text-xl font-black text-gray-800">ແກ້ໄຂລາຍຈ່າຍ</h3>
@@ -307,7 +307,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          @keydown.window.escape="showCategoryModal = false"
-         class="fixed inset-0 z-50 overflow-y-auto p-4 flex items-center justify-center bg-black/50 backdrop-blur-sm" x-cloak>
+         class="fixed inset-0 z-[9999] overflow-y-auto p-4 flex items-center justify-center bg-black/50 backdrop-blur-sm" x-cloak>
         <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl my-auto max-h-[90vh] overflow-y-auto" @click.away="showCategoryModal = false">
             <div class="p-6 border-b flex items-center justify-between sticky top-0 bg-white z-10">
                 <h3 class="text-xl font-black text-gray-800">ຈັດການປະເພດລາຍຈ່າຍ</h3>

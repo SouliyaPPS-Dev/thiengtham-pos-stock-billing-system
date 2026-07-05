@@ -227,11 +227,17 @@ class QuotationController extends \App\Controllers\BaseController
 
         $settings = (new \App\Models\Settings())->getAll();
 
+        $supplier = null;
+        if (!empty($quotation['supplier_id'])) {
+            $supplier = (new \App\Models\Supplier())->find($quotation['supplier_id']);
+        }
+
         return view('pages.admin.quotations.print', [
             'title' => 'ພິມໃບສະເໜີລາຄາ',
             'quotation' => $quotation,
             'template' => $template,
             'settings' => $settings,
+            'supplier' => $supplier,
             'layout' => false,
         ]);
     }

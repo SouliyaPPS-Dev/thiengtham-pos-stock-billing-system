@@ -13,25 +13,28 @@
             font-family: 'Noto Sans Lao', 'Sarabun', sans-serif;
             background: #f1f5f9;
             color: #1e293b;
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 13px;
+            line-height: 1.4;
         }
+        @page { size: A5; margin: 0; }
         .page-wrap {
-            max-width: 210mm;
-            margin: 24px auto;
+            width: 148mm;
+            min-height: 210mm;
+            margin: 0 auto;
             background: #fff;
-            min-height: 297mm;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.06);
         }
         .inner {
-            padding: 24px 48px 36px;
+            padding: 15px 20px 20px;
+            min-height: 210mm;
+            display: flex;
+            flex-direction: column;
         }
         /* ── Top Row: Logo + Bill No ── */
         .top-row {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .top-row .logo-box {
             width: <?= (int)($settings['bill_logo_width'] ?? 150) ?>px;
@@ -43,22 +46,19 @@
             object-fit: contain;
             object-position: <?= str_replace('-', ' ', $settings['bill_logo_position'] ?? 'top left') ?>;
         }
-        .top-row .bill-no-box {
-            text-align: right;
-        }
+        .top-row .bill-no-box { text-align: right; }
         .top-row .bill-no-box .label-bill {
             font-size: 10px;
             font-weight: 700;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.05em;
             display: block;
         }
         .top-row .bill-no-box .value-bill {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 900;
             color: <?= $template['logo_color'] ?>;
-            letter-spacing: 0.5px;
         }
         /* ── Title Image (center) ── */
         .title-row {
@@ -72,120 +72,112 @@
         .footer {
             text-align: center;
             padding-top: 12px;
-            margin-top: 20px;
-            border-top: 2px solid <?= $template['logo_color'] ?>;
-            font-size: 11px;
+            margin-top: auto;
+            border-top: 1px solid <?= $template['logo_color'] ?>;
+            font-size: 10px;
             color: #94a3b8;
+            line-height: 2;
         }
         /* ── Meta Info ── */
         .meta-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 4px 32px;
+            gap: 2px 25px;
             padding-bottom: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             border-bottom: 1px solid #e2e8f0;
-            font-size: 13px;
+            font-size: 12px;
         }
-        .meta-grid .field {
-            display: flex;
-            flex-direction: column;
-        }
-        .meta-grid .field.right {
-            text-align: right;
-        }
+        .meta-grid .field { display: flex; flex-direction: column; }
+        .meta-grid .field.right { text-align: right; }
         .meta-grid .field .lbl {
             font-size: 9px;
             font-weight: 700;
             color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.04em;
         }
-        .meta-grid .field .val {
-            font-weight: 600;
-            color: #1e293b;
-        }
-        .meta-grid .field .sub {
-            font-size: 12px;
-            color: #64748b;
-        }
+        .meta-grid .field .val { font-weight: 600; color: #1e293b; }
+        .meta-grid .field .sub { font-size: 11px; color: #64748b; }
         /* ── Items Table ── */
         table.items {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         table.items thead th {
             background: <?= $template['logo_color'] ?>;
             color: #fff;
-            padding: 10px 8px;
-            font-size: 11px;
+            padding: 6px 6px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.03em;
             text-align: left;
-            border-right: 1px solid rgba(255,255,255,0.2);
+            border-right: 1px solid rgba(255,255,255,0.15);
         }
         table.items thead th:last-child {
             border-right: none;
-            border-radius: 0 6px 0 0;
             text-align: right;
         }
-        table.items thead th:first-child { border-radius: 6px 0 0 0; }
+        table.items thead th:first-child { border-radius: 4px 0 0 0; }
+        table.items thead th:nth-child(2) { border-radius: 0; }
         table.items tbody td {
-            padding: 9px 8px;
+            padding: 5px 6px;
             border-bottom: 1px solid #e2e8f0;
             border-right: 1px solid #e2e8f0;
-            font-size: 13px;
+            font-size: 12px;
         }
         table.items tbody td:last-child { border-right: none; text-align: right; font-weight: 600; }
         table.items tbody td:nth-child(3),
         table.items tbody td:nth-child(4) { text-align: center; }
         table.items tbody td:nth-child(5) { text-align: right; }
         table.items tbody tr:last-child td { border-bottom: none; }
+        table.items thead th:nth-child(2) { text-align: center; }
         /* ── Totals ── */
         .totals {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            padding-top: 8px;
+            padding-top: 5px;
         }
         .totals > div {
-            width: 280px;
+            width: 250px;
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
-            font-size: 13px;
+            padding: 2px 0;
+            font-size: 12px;
         }
         .totals .grand-total {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 900;
             color: <?= $template['logo_color'] ?>;
             border-top: 2px solid <?= $template['logo_color'] ?>;
-            padding-top: 8px;
-            margin-top: 4px;
+            padding-top: 5px;
+            margin-top: 3px;
         }
         /* ── Terms ── */
         .terms {
-            margin-top: 12px;
-            padding: 10px 16px;
+            margin-top: 10px;
+            padding: 8px 15px;
             background: #f8fafc;
-            border-radius: 8px;
+            border-radius: 6px;
             border-left: 4px solid <?= $template['logo_color'] ?>;
         }
         .terms h4 {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 700;
             color: #64748b;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.03em;
         }
         .terms ul { list-style: none; padding: 0; }
         .terms ul li {
-            font-size: 12px;
+            font-size: 11px;
             color: #475569;
-            padding: 2px 0;
+            padding: 0;
+            line-height: 1.5;
         }
         .terms ul li::before {
             content: '• ';
@@ -197,90 +189,95 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-top: 8px;
-            gap: 24px;
+            margin-top: 10px;
+            gap: 20px;
         }
         .bill-terms-row .bill-terms {
-            font-size: 12px;
+            font-size: 11px;
             color: #475569;
-            line-height: 2;
+            line-height: 1.6;
             white-space: pre-wrap;
         }
-        .bill-terms-row .signature {
-            flex-shrink: 0;
-        }
-        .signature {
-            display: flex;
-            justify-content: flex-end;
-        }
-        .signature div {
-            text-align: center;
-            width: 200px;
-        }
+        .signature { display: flex; justify-content: flex-end; }
+        .signature div { text-align: center; width: 200px; max-width: 200px; }
         .signature .line {
             border-top: 1px solid #cbd5e1;
-            margin-top: 20px;
-            padding-top: 6px;
+            margin-top: 15px;
+            padding-top: 4px;
             font-size: 13px;
             font-weight: 700;
             color: #334155;
         }
-        .signature .sig-image {
-            margin-bottom: 4px;
-        }
-        .signature .sig-image img {
-            display: block;
-            margin: 0 auto;
-        }
-        .signature .title {
-            font-size: 11px;
-            color: #94a3b8;
-        }
-        /* ── Footer ── */
+        .signature .sig-image { margin-bottom: 2px; max-width: 100%; overflow: hidden; }
+        .signature .sig-image img { display: block; margin: 0 auto; object-fit: contain; }
+        .signature .title { font-size: 11px; color: #94a3b8; }
+        .signature .company-info { font-size: 9px; color: #64748b; line-height: 1.4; margin-bottom: 4px; }
         /* ── Print Button ── */
         .btn-print {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
+            bottom: 20px;
+            right: 20px;
             background: <?= $template['logo_color'] ?>;
             color: #fff;
             border: none;
-            border-radius: 14px;
-            padding: 14px 28px;
-            font-size: 15px;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-size: 14px;
             font-weight: 700;
             font-family: 'Noto Sans Lao', sans-serif;
             cursor: pointer;
             box-shadow: 0 4px 16px <?= $template['logo_color'] ?>40;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             z-index: 100;
-            transition: opacity 0.2s;
         }
         .btn-print:hover { opacity: 0.9; }
         @media print {
             body { background: #fff; }
-            .page-wrap { box-shadow: none; margin: 0; max-width: 100%; }
-            .inner { padding: 20px 24px; }
+            .page-wrap { box-shadow: none; margin: 0; width: 100%; min-height: auto; }
+            .inner { padding: 15px 20px 20px; min-height: auto; }
             .btn-print { display: none !important; }
             .no-print { display: none !important; }
         }
         @media (max-width: 600px) {
-            .inner { padding: 16px; }
-            .top-row { flex-direction: column; gap: 8px; }
+            .inner { padding: 10px; }
+            .top-row { flex-direction: column; gap: 4px; }
             .top-row .bill-no-box { text-align: left; }
             .meta-grid { grid-template-columns: 1fr; }
             .meta-grid .field.right { text-align: left; }
             .totals > div { width: 100%; }
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
-    <button class="btn-print no-print" onclick="window.print()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-        ພິມໃບສະເໜີລາຄາ
-    </button>
+    <div class="no-print" style="position:fixed;bottom:20px;right:20px;display:flex;gap:8px;z-index:100;">
+        <button onclick="exportPDF()" style="background:#dc2626;color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;font-family:'Noto Sans Lao',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 4px 16px rgba(220,38,38,0.3);">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Export PDF
+        </button>
+        <button onclick="window.print()" style="background:<?= $template['logo_color'] ?>;color:#fff;border:none;border-radius:12px;padding:12px 24px;font-size:14px;font-weight:700;font-family:'Noto Sans Lao',sans-serif;cursor:pointer;display:flex;align-items:center;gap:6px;box-shadow:0 4px 16px <?= $template['logo_color'] ?>40;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            ພິມ
+        </button>
+    </div>
+    <script>
+    function exportPDF() {
+        const element = document.querySelector('.page-wrap');
+        const opt = {
+            margin:       [0, 0, 0, 0],
+            filename:     '<?= 'quotation-' . str_pad($quotation['id'], 4, '0', STR_PAD_LEFT) . '.pdf' ?>',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true, allowTaint: true, letterRendering: true },
+            jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+    <?php if (!empty($_GET['pdf'])): ?>
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(exportPDF, 500); });
+    <?php endif; ?>
+    </script>
 
     <div class="page-wrap">
         <div class="inner">
@@ -322,13 +319,13 @@
             <table class="items">
                 <thead>
                     <tr>
-                        <th style="width:36px">#</th>
-                        <th style="width:40px">ຮູບ</th>
+                        <th style="width:22px">#</th>
+                        <th style="width:32px;text-align:center">ຮູບ</th>
                         <th>ລາຍການ / Description</th>
-                        <th style="width:56px">ຈຳນວນ / Qty</th>
-                        <th style="width:56px">ຫົວໜ່ວຍ / Unit</th>
-                        <th style="width:110px">ລາຄາ/ໜ່ວຍ<br><span style="font-weight:400;font-size:10px;">Unit Price (<?= $template['currency'] ?>)</span></th>
-                        <th style="width:110px">ຈຳນວນເງິນ<br><span style="font-weight:400;font-size:10px;">Amount (<?= $template['currency'] ?>)</span></th>
+                        <th style="width:42px;text-align:center">ຈຳນວນ</th>
+                        <th style="width:38px;text-align:center">ຫົວໜ່ວຍ</th>
+                        <th style="width:88px">ລາຄາ/ໜ່ວຍ<br><span style="font-weight:400;font-size:8px;">Price (<?= $template['currency'] ?>)</span></th>
+                        <th style="width:88px">ຈຳນວນເງິນ<br><span style="font-weight:400;font-size:8px;">Amount (<?= $template['currency'] ?>)</span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -337,7 +334,7 @@
                         <td style="color:#94a3b8"><?= $i + 1 ?></td>
                         <td style="text-align:center;">
                             <?php if (!empty($item['product_image'])): ?>
-                            <img src="<?= $item['product_image'] ?>" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:6px;display:inline-block;vertical-align:middle;">
+                            <img src="<?= $item['product_image'] ?>" alt="" style="width:28px;height:28px;object-fit:cover;border-radius:4px;display:inline-block;vertical-align:middle;">
                             <?php else: ?>
                             <span style="color:#cbd5e1;font-size:10px;">—</span>
                             <?php endif; ?>
@@ -407,7 +404,9 @@
             </div>
 
             <div class="footer">
-                <?= htmlspecialchars($template['company']) ?> &bull; <?= htmlspecialchars($template['address']) ?>
+                <?php if ($supplier && !empty($supplier['address'])): ?>
+                ທີ່ຢູ່: <?= htmlspecialchars($supplier['address']) ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>

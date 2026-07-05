@@ -114,6 +114,7 @@ CREATE TABLE suppliers (
     email VARCHAR(100),
     address TEXT,
     notes TEXT,
+    tax_percent DECIMAL(5,2) DEFAULT 10.00,
     status ENUM('Active', 'Inactive') DEFAULT 'Active',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

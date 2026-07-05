@@ -59,6 +59,7 @@ class InvoiceController extends \App\Controllers\BaseController
             'store_name' => $settings['store_name'] ?? '',
             'store_phone' => $settings['store_phone'] ?? '',
             'store_address' => $settings['store_address'] ?? '',
+            'settings' => $settings,
             'layout' => false,
         ]);
     }

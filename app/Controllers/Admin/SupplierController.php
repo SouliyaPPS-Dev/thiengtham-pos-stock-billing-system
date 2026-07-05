@@ -114,6 +114,21 @@ class SupplierController extends \App\Controllers\BaseController
         $this->redirect('/admin/suppliers', ['updated' => 1]);
     }
 
+    public function updateTax($id)
+    {
+        $supplier = (new Supplier())->find($id);
+
+        if (!$supplier) {
+            $this->json(['error' => true, 'message' => 'ບໍ່ພົບຜູ້ສະໜອງ']);
+            return;
+        }
+
+        $taxPercent = $_POST['tax_percent'] ?? 0;
+        (new Supplier())->update($id, ['tax_percent' => $taxPercent]);
+
+        $this->json(['success' => true, 'tax_percent' => $taxPercent]);
+    }
+
     public function delete($id)
     {
         $supplier = (new Supplier())->find($id);

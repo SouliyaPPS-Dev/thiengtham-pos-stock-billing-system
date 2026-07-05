@@ -110,10 +110,11 @@ function updateCart(productId, quantity) {
     .then(r => r.json())
     .then(data => {
         if (data.success) {
-            if (typeof window.updateCartBadge === 'function') {
-                window.updateCartBadge(data.cartCount);
+            var badge = document.getElementById('cart-count-badge');
+            if (badge) {
+                badge.textContent = data.cartCount;
+                badge.classList.toggle('hidden', data.cartCount <= 0);
             }
-            document.getElementById('cart-count-badge').textContent = data.cartCount;
             var itemSubtotal = document.getElementById('subtotal-' + productId);
             if (itemSubtotal) {
                 itemSubtotal.textContent = new Intl.NumberFormat('lo-LA').format(data.subtotal) + ' ກີບ';
@@ -150,10 +151,11 @@ function removeFromCart(productId) {
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
-                    if (typeof window.updateCartBadge === 'function') {
-                        window.updateCartBadge(data.cartCount);
+                    var badge = document.getElementById('cart-count-badge');
+                    if (badge) {
+                        badge.textContent = data.cartCount;
+                        badge.classList.toggle('hidden', data.cartCount <= 0);
                     }
-                    document.getElementById('cart-count-badge').textContent = data.cartCount;
                     var item = document.getElementById('cart-item-' + productId);
                     if (item) item.remove();
                     var totalEl = document.getElementById('cart-total-amount');

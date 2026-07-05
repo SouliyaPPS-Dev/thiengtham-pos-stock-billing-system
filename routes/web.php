@@ -76,6 +76,7 @@ return [
     '/admin/suppliers/{id}/edit' => ['Admin\SupplierController', 'edit'],
     '/admin/suppliers/{id}/update' => ['Admin\SupplierController', 'update'],
     '/admin/suppliers/{id}/delete' => ['Admin\SupplierController', 'delete'],
+    '/admin/suppliers/{id}/update-tax' => ['Admin\SupplierController', 'updateTax'],
 
     // Invoices / Print
     '/admin/invoices/{id}/print' => ['Admin\InvoiceController', 'print'],
@@ -109,9 +110,14 @@ return [
     '/admin/quotations/{id}/print'      => ['Admin\QuotationController', 'printView'],
 
     // Settings
-    '/admin/settings'              => ['Admin\SettingsController', 'index'],
-    '/admin/settings/update'       => ['Admin\SettingsController', 'update'],
-    '/admin/settings/change-password' => ['Admin\SettingsController', 'changePassword'],
+    '/admin/settings'                    => ['Admin\SettingsController', 'index'],
+    '/admin/settings/update'             => ['Admin\SettingsController', 'update'],
+    '/admin/settings/change-password'    => ['Admin\SettingsController', 'changePassword'],
+
+    // Payment Methods
+    '/admin/payment-methods/store'       => ['Admin\PaymentMethodController', 'store'],
+    '/admin/payment-methods/{id}/update' => ['Admin\PaymentMethodController', 'update'],
+    '/admin/payment-methods/{id}/delete' => ['Admin\PaymentMethodController', 'delete'],
 
     // Public invoice view (no auth)
     '/print-invoice/{id}' => ['Admin\InvoiceController', 'printPublic'],

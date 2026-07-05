@@ -38,6 +38,22 @@
                                 <label class="text-xs font-bold text-gray-500 mb-1 block">ຜູ້ຕິດຕໍ່ / ເບີໂທ</label>
                                 <input type="text" name="supplier_contact" x-model="supplierContact" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 mb-1 block">ອາກອນມູນຄ່າເພີ້ມ (VAT %)</label>
+                                <div class="flex items-center gap-2">
+                                    <input type="number" name="tax_percent" x-model="taxPercent" @input="calcTotals()" min="0" max="100" step="0.01" list="vat-options" class="w-24 px-3 py-2.5 border border-gray-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    <datalist id="vat-options">
+                                        <option value="0">
+                                        <option value="5">
+                                        <option value="7">
+                                        <option value="10">
+                                    </datalist>
+                                    <button type="button" @click="saveSupplierTax()" :disabled="!supplierId" class="px-3 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap" :class="supplierId ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-gray-50 text-gray-300 cursor-not-allowed'">
+                                        <i class="fas fa-save mr-1"></i> ບັນທຶກ
+                                    </button>
+                                    <span class="text-xs text-gray-400 ml-1">(ຕັ້ງອັດຕາອາກອນຕາມຜູ້ສະໜອງ)</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -72,43 +88,114 @@
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                        <div class="flex items-center gap-3 mb-4 pb-3 border-b border-gray-50">
-                            <div class="h-8 w-8 rounded-lg bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-200">
-                                <i class="fas fa-file-invoice text-xs"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-sm font-extrabold text-gray-800">ຮູບພາບໃບບິນ</h2>
-                                <p class="text-[10px] text-gray-400">ຕົວຢ່າງຮູບພາບທີ່ຈະສະແດງໃນໃບພິມ</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <div class="flex-1 text-center">
-                                <div class="text-[10px] font-bold text-gray-400 mb-1">ໂລໂກ້</div>
-                                <div class="h-16 w-16 mx-auto rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden border">
-                                    <?php $billLogo = $settings['bill_logo'] ?? ''; ?>
-                                    <?php if (!empty($billLogo)): ?>
-                                    <img src="<?= $billLogo ?>" class="h-full w-full object-contain">
-                                    <?php else: ?>
-                                    <i class="fas fa-image text-lg text-gray-300"></i>
-                                    <?php endif; ?>
+                    <!-- Bill Settings Section -->
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6" id="bill-settings-section">
+                        <h2 class="text-base font-extrabold text-gray-800 mb-4">ຕັ້ງຄ່າຮູບພາບໃບບິນ</h2>
+                        <div class="space-y-4">
+
+                            <!-- Logo Section -->
+                            <div class="space-y-3">
+                                <h4 class="text-sm font-extrabold text-gray-800">ໂລໂກ້ໃບບິນ</h4>
+                                <div x-data="{ preview: null, currentLogo: '<?= htmlspecialchars($settings['bill_logo'] ?? '') ?>' }" class="flex items-center gap-3">
+                                    <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden border shrink-0">
+                                        <template x-if="currentLogo && !preview">
+                                            <img :src="currentLogo" class="h-full w-full object-cover">
+                                        </template>
+                                        <template x-if="!currentLogo && !preview">
+                                            <i class="fas fa-image text-xl text-gray-300"></i>
+                                        </template>
+                                        <template x-if="preview">
+                                            <img :src="preview" class="h-full w-full object-cover">
+                                        </template>
+                                    </div>
+                                    <input type="file" name="bill_logo" accept="image/*" @change="preview = URL.createObjectURL($event.target.files[0]); currentLogo = null"
+                                           class="flex-1 text-xs file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-amber-50 file:text-amber-600 hover:file:bg-amber-100">
+                                </div>
+                                <div class="flex gap-2">
+                                    <div class="flex-1 min-w-0">
+                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ກ້ວາງ</label>
+                                        <input type="number" name="bill_logo_width" min="20" max="500" value="<?= htmlspecialchars($settings['bill_logo_width'] ?? '150') ?>"
+                                               class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ສູງ</label>
+                                        <input type="number" name="bill_logo_height" min="20" max="500" value="<?= htmlspecialchars($settings['bill_logo_height'] ?? '150') ?>"
+                                               class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ຕຳແໜ່ງ</label>
+                                        <select name="bill_logo_position"
+                                                class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                            <option value="top-left" <?= ($settings['bill_logo_position'] ?? 'top-left') === 'top-left' ? 'selected' : '' ?>>ຊ້າຍ-ເທິງ</option>
+                                            <option value="top-center" <?= ($settings['bill_logo_position'] ?? '') === 'top-center' ? 'selected' : '' ?>>ກາງ-ເທິງ</option>
+                                            <option value="top-right" <?= ($settings['bill_logo_position'] ?? '') === 'top-right' ? 'selected' : '' ?>>ຂວາ-ເທິງ</option>
+                                            <option value="center" <?= ($settings['bill_logo_position'] ?? '') === 'center' ? 'selected' : '' ?>>ກາງ</option>
+                                            <option value="bottom-left" <?= ($settings['bill_logo_position'] ?? '') === 'bottom-left' ? 'selected' : '' ?>>ຊ້າຍ-ລຸ່ມ</option>
+                                            <option value="bottom-center" <?= ($settings['bill_logo_position'] ?? '') === 'bottom-center' ? 'selected' : '' ?>>ກາງ-ລຸ່ມ</option>
+                                            <option value="bottom-right" <?= ($settings['bill_logo_position'] ?? '') === 'bottom-right' ? 'selected' : '' ?>>ຂວາ-ລຸ່ມ</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex-1 text-center">
-                                <div class="text-[10px] font-bold text-gray-400 mb-1">ລາຍເຊັນ</div>
-                                <div class="h-10 mx-auto flex items-center justify-center">
-                                    <?php $billSig = $settings['bill_signature'] ?? ''; ?>
-                                    <?php if (!empty($billSig)): ?>
-                                    <img src="<?= $billSig ?>" style="max-height:36px;max-width:100px;" class="object-contain">
-                                    <?php else: ?>
-                                    <span class="text-[10px] text-gray-300">— ບໍ່ມີ —</span>
-                                    <?php endif; ?>
+
+                            <!-- Signature Section -->
+                            <div class="space-y-3">
+                                <h4 class="text-sm font-extrabold text-gray-800">ລາຍເຊັນໃບບິນ</h4>
+                                <div x-data="{ preview: null, currentSig: '<?= htmlspecialchars($settings['bill_signature'] ?? '') ?>' }" class="flex items-center gap-3">
+                                    <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden border shrink-0">
+                                        <template x-if="currentSig && !preview">
+                                            <img :src="currentSig" class="h-full w-full object-cover">
+                                        </template>
+                                        <template x-if="!currentSig && !preview">
+                                            <i class="fas fa-pen text-xl text-gray-300"></i>
+                                        </template>
+                                        <template x-if="preview">
+                                            <img :src="preview" class="h-full w-full object-cover">
+                                        </template>
+                                    </div>
+                                    <input type="file" name="bill_signature" accept="image/*" @change="preview = URL.createObjectURL($event.target.files[0]); currentSig = null"
+                                           class="flex-1 text-xs file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-600 hover:file:bg-purple-100">
+                                </div>
+                                <div class="flex gap-2">
+                                    <div class="flex-1 min-w-0">
+                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ກ້ວາງ</label>
+                                        <input type="number" name="bill_signature_width" min="20" max="500" value="<?= htmlspecialchars($settings['bill_signature_width'] ?? '150') ?>"
+                                               class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ສູງ</label>
+                                        <input type="number" name="bill_signature_height" min="20" max="500" value="<?= htmlspecialchars($settings['bill_signature_height'] ?? '50') ?>"
+                                               class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ຕຳແໜ່ງ</label>
+                                        <select name="bill_signature_position"
+                                                class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                            <option value="center" <?= ($settings['bill_signature_position'] ?? 'center') === 'center' ? 'selected' : '' ?>>ກາງ</option>
+                                            <option value="top-left" <?= ($settings['bill_signature_position'] ?? '') === 'top-left' ? 'selected' : '' ?>>ຊ້າຍ-ເທິງ</option>
+                                            <option value="top-center" <?= ($settings['bill_signature_position'] ?? '') === 'top-center' ? 'selected' : '' ?>>ກາງ-ເທິງ</option>
+                                            <option value="top-right" <?= ($settings['bill_signature_position'] ?? '') === 'top-right' ? 'selected' : '' ?>>ຂວາ-ເທິງ</option>
+                                            <option value="center-left" <?= ($settings['bill_signature_position'] ?? '') === 'center-left' ? 'selected' : '' ?>>ຊ້າຍ-ກາງ</option>
+                                            <option value="center-right" <?= ($settings['bill_signature_position'] ?? '') === 'center-right' ? 'selected' : '' ?>>ຂວາ-ກາງ</option>
+                                            <option value="bottom-left" <?= ($settings['bill_signature_position'] ?? '') === 'bottom-left' ? 'selected' : '' ?>>ຊ້າຍ-ລຸ່ມ</option>
+                                            <option value="bottom-center" <?= ($settings['bill_signature_position'] ?? '') === 'bottom-center' ? 'selected' : '' ?>>ກາງ-ລຸ່ມ</option>
+                                            <option value="bottom-right" <?= ($settings['bill_signature_position'] ?? '') === 'bottom-right' ? 'selected' : '' ?>>ຂວາ-ລຸ່ມ</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
+
+                            <!-- Bill Terms -->
+                            <div class="space-y-3">
+                                <h4 class="text-sm font-extrabold text-gray-800">ເງື່ອນໄຂໃບບິນ</h4>
+                                <textarea name="bill_terms" rows="4" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none" placeholder='ຕົວຢ່າງ: ເສັ້ນສະເໜີລາຄາ 60 ວັນ / ຈັດສົ່ງ 14 ວັນ ຫຼັງ PO / ເຄຣດິດ 30 ວັນ'><?= htmlspecialchars($settings['bill_terms'] ?? '') ?></textarea>
+                            </div>
+
+                            <!-- Save Button -->
+                            <button type="button" onclick="saveBillSettings()" class="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-300">
+                                <i class="fas fa-save"></i> ບັນທຶກຕັ້ງຄ່າ
+                            </button>
                         </div>
-                        <button @click="openBillSettings()" type="button" class="mt-3 w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 bg-amber-50 text-amber-600 rounded-xl text-xs font-bold hover:bg-amber-100 transition-all">
-                            <i class="fas fa-cog"></i> ຕັ້ງຄ່າຮູບພາບໃບບິນ
-                        </button>
                     </div>
                 </div>
 
@@ -239,6 +326,12 @@
 
                     <div class="flex items-center justify-end gap-3">
                         <a href="<?= url('/admin/quotations') ?>" class="px-5 py-2.5 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">ຍົກເລີກ</a>
+                        <?php if ($isEdit): ?>
+                        <a href="<?= url('/admin/quotations/' . $quotation['id'] . '/print') ?>" target="_blank" class="px-5 py-2.5 bg-red-500 text-white rounded-xl font-bold text-sm hover:bg-red-600 transition-all shadow-lg shadow-red-300 inline-flex items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            Export PDF
+                        </a>
+                        <?php endif; ?>
                         <button type="submit" name="action" value="save" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-300">ບັນທຶກ</button>
                         <button type="submit" name="action" value="save_print" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-300">
                             <i class="fas fa-print"></i> ບັນທຶກ ແລະ ພິມ
@@ -247,226 +340,82 @@
                 </div>
             </div>
         </form>
-    </div>
 
-    <!-- Product Browser Modal (center) -->
-    <div x-show="showProductBrowser" class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-         x-cloak>
-        <div class="fixed inset-0 bg-black/40"
-             @click="closeProductBrowser()"></div>
-        <div class="relative w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
-            <!-- Header -->
-            <div class="flex items-center justify-between p-4 border-b border-gray-100 flex-shrink-0">
-                <h3 class="text-base font-extrabold text-gray-800">
-                    <i class="fas fa-box text-primary mr-2"></i>ລາຍການສິນຄ້າ
-                </h3>
-                <button @click="closeProductBrowser()" type="button" class="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all">
-                    <i class="fas fa-times text-xs"></i>
-                </button>
-            </div>
-            <!-- Search -->
-            <div class="p-4 border-b border-gray-50 flex-shrink-0">
-                <div class="relative">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="text" x-model="productSearch" @input.debounce.500ms="onProductSearchInput()" placeholder="ຄົ້ນຫາຊື່ສິນຄ້າ..." class="w-full pl-8 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+        <!-- Product Browser Modal (center) -->
+        <div x-show="showProductBrowser" class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+             x-cloak>
+            <div class="fixed inset-0 bg-black/40 z-0"
+                 @click="closeProductBrowser()"></div>
+            <div class="relative z-50 w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+                <!-- Header -->
+                <div class="flex items-center justify-between p-4 border-b border-gray-100 flex-shrink-0">
+                    <h3 class="text-base font-extrabold text-gray-800">
+                        <i class="fas fa-box text-primary mr-2"></i>ລາຍການສິນຄ້າ
+                    </h3>
+                    <button @click="closeProductBrowser()" type="button" class="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
                 </div>
-            </div>
-            <!-- Product List (scrollable, infinite scroll) -->
-            <div class="flex-1 overflow-y-auto min-h-0 px-1" @scroll="checkProductScroll($el)" style="max-height: calc(85vh - 180px);">
-                <template x-if="!loading && filteredProducts.length === 0">
-                    <div class="flex flex-col items-center justify-center py-16 text-center px-4">
-                        <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-3">
-                            <i class="fas fa-box-open text-2xl"></i>
-                        </div>
-                        <p class="text-sm font-bold text-gray-600">ບໍ່ພົບສິນຄ້າ</p>
+                <!-- Search -->
+                <div class="p-4 border-b border-gray-50 flex-shrink-0">
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="text" x-model="productSearch" @input.debounce.500ms="onProductSearchInput()" placeholder="ຄົ້ນຫາຊື່ສິນຄ້າ..." class="w-full pl-8 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                     </div>
-                </template>
-                <div class="divide-y divide-gray-50">
-                    <template x-for="p in filteredProducts" :key="p.id">
-                        <div @click="addProductFromBrowser(p)"
-                             class="flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-gray-50 rounded-xl mx-1"
-                             :class="isProductInItems(p.id) ? 'bg-primary/5' : ''">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center text-gray-300 overflow-hidden flex-shrink-0">
-                                <template x-if="p.image">
-                                    <img :src="p.image" class="h-full w-full object-cover">
-                                </template>
-                                <template x-if="!p.image">
-                                    <i class="fas fa-box text-lg"></i>
-                                </template>
+                </div>
+                <!-- Product List (scrollable, infinite scroll) -->
+                <div class="flex-1 overflow-y-auto min-h-0 px-1" @scroll="checkProductScroll($el)" style="max-height: calc(85vh - 180px);">
+                    <template x-if="!loading && filteredProducts.length === 0">
+                        <div class="flex flex-col items-center justify-center py-16 text-center px-4">
+                            <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-3">
+                                <i class="fas fa-box-open text-2xl"></i>
                             </div>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-sm font-bold text-gray-800 truncate" x-text="p.name"></div>
-                                <div class="text-[11px] text-gray-400 truncate" x-text="p.sku || ''"></div>
-                                <div class="text-xs font-bold text-primary mt-0.5" x-text="formatPrice(p.selling_price)"></div>
-                            </div>
-                            <template x-if="isProductInItems(p.id)">
-                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg flex-shrink-0">ເພີ່ມແລ້ວ</span>
-                            </template>
+                            <p class="text-sm font-bold text-gray-600">ບໍ່ພົບສິນຄ້າ</p>
                         </div>
                     </template>
+                    <div class="divide-y divide-gray-50">
+                        <template x-for="p in filteredProducts" :key="p.id">
+                            <div @click="addProductFromBrowser(p)"
+                                 class="flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-gray-50 rounded-xl mx-1"
+                                 :class="isProductInItems(p.id) ? 'bg-primary/5' : ''">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center text-gray-300 overflow-hidden flex-shrink-0">
+                                    <template x-if="p.image">
+                                        <img :src="p.image" class="h-full w-full object-cover">
+                                    </template>
+                                    <template x-if="!p.image">
+                                        <i class="fas fa-box text-lg"></i>
+                                    </template>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-bold text-gray-800 truncate" x-text="p.name"></div>
+                                    <div class="text-[11px] text-gray-400 truncate" x-text="p.sku || ''"></div>
+                                    <div class="text-xs font-bold text-primary mt-0.5" x-text="formatPrice(p.selling_price)"></div>
+                                </div>
+                                <template x-if="isProductInItems(p.id)">
+                                    <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg flex-shrink-0">ເພີ່ມແລ້ວ</span>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                    <!-- Loading more indicator -->
+                    <template x-if="loading">
+                        <div class="flex items-center justify-center py-6">
+                            <svg class="h-5 w-5 text-primary animate-spin-custom" viewBox="0 0 24 24" fill="none">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            <span class="ml-2 text-xs text-gray-500">ກຳລັງໂຫຼດ...</span>
+                        </div>
+                    </template>
+                    <template x-if="!loading && !hasMore && filteredProducts.length > 0">
+                        <div class="py-4 text-center text-[10px] text-gray-400">— ທັງໝົດແລ້ວ —</div>
+                    </template>
                 </div>
-                <!-- Loading more indicator -->
-                <template x-if="loading">
-                    <div class="flex items-center justify-center py-6">
-                        <svg class="h-5 w-5 text-primary animate-spin-custom" viewBox="0 0 24 24" fill="none">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                        </svg>
-                        <span class="ml-2 text-xs text-gray-500">ກຳລັງໂຫຼດ...</span>
-                    </div>
-                </template>
-                <template x-if="!loading && !hasMore && filteredProducts.length > 0">
-                    <div class="py-4 text-center text-[10px] text-gray-400">— ທັງໝົດແລ້ວ —</div>
-                </template>
-            </div>
-            <!-- Footer -->
-            <div class="p-4 border-t border-gray-100 flex items-center justify-between rounded-b-2xl bg-gray-50/50 flex-shrink-0">
-                <span class="text-xs text-gray-500" x-text="filteredProducts.length + ' ລາຍການ'"></span>
-                <button @click="closeProductBrowser()" type="button" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-200 transition-all">ປິດ</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bill Settings Modal -->
-    <div x-show="showBillSettings" class="fixed inset-0 z-[9999] flex items-center justify-center p-4" x-cloak>
-        <div class="fixed inset-0 bg-black/40" @click="closeBillSettings()"></div>
-        <div class="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[calc(100vh-100px)] overflow-hidden">
-            <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 flex-shrink-0">
-                <div class="flex items-center gap-2.5">
-                    <div class="h-7 w-7 rounded-lg bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow shadow-amber-200">
-                        <i class="fas fa-file-invoice text-xs"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-extrabold text-gray-800">ຕັ້ງຄ່າຮູບພາບໃບບິນ</h3>
-                        <p class="text-[10px] text-gray-400">ຮູບພາບສຳລັບໃບບິນ ແລະ ໃບແຈ້ງໜີ້</p>
-                    </div>
+                <!-- Footer -->
+                <div class="p-4 border-t border-gray-100 flex items-center justify-between rounded-b-2xl bg-gray-50/50 flex-shrink-0">
+                    <span class="text-xs text-gray-500" x-text="filteredProducts.length + ' ລາຍການ'"></span>
+                    <button @click="closeProductBrowser()" type="button" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-200 transition-all">ປິດ</button>
                 </div>
-                <button @click="closeBillSettings()" type="button" class="h-7 w-7 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all">
-                    <i class="fas fa-times text-xs"></i>
-                </button>
-            </div>
-            <div class="overflow-y-auto px-4 py-3">
-                <form action="<?= url('/admin/settings/update') ?>" method="POST" enctype="multipart/form-data" class="space-y-3">
-
-                    <!-- Logo Section -->
-                    <div class="bg-gray-50/70 rounded-xl p-3 space-y-2.5 border border-gray-100">
-                        <div class="flex items-center gap-2">
-                            <div class="h-5 w-5 rounded-lg bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white text-[8px] shadow shadow-amber-200">
-                                <i class="fas fa-image"></i>
-                            </div>
-                            <span class="text-xs font-bold text-gray-800">ໂລໂກ້ໃບບິນ (Bill Logo)</span>
-                        </div>
-                        <div x-data="{ preview: null, currentLogo: '<?= htmlspecialchars($settings['bill_logo'] ?? '') ?>' }" class="flex items-center gap-2.5">
-                            <div class="h-12 w-12 rounded-lg bg-white flex items-center justify-center overflow-hidden border shrink-0">
-                                <template x-if="currentLogo && !preview">
-                                    <img :src="currentLogo" class="h-full w-full object-cover">
-                                </template>
-                                <template x-if="!currentLogo && !preview">
-                                    <i class="fas fa-image text-base text-gray-300"></i>
-                                </template>
-                                <template x-if="preview">
-                                    <img :src="preview" class="h-full w-full object-cover">
-                                </template>
-                            </div>
-                            <input type="file" name="bill_logo" accept="image/*" @change="preview = URL.createObjectURL($event.target.files[0]); currentLogo = null"
-                                   class="flex-1 text-[11px] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-amber-50 file:text-amber-600 hover:file:bg-amber-100">
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="min-w-0">
-                                <label class="text-[9px] font-bold text-gray-500">ກ້ວາງ (px)</label>
-                                <input type="number" name="bill_logo_width" min="20" max="500" value="<?= htmlspecialchars($settings['bill_logo_width'] ?? '150') ?>"
-                                       class="w-full px-2 py-1.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-[11px]">
-                            </div>
-                            <div class="min-w-0">
-                                <label class="text-[9px] font-bold text-gray-500">ສູງ (px)</label>
-                                <input type="number" name="bill_logo_height" min="20" max="500" value="<?= htmlspecialchars($settings['bill_logo_height'] ?? '150') ?>"
-                                       class="w-full px-2 py-1.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-[11px]">
-                            </div>
-                            <div class="min-w-0">
-                                <label class="text-[9px] font-bold text-gray-500">ຕຳແໜ່ງ</label>
-                                <select name="bill_logo_position"
-                                        class="w-full px-2 py-1.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-[11px]">
-                                    <option value="top-left" <?= ($settings['bill_logo_position'] ?? 'top-left') === 'top-left' ? 'selected' : '' ?>>ຊ້າຍ-ເທິງ</option>
-                                    <option value="top-center" <?= ($settings['bill_logo_position'] ?? '') === 'top-center' ? 'selected' : '' ?>>ກາງ-ເທິງ</option>
-                                    <option value="top-right" <?= ($settings['bill_logo_position'] ?? '') === 'top-right' ? 'selected' : '' ?>>ຂວາ-ເທິງ</option>
-                                    <option value="center-left" <?= ($settings['bill_logo_position'] ?? '') === 'center-left' ? 'selected' : '' ?>>ຊ້າຍ-ກາງ</option>
-                                    <option value="center" <?= ($settings['bill_logo_position'] ?? '') === 'center' ? 'selected' : '' ?>>ກາງ</option>
-                                    <option value="center-right" <?= ($settings['bill_logo_position'] ?? '') === 'center-right' ? 'selected' : '' ?>>ຂວາ-ກາງ</option>
-                                    <option value="bottom-left" <?= ($settings['bill_logo_position'] ?? '') === 'bottom-left' ? 'selected' : '' ?>>ຊ້າຍ-ລຸ່ມ</option>
-                                    <option value="bottom-center" <?= ($settings['bill_logo_position'] ?? '') === 'bottom-center' ? 'selected' : '' ?>>ກາງ-ລຸ່ມ</option>
-                                    <option value="bottom-right" <?= ($settings['bill_logo_position'] ?? '') === 'bottom-right' ? 'selected' : '' ?>>ຂວາ-ລຸ່ມ</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Signature Section -->
-                    <div class="bg-gray-50/70 rounded-xl p-3 space-y-2.5 border border-gray-100">
-                        <div class="flex items-center gap-2">
-                            <div class="h-5 w-5 rounded-lg bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center text-white text-[8px] shadow shadow-purple-200">
-                                <i class="fas fa-pen"></i>
-                            </div>
-                            <span class="text-xs font-bold text-gray-800">ລາຍເຊັນໃບບິນ (Bill Signature)</span>
-                        </div>
-                        <div x-data="{ preview: null, currentSig: '<?= htmlspecialchars($settings['bill_signature'] ?? '') ?>' }" class="flex items-center gap-2.5">
-                            <div class="h-12 w-12 rounded-lg bg-white flex items-center justify-center overflow-hidden border shrink-0">
-                                <template x-if="currentSig && !preview">
-                                    <img :src="currentSig" class="h-full w-full object-cover">
-                                </template>
-                                <template x-if="!currentSig && !preview">
-                                    <i class="fas fa-pen text-base text-gray-300"></i>
-                                </template>
-                                <template x-if="preview">
-                                    <img :src="preview" class="h-full w-full object-cover">
-                                </template>
-                            </div>
-                            <input type="file" name="bill_signature" accept="image/*" @change="preview = URL.createObjectURL($event.target.files[0]); currentSig = null"
-                                   class="flex-1 text-[11px] file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-purple-50 file:text-purple-600 hover:file:bg-purple-100">
-                        </div>
-                        <div class="grid grid-cols-3 gap-2">
-                            <div class="min-w-0">
-                                <label class="text-[9px] font-bold text-gray-500">ກ້ວາງ (px)</label>
-                                <input type="number" name="bill_signature_width" min="20" max="500" value="<?= htmlspecialchars($settings['bill_signature_width'] ?? '150') ?>"
-                                       class="w-full px-2 py-1.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-[11px]">
-                            </div>
-                            <div class="min-w-0">
-                                <label class="text-[9px] font-bold text-gray-500">ສູງ (px)</label>
-                                <input type="number" name="bill_signature_height" min="20" max="500" value="<?= htmlspecialchars($settings['bill_signature_height'] ?? '50') ?>"
-                                       class="w-full px-2 py-1.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-[11px]">
-                            </div>
-                            <div class="min-w-0">
-                                <label class="text-[9px] font-bold text-gray-500">ຕຳແໜ່ງ</label>
-                                <select name="bill_signature_position"
-                                        class="w-full px-2 py-1.5 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-[11px]">
-                                    <option value="center" <?= ($settings['bill_signature_position'] ?? 'center') === 'center' ? 'selected' : '' ?>>ກາງ</option>
-                                    <option value="top-left" <?= ($settings['bill_signature_position'] ?? '') === 'top-left' ? 'selected' : '' ?>>ຊ້າຍ-ເທິງ</option>
-                                    <option value="top-center" <?= ($settings['bill_signature_position'] ?? '') === 'top-center' ? 'selected' : '' ?>>ກາງ-ເທິງ</option>
-                                    <option value="top-right" <?= ($settings['bill_signature_position'] ?? '') === 'top-right' ? 'selected' : '' ?>>ຂວາ-ເທິງ</option>
-                                    <option value="center-left" <?= ($settings['bill_signature_position'] ?? '') === 'center-left' ? 'selected' : '' ?>>ຊ້າຍ-ກາງ</option>
-                                    <option value="center-right" <?= ($settings['bill_signature_position'] ?? '') === 'center-right' ? 'selected' : '' ?>>ຂວາ-ກາງ</option>
-                                    <option value="bottom-left" <?= ($settings['bill_signature_position'] ?? '') === 'bottom-left' ? 'selected' : '' ?>>ຊ້າຍ-ລຸ່ມ</option>
-                                    <option value="bottom-center" <?= ($settings['bill_signature_position'] ?? '') === 'bottom-center' ? 'selected' : '' ?>>ກາງ-ລຸ່ມ</option>
-                                    <option value="bottom-right" <?= ($settings['bill_signature_position'] ?? '') === 'bottom-right' ? 'selected' : '' ?>>ຂວາ-ລຸ່ມ</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Bill Terms -->
-                    <div class="space-y-1">
-                        <label class="text-xs font-bold text-gray-700">ເງື່ອນໄຂໃບບິນ (Bill Terms)</label>
-                        <textarea name="bill_terms" rows="2" class="w-full px-3 py-1.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-xs resize-none" placeholder='ຕົວຢ່າງ: ເສັ້ນສະເໜີລາຄາ 60 ວັນ / ຈັດສົ່ງ 14 ວັນ ຫຼັງ PO / ເຄຣດິດ 30 ວັນ'><?= htmlspecialchars($settings['bill_terms'] ?? '') ?></textarea>
-                    </div>
-
-                    <!-- Buttons -->
-                    <div class="flex items-center justify-end gap-2">
-                        <button @click="closeBillSettings()" type="button" class="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg font-bold text-xs hover:bg-gray-200 transition-all">ຍົກເລີກ</button>
-                        <button type="submit" class="inline-flex items-center gap-1.5 px-3 py-1 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-lg font-bold text-xs hover:from-sky-600 hover:to-sky-700 transition-all shadow shadow-sky-300 active:scale-[0.97]">
-                            <i class="fas fa-save"></i>
-                            <span>ບັນທຶກ</span>
-                        </button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -543,6 +492,22 @@ function quotationForm() {
             }
         },
 
+        saveSupplierTax() {
+            if (!this.supplierId) return;
+            const formData = new FormData();
+            formData.append('tax_percent', this.taxPercent);
+            fetch('<?= url('/admin/suppliers') ?>/' + this.supplierId + '/update-tax', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    Swal.fire({ icon: 'success', title: 'ບັນທຶກສຳເລັດ', text: 'ບັນທຶກອັດຕາອາກອນໃຫ້ຜູ້ສະໜອງສຳເລັດ', timer: 2500, showConfirmButton: false });
+                }
+            });
+        },
+
         addItem() {
             this.items.push({
                 product_id: '',
@@ -610,15 +575,6 @@ function quotationForm() {
 
         // ── Product browser (infinite scroll modal) ──
         showProductBrowser: false,
-        showBillSettings: false,
-
-        openBillSettings() {
-            this.showBillSettings = true;
-        },
-
-        closeBillSettings() {
-            this.showBillSettings = false;
-        },
 
         productSearch: '',
         products: [],
@@ -716,6 +672,27 @@ function quotationForm() {
             this.$el.submit();
         }
     };
+}
+</script>
+<script>
+function saveBillSettings() {
+    const section = document.getElementById('bill-settings-section');
+    const formData = new FormData();
+    const fields = section.querySelectorAll('input, select, textarea');
+    fields.forEach(f => {
+        if (f.name && f.type !== 'file') formData.append(f.name, f.value);
+    });
+    const fileInputs = section.querySelectorAll('input[type="file"]');
+    fileInputs.forEach(f => {
+        if (f.files[0]) formData.append(f.name, f.files[0]);
+    });
+    fetch('<?= url('/admin/settings/update') ?>', { method: 'POST', body: formData, redirect: 'manual' })
+    .then(r => {
+        if (r.type === 'opaqueredirect' || r.status === 302) {
+            Swal.fire({ icon: 'success', title: 'ສຳເລັດ', text: 'ບັນທຶກຕັ້ງຄ່າຮູບພາບໃບບິນສຳເລັດ', timer: 1500, showConfirmButton: false })
+            .then(() => location.reload());
+        }
+    });
 }
 </script>
 <style>

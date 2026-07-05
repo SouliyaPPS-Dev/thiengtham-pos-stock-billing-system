@@ -97,15 +97,11 @@
                     </a>
 
                     <!-- Cart -->
-                    <div x-data="{ cartBadgeCount: <?= (int)($cartCount ?? 0) ?> }"
-                         x-init="window.updateCartBadge = (n) => { cartBadgeCount = n; }">
-                        <a href="<?= url('/cart') ?>" class="relative h-10 w-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors">
-                            <i class="fas fa-shopping-cart text-lg"></i>
-                            <span id="cart-count-badge"
-                                  x-text="cartBadgeCount"
-                                  class="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-sky-500 text-white text-[11px] font-black flex items-center justify-center shadow-sm shadow-sky-200"><?= (int)($cartCount ?? 0) ?></span>
-                        </a>
-                    </div>
+                    <a href="<?= url('/cart') ?>" class="relative h-10 w-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-shopping-cart text-lg"></i>
+                        <span id="cart-count-badge"
+                              class="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-sky-500 text-white text-[11px] font-black flex items-center justify-center shadow-sm shadow-sky-200 <?= ((int)($cartCount ?? 0) > 0) ? '' : 'hidden' ?>"><?= (int)($cartCount ?? 0) ?></span>
+                    </a>
 
                     <!-- Mobile Menu Toggle -->
                     <button @click="mobileMenu = !mobileMenu" class="lg:hidden h-10 w-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors">
@@ -381,10 +377,11 @@
         .then(r => r.json())
         .then(data => {
             if (data.success) {
-                if (typeof window.updateCartBadge === 'function') {
-                    window.updateCartBadge(data.cartCount);
+                var badge = document.getElementById('cart-count-badge');
+                if (badge) {
+                    badge.textContent = data.cartCount;
+                    badge.classList.toggle('hidden', data.cartCount <= 0);
                 }
-                document.getElementById('cart-count-badge').textContent = data.cartCount;
                 Swal.fire({
                     icon: 'success',
                     title: 'ສຳເລັດ',

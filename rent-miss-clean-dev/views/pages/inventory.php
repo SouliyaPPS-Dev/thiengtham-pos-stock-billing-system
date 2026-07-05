@@ -238,7 +238,7 @@
     </div>
 
     <!-- Add Product Modal -->
-    <div x-show="showAddModal" x-cloak class="fixed inset-0 bg-black/50 z-50 overflow-y-auto p-4 flex items-center justify-center">
+    <div x-show="showAddModal" x-cloak class="fixed inset-0 z-[9999] bg-black/50 overflow-y-auto p-4 flex items-center justify-center">
         <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl my-auto max-h-[90vh] overflow-y-auto" @click.away="showAddModal = false">
             <div class="flex items-center justify-between mb-6">
                 <h3 class="text-xl font-bold text-gray-800">ເພີ່ມຊຸດໃໝ່</h3>
@@ -333,7 +333,7 @@
     </div>
 
     <!-- Edit Product Modal -->
-    <div x-show="showEditModal" x-cloak class="fixed inset-0 bg-black/50 z-50 overflow-y-auto p-4 flex items-center justify-center">
+    <div x-show="showEditModal" x-cloak class="fixed inset-0 z-[9999] bg-black/50 overflow-y-auto p-4 flex items-center justify-center">
         <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl my-auto max-h-[90vh] overflow-y-auto" @click.away="showEditModal = false">
             <div class="flex items-center justify-between mb-5">
                 <h3 class="text-xl font-bold text-gray-800">ແກ້ໄຂຂໍ້ມູນຊຸດ</h3>
@@ -422,7 +422,7 @@
     </div>
 
     <!-- Category Management Modal -->
-    <div x-show="showCategoryModal" x-cloak class="fixed inset-0 bg-black/50 z-50 overflow-y-auto p-4 flex items-center justify-center">
+    <div x-show="showCategoryModal" x-cloak class="fixed inset-0 z-[9999] bg-black/50 overflow-y-auto p-4 flex items-center justify-center">
         <div class="bg-white rounded-2xl w-full max-w-md shadow-2xl my-auto max-h-[90vh] overflow-y-auto" @click.away="showCategoryModal = false">
             <div class="p-6 border-b flex items-center justify-between">
                 <h3 class="text-xl font-bold text-gray-800">ຈັດການໝວດໝູ່ສິນຄ້າ</h3>
@@ -468,7 +468,7 @@
     </div>
 
     <!-- Stock Quick Edit Modal -->
-    <div x-show="showStockModal" x-cloak class="fixed inset-0 bg-black/50 z-50 overflow-y-auto p-4 flex items-center justify-center">
+    <div x-show="showStockModal" x-cloak class="fixed inset-0 z-[9999] bg-black/50 overflow-y-auto p-4 flex items-center justify-center">
         <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl my-auto" @click.away="showStockModal = false">
             <div class="flex items-center justify-between mb-6">
                 <div>
@@ -502,7 +502,7 @@
     </div>
 
     <!-- Rental History Modal -->
-    <div x-show="showHistoryModal" x-cloak class="fixed inset-0 bg-black/50 z-50 overflow-y-auto p-4 flex items-center justify-center">
+    <div x-show="showHistoryModal" x-cloak class="fixed inset-0 z-[9999] bg-black/50 overflow-y-auto p-4 flex items-center justify-center">
         <div class="bg-white rounded-2xl w-full max-w-lg p-6 shadow-2xl my-auto max-h-[90vh] overflow-y-auto" @click.away="showHistoryModal = false">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-3">

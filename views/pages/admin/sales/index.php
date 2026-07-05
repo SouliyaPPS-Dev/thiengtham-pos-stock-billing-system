@@ -80,7 +80,7 @@
                                 <?php $pm = strtolower($s['payment_method'] ?? 'cash'); ?>
                                 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold <?= $pm === 'cash' ? 'bg-green-50 text-green-600' : ($pm === 'transfer' ? 'bg-blue-50 text-blue-600' : ($pm === 'qr' ? 'bg-purple-50 text-purple-600' : 'bg-gray-50 text-gray-600')) ?>">
                                     <i class="fas fa-<?= $pm === 'cash' ? 'money-bill' : ($pm === 'transfer' ? 'exchange-alt' : ($pm === 'qr' ? 'qrcode' : 'credit-card')) ?>"></i>
-                                    <?= $pm === 'cash' ? 'ເງິນສົດ' : ($pm === 'transfer' ? 'ໂອນ' : ($pm === 'qr' ? 'QR' : 'ກູ້')) ?>
+                                    <?= $pm === 'cash' ? 'ເງິນສົດ' : ($pm === 'transfer' ? 'ໂອນ' : ($pm === 'qr' ? 'QR' : 'ເງິນສົດ')) ?>
                                 </span>
                             </td>
                             <td class="py-3 px-2 font-medium text-gray-800"><?= number_format($s['grand_total'] ?: 0, 0) ?> ກີບ</td>

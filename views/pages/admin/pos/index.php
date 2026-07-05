@@ -330,7 +330,7 @@ function posSystem() {
         discount: 0,
         paidAmount: 0,
         grandTotal: 0,
-        selectedPaymentMethod: 'ເງິນສົດ',
+        selectedPaymentMethod: (<?= json_encode($paymentMethods ?? []) ?>[0]?.name) || 'ເງິນສົດ',
 
         // Splitter
         leftWidth: window.innerWidth * 0.65,
@@ -487,6 +487,8 @@ function posSystem() {
             if (this.cart.length === 0) return;
 
             const missing = [];
+            if (this.billParty === 'customer' && !this.selectedCustomer) missing.push('ກະລຸນາເລືອກລູກຄ້າ');
+            if (this.billParty === 'supplier' && !this.selectedSupplier) missing.push('ກະລຸນາເລືອກຜູ້ສະໜອງ');
             if (Number(this.paidAmount) < this.grandTotal) missing.push('ຈຳນວນເງິນທີ່ຮັບຕ້ອງຫຼາຍກວ່າ ຫຼື ເທົ່າກັບຍອດລວມ');
 
             if (missing.length > 0) {
@@ -557,6 +559,10 @@ function posSystem() {
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ກຳລັງດຳເນີນການ...';
 
+            const sub = this.subtotal();
+            const grand = this.grandTotal;
+            const change = Math.max(0, this.paidAmount - grand);
+
             fetch('<?= url('/admin/pos/checkout') ?>', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -566,7 +572,10 @@ function posSystem() {
                     customer_phone: this.billParty === 'customer' ? (this.selectedCustomer?.phone || '') : '',
                     supplier_id: this.billParty === 'supplier' ? (this.selectedSupplier?.id || null) : null,
                     supplier_name: this.billParty === 'supplier' ? (this.selectedSupplier?.name || '') : '',
+                    subtotal: sub,
                     discount: Number(this.discount),
+                    grand_total: grand,
+                    change_amount: change,
                     payment_method: this.selectedPaymentMethod,
                     amount_paid: Number(this.paidAmount),
                     items: this.cart.map(item => ({

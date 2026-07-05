@@ -3,6 +3,7 @@
 namespace App\Controllers\Admin;
 
 use App\Models\Settings;
+use App\Models\PaymentMethod;
 use App\Helpers\ImageKit;
 
 class SettingsController extends \App\Controllers\BaseController
@@ -10,10 +11,12 @@ class SettingsController extends \App\Controllers\BaseController
     public function index()
     {
         $settings = (new Settings())->getAll();
+        $paymentMethods = (new PaymentMethod())->getAll();
 
         return view('pages.admin.settings.index', [
             'title' => 'ຕັ້ງຄ່າລະບົບ',
             'settings' => $settings,
+            'paymentMethods' => $paymentMethods,
         ]);
     }
 

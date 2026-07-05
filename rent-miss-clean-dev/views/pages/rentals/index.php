@@ -277,7 +277,7 @@ function rentalFilter() {
 </div>
 
     <!-- View Modal -->
-    <div x-show="showViewModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4" x-transition.opacity>
+    <div x-show="showViewModal" x-cloak class="fixed inset-0 z-[9999] flex items-center justify-center p-4" x-transition.opacity>
         <div class="fixed inset-0 bg-black/40" @click="showViewModal = false"></div>
         <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto z-10">
             <div class="sticky top-0 bg-white border-b flex items-center justify-between px-5 py-4 rounded-t-2xl">

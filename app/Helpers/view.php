@@ -127,10 +127,10 @@ function get_menu_active_class($routePath, $activeClass = 'menu-active-box', $de
 function get_store_logo() {
     try {
         $db = \App\Core\Database::getInstance()->getConnection();
-        $stmt = $db->query("SELECT store_logo FROM settings LIMIT 1");
-        if ($stmt && $row = $stmt->fetch()) {
-            return $row['store_logo'] ?: '';
-        }
+        $stmt = $db->prepare("SELECT setting_value FROM settings WHERE setting_key = 'store_logo' LIMIT 1");
+        $stmt->execute();
+        $row = $stmt->fetch();
+        return $row ? ($row['setting_value'] ?: '') : '';
     } catch (\Exception $e) {}
     return '';
 }
@@ -138,10 +138,10 @@ function get_store_logo() {
 function get_store_name() {
     try {
         $db = \App\Core\Database::getInstance()->getConnection();
-        $stmt = $db->query("SELECT store_name FROM settings LIMIT 1");
-        if ($stmt && $row = $stmt->fetch()) {
-            return htmlspecialchars($row['store_name'] ?: 'My Store');
-        }
+        $stmt = $db->prepare("SELECT setting_value FROM settings WHERE setting_key = 'store_name' LIMIT 1");
+        $stmt->execute();
+        $row = $stmt->fetch();
+        return $row ? htmlspecialchars($row['setting_value'] ?: 'My Store') : 'My Store';
     } catch (\Exception $e) {}
     return 'My Store';
 }

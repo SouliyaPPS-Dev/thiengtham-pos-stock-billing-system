@@ -192,7 +192,7 @@
         </div>
     </div>
 
-    <div x-show="showModal" x-cloak @keydown.window.enter="if(showModal) saveCustomer()" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div x-show="showModal" x-cloak @keydown.window.enter="if(showModal) saveCustomer()" class="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl mx-4 max-h-[90vh] overflow-y-auto" @click.away="showModal = false">
             <div class="flex items-center justify-between mb-6">
                 <h2 x-text="modalTitle" class="text-xl font-bold text-gray-800"></h2>
@@ -285,7 +285,7 @@
     </div>
 
     <!-- View Modal -->
-    <div x-show="viewModal" x-cloak class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div x-show="viewModal" x-cloak class="fixed inset-0 z-[9999] bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl w-full max-w-md p-6 shadow-2xl mx-4 my-auto max-h-[90vh] overflow-y-auto" @click.away="viewModal = false">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-4">

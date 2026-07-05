@@ -9,7 +9,7 @@ $adminPrefix = '/admin';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?? 'POS & Stock - ລະບົບຂາຍ ແລະ ຈັດການສາງສິນຄ້າ' ?></title>
+    <title><?= htmlspecialchars($title ?? get_store_name()) ?> - <?= htmlspecialchars(get_store_name()) ?></title>
 
     <link rel="icon" type="image/png" href="<?= url('/public/icon-192.png') ?>">
 

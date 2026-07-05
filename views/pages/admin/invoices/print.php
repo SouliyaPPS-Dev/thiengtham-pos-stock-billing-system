@@ -100,8 +100,8 @@ $paperWidth = $layout === '58mm' ? '58mm' : ($layout === '80mm' ? '80mm' : '210m
     </div>
 
     <div class="header">
-        <?php if (!empty($settings['store_logo'])): ?>
-        <img src="<?= htmlspecialchars($settings['store_logo']) ?>" alt="Logo">
+        <?php if (!empty($settings['bill_logo'])): ?>
+        <img src="<?= htmlspecialchars($settings['bill_logo']) ?>" alt="Logo" style="max-height:60px;margin-bottom:8px;">
         <?php endif; ?>
         <h1><?= htmlspecialchars($settings['store_name'] ?? 'ຮ້ານຄ້າ') ?></h1>
         <div class="info">
@@ -154,10 +154,17 @@ $paperWidth = $layout === '58mm' ? '58mm' : ($layout === '80mm' ? '80mm' : '210m
         </tbody>
     </table>
 
+    <?php
+    $computedSubtotal = array_sum(array_map(function($item) {
+        return ($item['price'] ?? 0) * ($item['quantity'] ?? 0);
+    }, $sale['items'] ?? []));
+    $displaySubtotal = ($sale['subtotal'] ?? 0) > 0 ? $sale['subtotal'] : $computedSubtotal;
+    $displayTotal = ($sale['grand_total'] ?? 0) > 0 ? $sale['grand_total'] : ($sale['total'] ?? $computedSubtotal);
+    ?>
     <div class="totals">
         <div class="row">
             <span>ລວມຍ່ອຍ / Subtotal</span>
-            <span><?= number_format($sale['subtotal'] ?? $sale['total'], 0) ?> ກີບ</span>
+            <span><?= number_format($displaySubtotal, 0) ?> ກີບ</span>
         </div>
         <?php if (!empty($sale['discount'])): ?>
         <div class="row">
@@ -173,7 +180,7 @@ $paperWidth = $layout === '58mm' ? '58mm' : ($layout === '80mm' ? '80mm' : '210m
         <?php endif; ?>
         <div class="row grand">
             <span>ລວມທັງໝົດ / GRAND TOTAL</span>
-            <span><?= number_format($sale['grand_total'] ?? $sale['total'], 0) ?> ກີບ</span>
+            <span><?= number_format($displayTotal, 0) ?> ກີບ</span>
         </div>
     </div>
 

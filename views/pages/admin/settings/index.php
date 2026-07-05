@@ -87,6 +87,56 @@
 
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
                 <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                        <i class="fas fa-file-invoice text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-extrabold text-gray-800">ຕັ້ງຄ່າໂລໂກ້ໃບບິນ</h2>
+                        <p class="text-xs text-gray-400">ຮູບພາບໂລໂກ້ທີ່ສະແດງໃນໃບພິມ</p>
+                    </div>
+                </div>
+                <form action="<?= url('/admin/settings/update') ?>" method="POST" enctype="multipart/form-data">
+                    <div class="space-y-1.5">
+                        <label class="text-sm font-bold text-gray-700">ໂລໂກ້ໃບບິນ (Bill Logo)</label>
+                        <div x-data="{ preview: null, currentLogo: '<?= htmlspecialchars($settings['bill_logo'] ?? '') ?>' }" class="flex items-center gap-4">
+                            <div class="h-20 w-20 rounded-xl bg-gray-50 flex items-center justify-center overflow-hidden border">
+                                <template x-if="currentLogo && !preview">
+                                    <img :src="currentLogo" class="h-full w-full object-cover">
+                                </template>
+                                <template x-if="!currentLogo && !preview">
+                                    <i class="fas fa-file-invoice text-2xl text-gray-300"></i>
+                                </template>
+                                <template x-if="preview">
+                                    <img :src="preview" class="h-full w-full object-cover">
+                                </template>
+                            </div>
+                            <input type="file" name="bill_logo" accept="image/*" @change="preview = URL.createObjectURL($event.target.files[0]); currentLogo = null"
+                                   class="flex-1 text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-amber-50 file:text-amber-600 hover:file:bg-amber-100">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div class="space-y-1.5">
+                            <label class="text-sm font-bold text-gray-700">ກ້ວາງ (Width)</label>
+                            <input type="number" name="bill_logo_width" min="20" max="500" value="<?= htmlspecialchars($settings['bill_logo_width'] ?? '150') ?>"
+                                   class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-sm font-bold text-gray-700">ສູງ (Height)</label>
+                            <input type="number" name="bill_logo_height" min="20" max="500" value="<?= htmlspecialchars($settings['bill_logo_height'] ?? '150') ?>"
+                                   class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
+                            <i class="fas fa-save"></i>
+                            <span>ບັນທຶກ</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                     <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-200">
                         <i class="fas fa-info-circle text-sm"></i>
                     </div>
@@ -129,6 +179,147 @@
                         </button>
                     </div>
                 </form>
+            </div>
+
+            <div id="payment-methods" class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-green-400 to-green-500 flex items-center justify-center text-white shadow-lg shadow-green-200">
+                        <i class="fas fa-credit-card text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-extrabold text-gray-800">ວິທີຊຳລະ</h2>
+                        <p class="text-xs text-gray-400">ຈັດການວິທີຊຳລະເງິນໃນລະບົບ POS</p>
+                    </div>
+                </div>
+
+                <div x-data="paymentMethodsManager()" class="space-y-4">
+                    <!-- Add Form -->
+                    <form method="POST" action="<?= url('/admin/payment-methods/store') ?>" class="flex flex-col sm:flex-row gap-3 items-end">
+                        <div class="flex-1 w-full">
+                            <label class="block text-xs font-bold text-gray-500 mb-1">ຊື່ວິທີຊຳລະ</label>
+                            <input type="text" name="name" required
+                                   class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                                   placeholder="ເຊັ່ນ: ເງິນສົດ, QR Code, ໂອນ">
+                        </div>
+                        <div class="flex-1 w-full">
+                            <label class="block text-xs font-bold text-gray-500 mb-1">ລາຍລະອຽດ (ທາງເລືອກ)</label>
+                            <input type="text" name="details"
+                                   class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                                   placeholder="ຄຳອະທິບາຍ">
+                        </div>
+                        <label class="flex items-center gap-2 pb-2 cursor-pointer">
+                            <input type="checkbox" name="is_active" checked class="rounded border-gray-300 text-primary focus:ring-primary">
+                            <span class="text-sm text-gray-600">ເປີດໃຊ້</span>
+                        </label>
+                        <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl font-bold text-sm hover:from-green-600 hover:to-green-700 transition-all shadow-lg shadow-green-200 active:scale-[0.97] whitespace-nowrap">
+                            <i class="fas fa-plus"></i>
+                            <span>ເພີ່ມ</span>
+                        </button>
+                    </form>
+
+                    <!-- List -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່</th>
+                                    <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລາຍລະອຽດ</th>
+                                    <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ສະຖານະ</th>
+                                    <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php if (empty($paymentMethods)): ?>
+                                <tr>
+                                    <td colspan="4" class="py-8 text-center text-gray-400 text-sm">ຍັງບໍ່ມີວິທີຊຳລະ</td>
+                                </tr>
+                                <?php else: ?>
+                                <?php foreach ($paymentMethods as $pm): ?>
+                                <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                                    <td class="py-3 px-2 font-medium text-gray-800"><?= htmlspecialchars($pm['name']) ?></td>
+                                    <td class="py-3 px-2 text-gray-500"><?= htmlspecialchars($pm['details'] ?? '') ?></td>
+                                    <td class="py-3 px-2">
+                                        <?php if ($pm['is_active']): ?>
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-green-50 text-green-600">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                            ເປີດໃຊ້
+                                        </span>
+                                        <?php else: ?>
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-gray-50 text-gray-400">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-gray-300"></span>
+                                            ປິດໃຊ້
+                                        </span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="py-3 px-2">
+                                        <div class="flex items-center gap-1 justify-end">
+                                            <button type="button" @click="openEdit(<?= $pm['id'] ?>, '<?= htmlspecialchars($pm['name'], ENT_QUOTES) ?>', '<?= htmlspecialchars($pm['details'] ?? '', ENT_QUOTES) ?>', <?= $pm['is_active'] ?>)" class="icon-btn icon-btn-edit" title="ແກ້ໄຂ">
+                                                <i class="fas fa-pen text-xs"></i>
+                                            </button>
+                                            <form method="POST" action="<?= url('/admin/payment-methods/' . $pm['id'] . '/delete') ?>" onsubmit="return confirm('ທ່ານແນ່ໃຈບໍ່?')">
+                                                <button type="submit" class="icon-btn icon-btn-danger" title="ລົບ">
+                                                    <i class="fas fa-trash text-xs"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Edit Modal -->
+                    <div x-show="editModal" @keydown.escape.window="editModal = false" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30" x-cloak>
+                        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" @click.away="editModal = false">
+                            <h3 class="text-lg font-extrabold text-gray-800 mb-4">ແກ້ໄຂວິທີຊຳລະ</h3>
+                            <form :action="editAction" method="POST" class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-600 mb-1">ຊື່</label>
+                                    <input type="text" name="name" x-model="editName" required
+                                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-gray-600 mb-1">ລາຍລະອຽດ</label>
+                                    <input type="text" name="details" x-model="editDetails"
+                                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                                </div>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" name="is_active" x-model="editActive" class="rounded border-gray-300 text-primary focus:ring-primary">
+                                    <span class="text-sm text-gray-600">ເປີດໃຊ້</span>
+                                </label>
+                                <div class="flex justify-end gap-2 pt-2">
+                                    <button type="button" @click="editModal = false" class="px-4 py-2.5 rounded-xl text-sm font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all">
+                                        ຍົກເລີກ
+                                    </button>
+                                    <button type="submit" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200">
+                                        <i class="fas fa-save"></i> ບັນທຶກ
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                function paymentMethodsManager() {
+                    return {
+                        editModal: false,
+                        editAction: '',
+                        editName: '',
+                        editDetails: '',
+                        editActive: true,
+                        openEdit(id, name, details, active) {
+                            this.editAction = '<?= url('/admin/payment-methods') ?>/' + id + '/update';
+                            this.editName = name;
+                            this.editDetails = details;
+                            this.editActive = !!active;
+                            this.editModal = true;
+                        }
+                    };
+                }
+                </script>
             </div>
 
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">

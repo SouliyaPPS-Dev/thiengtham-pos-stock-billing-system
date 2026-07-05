@@ -29,9 +29,9 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            padding-bottom: 32px;
+            padding-bottom: 16px;
             border-bottom: 2px solid #f1f5f9;
-            margin-bottom: 32px;
+            margin-bottom: 16px;
         }
         .store-info h1 {
             font-size: 22px;
@@ -58,10 +58,10 @@
         .invoice-meta {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            padding-bottom: 24px;
+            gap: 8px;
+            padding-bottom: 12px;
             border-bottom: 1px solid #f1f5f9;
-            margin-bottom: 24px;
+            margin-bottom: 12px;
         }
         .meta-item label {
             font-size: 11px;
@@ -80,11 +80,11 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 24px;
+            margin-bottom: 12px;
         }
         thead th {
             text-align: left;
-            padding: 12px 8px;
+            padding: 6px 8px;
             font-size: 11px;
             font-weight: 700;
             color: #94a3b8;
@@ -93,7 +93,7 @@
             border-bottom: 2px solid #f1f5f9;
         }
         tbody td {
-            padding: 12px 8px;
+            padding: 6px 8px;
             border-bottom: 1px solid #f1f5f9;
             font-size: 13px;
         }
@@ -107,7 +107,7 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            padding-top: 16px;
+            padding-top: 8px;
             border-top: 2px solid #f1f5f9;
         }
         .totals > div {
@@ -127,9 +127,9 @@
         }
         .invoice-footer {
             text-align: center;
-            padding-top: 32px;
+            padding-top: 16px;
             border-top: 2px solid #f1f5f9;
-            margin-top: 32px;
+            margin-top: 16px;
             font-size: 12px;
             color: #94a3b8;
         }
@@ -167,9 +167,9 @@
             .no-print { display: none !important; }
         }
         @media (max-width: 600px) {
-            .invoice-wrap { padding: 24px; }
+            .invoice-wrap { padding: 16px; }
             .invoice-header { flex-direction: column; }
-            .invoice-title { text-align: left; margin-top: 12px; }
+            .invoice-title { text-align: left; margin-top: 8px; }
             .invoice-meta { grid-template-columns: 1fr; }
             .totals > div { width: 100%; }
         }
@@ -184,7 +184,9 @@
     <div class="invoice-wrap">
         <div class="invoice-header">
             <div class="store-info">
-                <h1><?= htmlspecialchars($store_name ?? get_store_name()) ?></h1>
+                <?php if (!empty($settings['bill_logo'])): ?>
+                <img src="<?= htmlspecialchars($settings['bill_logo']) ?>" alt="Logo" style="width:<?= (int)($settings['bill_logo_width'] ?? 150) ?>px;height:<?= (int)($settings['bill_logo_height'] ?? 150) ?>px;object-fit:contain;margin-bottom:8px;">
+                <?php endif; ?>
                 <p><?= htmlspecialchars($store_address ?? '') ?></p>
                 <p><?= htmlspecialchars($store_phone ?? '') ?></p>
             </div>
@@ -280,7 +282,7 @@
 
         <div class="invoice-footer">
             <p>ຂໍຂອບໃຈທີ່ໃຊ້ບໍລິການ</p>
-            <p style="margin-top:4px;"><?= htmlspecialchars($store_name ?? get_store_name()) ?> | <?= htmlspecialchars($store_phone ?? '') ?> | <?= htmlspecialchars($store_address ?? '') ?></p>
+            <p style="margin-top:4px;"><?= htmlspecialchars($store_name ?? get_store_name()) ?><?php if (!empty($store_phone)): ?> | <?= htmlspecialchars($store_phone) ?><?php endif; ?><?php if (!empty($store_address)): ?> | <?= htmlspecialchars($store_address) ?><?php endif; ?></p>
         </div>
     </div>
 </body>
