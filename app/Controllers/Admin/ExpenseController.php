@@ -37,6 +37,7 @@ class ExpenseController extends \App\Controllers\BaseController
             'title' => 'ລາຍຈ່າຍ',
             'expenses' => $expenses,
             'categories' => $categories,
+            'expenseCategories' => $categories,
             'currentMonth' => $month,
             'totalAmount' => $totalAmount,
         ]);

@@ -28,7 +28,6 @@
                         <tr class="border-b border-gray-100">
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ເລກທີໃບ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ແມ່ແບບ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຜູ້ສະໜອງ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ເລກອ້າງອີງ</th>
                             <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວັນທີ</th>
@@ -40,7 +39,7 @@
                     <tbody>
                         <?php if (empty($quotations)): ?>
                         <tr>
-                            <td colspan="9" class="py-3 px-2">
+                            <td colspan="8" class="py-3 px-2">
                                 <div class="flex flex-col items-center justify-center py-12 text-center">
                                     <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                         <i class="fas fa-file-invoice text-2xl"></i>
@@ -59,16 +58,6 @@
                                 <a href="<?= url('/admin/quotations/' . $q['id']) ?>" class="font-bold text-primary hover:text-primary/80">
                                     #<?= htmlspecialchars($q['quotation_number']) ?>
                                 </a>
-                            </td>
-                            <td class="py-3 px-2">
-                                <?php $tpl = $templates[$q['company_template']] ?? null; ?>
-                                <?php if ($tpl): ?>
-                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold" style="background: <?= $tpl['logo_color'] ?>15; color: <?= $tpl['logo_color'] ?>">
-                                    <?= htmlspecialchars($tpl['label']) ?>
-                                </span>
-                                <?php else: ?>
-                                <span class="text-gray-400">-</span>
-                                <?php endif; ?>
                             </td>
                             <td class="py-3 px-2 font-medium text-gray-800"><?= htmlspecialchars($q['supplier_name'] ?: '-') ?></td>
                             <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($q['ref_no'] ?: '-') ?></td>

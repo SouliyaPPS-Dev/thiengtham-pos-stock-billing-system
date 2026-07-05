@@ -77,10 +77,28 @@
                             <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></td>
                             <td class="py-3 px-2 text-gray-600"><?= (int)($s['items_count'] ?? 0) ?></td>
                             <td class="py-3 px-2">
-                                <?php $pm = strtolower($s['payment_method'] ?? 'cash'); ?>
-                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold <?= $pm === 'cash' ? 'bg-green-50 text-green-600' : ($pm === 'transfer' ? 'bg-blue-50 text-blue-600' : ($pm === 'qr' ? 'bg-purple-50 text-purple-600' : 'bg-gray-50 text-gray-600')) ?>">
-                                    <i class="fas fa-<?= $pm === 'cash' ? 'money-bill' : ($pm === 'transfer' ? 'exchange-alt' : ($pm === 'qr' ? 'qrcode' : 'credit-card')) ?>"></i>
-                                    <?= $pm === 'cash' ? 'ເງິນສົດ' : ($pm === 'transfer' ? 'ໂອນ' : ($pm === 'qr' ? 'QR' : 'ເງິນສົດ')) ?>
+                                <?php
+                                $pm = $s['payment_method'] ?? 'ເງິນສົດ';
+                                $pmColors = [
+                                    'bg-green-50 text-green-600' => ['ເງິນສົດ', 'cash', 'ເງິນສົດສົດ'],
+                                    'bg-blue-50 text-blue-600' => ['ໂອນ', 'transfer', 'bank', 'banking'],
+                                    'bg-purple-50 text-purple-600' => ['qr', 'qr code', 'qrcode', 'promptpay'],
+                                    'bg-amber-50 text-amber-600' => ['credit', 'card', 'visa', 'mastercard'],
+                                    'bg-rose-50 text-rose-600' => ['mobile', 'wallet', 'truewallet'],
+                                ];
+                                $pmClass = 'bg-gray-50 text-gray-600';
+                                foreach ($pmColors as $class => $keywords) {
+                                    foreach ($keywords as $kw) {
+                                        if (str_contains(mb_strtolower($pm), $kw)) {
+                                            $pmClass = $class;
+                                            break 2;
+                                        }
+                                    }
+                                }
+                                ?>
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold <?= $pmClass ?>">
+                                    <i class="fas fa-credit-card"></i>
+                                    <?= htmlspecialchars($pm) ?>
                                 </span>
                             </td>
                             <td class="py-3 px-2 font-medium text-gray-800"><?= number_format($s['grand_total'] ?: 0, 0) ?> ກີບ</td>

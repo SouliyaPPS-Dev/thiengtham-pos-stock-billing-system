@@ -91,20 +91,128 @@
                     <p class="text-xs text-gray-400">ເພີ່ມ ຫຼື ຈັດການໝວດລາຍຈ່າຍ</p>
                 </div>
             </div>
-            <form action="<?= url('/admin/expenses/categories/store') ?>" method="POST" class="flex gap-3 mb-4">
-                <input type="text" name="name" required placeholder="ຊື່ໝວດລາຍຈ່າຍໃໝ່"
-                       class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
-                <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-bold text-sm hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-[0.97]">
-                    <i class="fas fa-plus"></i> ເພີ່ມ
-                </button>
-            </form>
-            <div class="flex flex-wrap gap-2">
-                <?php foreach ($expenseCategories ?? [] as $cat): ?>
-                <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 text-gray-700 text-xs font-bold">
-                    <?= htmlspecialchars($cat['name']) ?>
-                </span>
-                <?php endforeach; ?>
+            <div x-data="categoryManager()">
+                <form @submit.prevent="addCategory()" class="flex gap-3 mb-4">
+                    <input type="text" x-model="newCategoryName" required placeholder="ຊື່ໝວດລາຍຈ່າຍໃໝ່"
+                           class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                    <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-bold text-sm hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-[0.97]">
+                        <i class="fas fa-plus"></i> ເພີ່ມ
+                    </button>
+                </form>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="border-b border-gray-100">
+                                <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
+                                <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່ໝວດ</th>
+                                <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider" style="width:120px"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-if="categories.length === 0">
+                                <tr>
+                                    <td colspan="3" class="py-8 text-center text-gray-400 text-sm">ຍັງບໍ່ມີໝວດລາຍຈ່າຍ</td>
+                                </tr>
+                            </template>
+                            <template x-for="(cat, index) in categories" :key="cat.id">
+                                <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
+                                    <td class="py-3 px-2 text-gray-400 text-sm text-center" x-text="index + 1"></td>
+                                    <td class="py-3 px-2">
+                                        <template x-if="editingId !== cat.id">
+                                            <span class="font-medium text-gray-800" x-text="cat.name"></span>
+                                        </template>
+                                        <template x-if="editingId === cat.id">
+                                            <input type="text" x-model="editName" @keydown.enter="updateCategory(cat.id)"
+                                                   class="w-full px-3 py-1.5 border border-primary/50 rounded-lg focus:ring-2 focus:ring-primary/20 outline-none text-sm">
+                                        </template>
+                                    </td>
+                                    <td class="py-3 px-2">
+                                        <div class="flex items-center gap-1 justify-end">
+                                            <template x-if="editingId !== cat.id">
+                                                <button @click="startEdit(cat)" class="icon-btn icon-btn-edit" title="ແກ້ໄຂ">
+                                                    <i class="fas fa-pen text-xs"></i>
+                                                </button>
+                                            </template>
+                                            <template x-if="editingId === cat.id">
+                                                <button @click="updateCategory(cat.id)" class="icon-btn" style="background:#ecfdf5;color:#059669" title="ບັນທຶກ">
+                                                    <i class="fas fa-check text-xs"></i>
+                                                </button>
+                                            </template>
+                                            <button @click="deleteCategory(cat.id)" class="icon-btn icon-btn-delete" title="ລຶບ">
+                                                <i class="fas fa-trash text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
+            <script>
+            function categoryManager() {
+                return {
+                    categories: <?= json_encode(array_map(function($c) { return ['id' => $c['id'], 'name' => $c['name']]; }, $expenseCategories ?? [])) ?>,
+                    newCategoryName: '',
+                    editingId: null,
+                    editName: '',
+
+                    addCategory() {
+                        if (!this.newCategoryName.trim()) return;
+                        const formData = new FormData();
+                        formData.append('name', this.newCategoryName);
+                        fetch('<?= url('/admin/expenses/category/add') ?>', {
+                            method: 'POST', body: formData
+                        }).then(() => {
+                            this.newCategoryName = '';
+                            location.reload();
+                        });
+                    },
+
+                    startEdit(cat) {
+                        this.editingId = cat.id;
+                        this.editName = cat.name;
+                    },
+
+                    updateCategory(id) {
+                        if (!this.editName.trim()) return;
+                        const formData = new FormData();
+                        formData.append('id', id);
+                        formData.append('name', this.editName);
+                        fetch('<?= url('/admin/expenses/category/edit') ?>', {
+                            method: 'POST', body: formData
+                        }).then(() => {
+                            this.editingId = null;
+                            location.reload();
+                        });
+                    },
+
+                    deleteCategory(id) {
+                        Swal.fire({
+                            title: 'ທ່ານແນ່ໃຈບໍ່?',
+                            text: 'ຕ້ອງການລຶບໝວດລາຍຈ່າຍນີ້ແທ້ບໍ່?',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#ef4444',
+                            cancelButtonColor: '#6b7280',
+                            confirmButtonText: 'ລຶບ',
+                            cancelButtonText: 'ຍົກເລີກ',
+                            reverseButtons: true,
+                            customClass: { popup: 'rounded-3xl' }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                const formData = new FormData();
+                                formData.append('id', id);
+                                fetch('<?= url('/admin/expenses/category/delete') ?>', {
+                                    method: 'POST', body: formData
+                                }).then(() => location.reload());
+                            }
+                        });
+                    }
+                };
+            }
+            </script>
         </div>
     </div>
 
@@ -159,7 +267,7 @@
 function expenseApp() {
     return {
         expenses: <?= json_encode($expenses ?? []) ?>,
-        expenseCategories: <?= json_encode($expenseCategories ?? []) ?>,
+        expenseCategories: <?= json_encode($categories ?? []) ?>,
         selectedMonth: new Date().toISOString().slice(0, 7),
         isEditing: false,
         editingId: null,
@@ -214,23 +322,30 @@ function expenseApp() {
         },
 
         saveExpense() {
+            const formData = new FormData();
+            formData.append('expense_date', this.form.date);
+            formData.append('category_id', this.form.category);
+            formData.append('amount', this.form.amount);
+            formData.append('description', this.form.description);
+            if (this.isEditing) {
+                formData.append('id', this.editingId);
+            }
+
             const url = this.isEditing
-                ? '<?= url('/admin/expenses') ?>/' + this.editingId + '/update'
-                : '<?= url('/admin/expenses/store') ?>';
+                ? '<?= url('/admin/expenses/edit') ?>'
+                : '<?= url('/admin/expenses/add') ?>';
 
             fetch(url, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(this.form)
+                body: formData
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
+            .then(res => {
+                if (res.redirected) {
                     this.fetchExpenses();
                     this.closeModalWindow();
                     Swal.fire({ icon: 'success', title: 'ສຳເລັດ', text: 'ບັນທຶກຂໍ້ມູນສຳເລັດ', timer: 1500, showConfirmButton: false, customClass: { popup: 'rounded-3xl' } });
                 } else {
-                    Swal.fire({ icon: 'error', title: 'ເກີດຂໍ້ຜິດພາດ', text: data.message || 'ບໍ່ສາມາດບັນທຶກໄດ້', confirmButtonColor: '#0ea5e9', customClass: { popup: 'rounded-3xl' } });
+                    Swal.fire({ icon: 'error', title: 'ເກີດຂໍ້ຜິດພາດ', text: 'ບໍ່ສາມາດບັນທຶກໄດ້', confirmButtonColor: '#0ea5e9', customClass: { popup: 'rounded-3xl' } });
                 }
             });
         },
@@ -249,7 +364,8 @@ function expenseApp() {
                 customClass: { popup: 'rounded-3xl' }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch('<?= url('/admin/expenses') ?>/' + id + '/delete', { method: 'POST' })
+                    const deleteForm = new FormData(); deleteForm.append('id', id);
+                    fetch('<?= url('/admin/expenses/delete') ?>', { method: 'POST', body: deleteForm })
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
