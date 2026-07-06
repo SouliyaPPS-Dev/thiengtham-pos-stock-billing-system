@@ -16,6 +16,8 @@ return [
     '/checkout'         => ['Ecommerce\CheckoutController', 'index'],
     '/checkout/process' => ['Ecommerce\CheckoutController', 'process'],
     '/order/{id}'       => ['Ecommerce\CheckoutController', 'orderDetail'],
+    '/order/{id}/status' => ['Ecommerce\CheckoutController', 'orderStatusJson'],
+    '/account/orders-status' => ['Ecommerce\AccountController', 'ordersStatusJson'],
     '/account'          => ['Ecommerce\AccountController', 'index'],
     '/account/update'   => ['Ecommerce\AccountController', 'update'],
     '/login-customer'   => ['Ecommerce\HomeController', 'login'],
@@ -86,6 +88,14 @@ return [
     '/admin/suppliers/{id}/update' => ['Admin\SupplierController', 'update'],
     '/admin/suppliers/{id}/delete' => ['Admin\SupplierController', 'delete'],
     '/admin/suppliers/{id}/update-tax' => ['Admin\SupplierController', 'updateTax'],
+
+    // Promotions
+    '/admin/promotions'              => ['Admin\PromotionController', 'index'],
+    '/admin/promotions/create'       => ['Admin\PromotionController', 'create'],
+    '/admin/promotions/store'        => ['Admin\PromotionController', 'store'],
+    '/admin/promotions/{id}/edit'    => ['Admin\PromotionController', 'edit'],
+    '/admin/promotions/{id}/update'  => ['Admin\PromotionController', 'update'],
+    '/admin/promotions/{id}/delete'  => ['Admin\PromotionController', 'delete'],
 
     // Invoices / Print
     '/admin/invoices/{id}/print' => ['Admin\InvoiceController', 'print'],

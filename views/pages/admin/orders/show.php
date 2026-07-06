@@ -69,15 +69,20 @@
                         </div>
                     </div>
                     <div id="map-order-show" class="w-full h-48 rounded-xl border border-border z-0"></div>
-                    <div class="flex gap-3 mt-2">
-                        <span class="text-xs text-muted-foreground">ເສັ້ນຂວາງ: <?= $order['shipping_latitude'] ?></span>
-                        <span class="text-xs text-muted-foreground">ເສັ້ນແວງ: <?= $order['shipping_longitude'] ?></span>
+                    <div class="flex items-center justify-between mt-2">
+                        <div class="flex gap-3">
+                            <span class="text-xs text-muted-foreground">ເສັ້ນຂວາງ: <?= $order['shipping_latitude'] ?></span>
+                            <span class="text-xs text-muted-foreground">ເສັ້ນແວງ: <?= $order['shipping_longitude'] ?></span>
+                        </div>
+                        <a href="https://www.google.com/maps?q=<?= $order['shipping_latitude'] ?>,<?= $order['shipping_longitude'] ?>" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[11px] font-bold transition-all">
+                            <i class="fab fa-google"></i> Google Maps
+                        </a>
                     </div>
                     <script>
                     document.addEventListener('DOMContentLoaded', function() {
                         var isDark = document.documentElement.classList.contains('dark');
                         var map = L.map('map-order-show', { zoomControl: true, scrollWheelZoom: false }).setView([<?= $order['shipping_latitude'] ?>, <?= $order['shipping_longitude'] ?>], 15);
-                        L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OSM' }).addTo(map);
+                        L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
                         L.marker([<?= $order['shipping_latitude'] ?>, <?= $order['shipping_longitude'] ?>]).addTo(map);
                     });
                     </script>

@@ -185,6 +185,13 @@
                                placeholder="ເບີໂທຮ້ານ">
                     </div>
                     <div class="space-y-1.5">
+                        <label class="text-sm font-bold text-foreground/85">ເບີ WhatsApp <span class="text-emerald-500"><i class="fa-brands fa-whatsapp"></i></span></label>
+                        <input type="text" name="store_whatsapp" value="<?= htmlspecialchars($settings['store_whatsapp'] ?? '') ?>"
+                               class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
+                               placeholder="ເບີ WhatsApp (ຖ້າບໍ່ປ້ອນ, ຈະໃຊ້ເບີໂທຮ້ານ)">
+                        <p class="text-xs text-muted-foreground mt-1">ສະແດງປຸ່ມ WhatsApp ໃນໜ້າເວັບລູກຄ້າ</p>
+                    </div>
+                    <div class="space-y-1.5">
                         <label class="text-sm font-bold text-foreground/85">ອີເມວຮ້ານ</label>
                         <input type="email" name="store_email" value="<?= htmlspecialchars($settings['store_email'] ?? '') ?>"
                                class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"

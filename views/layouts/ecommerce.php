@@ -242,28 +242,54 @@
     <!-- Hero Section (optional) -->
     <?php if (isset($hero) && $hero): ?>
     <?php if (!empty($banners)): ?>
-    <div x-data="{ current: 0, slides: <?= count($banners) ?> }" x-init="setInterval(() => { current = (current + 1) % slides }, 5000)" class="relative overflow-hidden bg-gradient-to-r from-sky-600 to-sky-800">
-        <div class="max-w-7xl mx-auto">
+    <div x-data="{ current: 0, slides: <?= count($banners) ?>, touchX: 0 }"
+         x-init="let t = setInterval(() => { current = (current + 1) % slides }, 5000)"
+         class="relative overflow-hidden bg-gray-900 select-none">
+        <div class="relative aspect-[21/9] max-h-[500px]">
             <?php foreach ($banners as $i => $banner): ?>
-            <div x-show="current === <?= $i ?>" x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 translate-x-8" x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 translate-x-0" x-transition:leave-end="opacity-0 -translate-x-8" class="relative">
-                <div class="px-6 py-16 md:py-24 md:px-12 lg:px-16 text-center md:text-left">
-                    <h2 class="text-3xl md:text-5xl font-black text-white mb-4 leading-tight"><?= htmlspecialchars($banner['title'] ?? '') ?></h2>
-                    <?php if (!empty($banner['subtitle'])): ?>
-                    <p class="text-lg md:text-xl text-sky-100 mb-8 max-w-2xl mx-auto md:mx-0"><?= htmlspecialchars($banner['subtitle']) ?></p>
-                    <?php endif; ?>
-                    <?php if (!empty($banner['link'])): ?>
-                    <a href="<?= url('/products') ?>" class="inline-flex items-center gap-2 bg-white text-sky-700 font-bold px-8 py-3.5 rounded-xl hover:bg-sky-50 transition-all shadow-lg">
-                        ສັ່ງຊື້ເລີຍ <i class="fas fa-arrow-right"></i>
-                    </a>
-                    <?php endif; ?>
+            <div x-show="current === <?= $i ?>"
+                 x-transition:enter="transition-all ease-out duration-700"
+                 x-transition:enter-start="opacity-0 scale-105"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition-all ease-in duration-500"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 class="absolute inset-0"
+                 @touchstart="touchX = $event.touches[0].clientX"
+                 @touchend="if ($event.changedTouches[0].clientX - touchX < -50) current = (current + 1) % slides; if ($event.changedTouches[0].clientX - touchX > 50) current = (current - 1 + slides) % slides">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+                <?php if (!empty($banner['image'])): ?>
+                <img src="<?= htmlspecialchars($banner['image']) ?>" alt="<?= htmlspecialchars($banner['title'] ?? '') ?>" class="w-full h-full object-cover">
+                <?php endif; ?>
+                <div class="absolute inset-0 z-20 flex items-center">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+                        <div class="max-w-2xl">
+                            <h2 class="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-3 leading-tight drop-shadow-lg"><?= htmlspecialchars($banner['title'] ?? '') ?></h2>
+                            <?php if (!empty($banner['subtitle'])): ?>
+                            <p class="text-sm sm:text-lg md:text-xl text-gray-200 mb-6 max-w-xl drop-shadow"><?= htmlspecialchars($banner['subtitle']) ?></p>
+                            <?php endif; ?>
+                            <?php if (!empty($banner['link'])): ?>
+                            <a href="<?= url($banner['link']) ?>" class="inline-flex items-center gap-2 bg-white text-sky-700 font-bold px-6 py-3 md:px-8 md:py-3.5 rounded-xl hover:bg-sky-50 transition-all shadow-xl text-sm md:text-base">
+                                ສັ່ງຊື້ເລີຍ <i class="fas fa-arrow-right"></i>
+                            </a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
             </div>
             <?php endforeach; ?>
         </div>
+        <!-- Arrows -->
+        <button @click="current = (current - 1 + slides) % slides" class="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm flex items-center justify-center text-white transition-all">
+            <i class="fas fa-chevron-left text-sm md:text-base"></i>
+        </button>
+        <button @click="current = (current + 1) % slides" class="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm flex items-center justify-center text-white transition-all">
+            <i class="fas fa-chevron-right text-sm md:text-base"></i>
+        </button>
         <!-- Dots -->
-        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        <div class="absolute bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 z-30 flex gap-2">
             <?php foreach ($banners as $i => $banner): ?>
-            <button @click="current = <?= $i ?>" class="w-2.5 h-2.5 rounded-full transition-all" :class="current === <?= $i ?> ? 'bg-white w-8' : 'bg-white/40 hover:bg-white/60'"></button>
+            <button @click="current = <?= $i ?>" class="h-2 md:h-2.5 rounded-full transition-all duration-300" :class="current === <?= $i ?> ? 'bg-white w-6 md:w-8' : 'bg-white/40 hover:bg-white/60 w-2 md:w-2.5'"></button>
             <?php endforeach; ?>
         </div>
     </div>
@@ -445,7 +471,7 @@
             : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
             maxZoom: 19,
-            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OSM</a>'
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(map);
         var marker = null;
         var latInput = document.getElementById(latInputId);
@@ -503,5 +529,37 @@
         );
     }
     </script>
+
+    <?php $whatsappNumber = get_store_whatsapp(); ?>
+    <?php if (!empty($whatsappNumber)): ?>
+    <?php
+    $waClean = preg_replace('/[^0-9]/', '', $whatsappNumber);
+    if (strlen($waClean) >= 9):
+    ?>
+    <a href="https://wa.me/<?= $waClean ?>?text=ສະບາຍດີ,%20ຂ້ອຍສົນໃຈສິນຄ້າ" target="_blank" rel="noopener noreferrer"
+       class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 anim-whatsapp-float"
+       title="ສົນທະນາຜ່ານ WhatsApp"
+       aria-label="ສົນທະນາຜ່ານ WhatsApp">
+        <i class="fa-brands fa-whatsapp text-3xl"></i>
+        <span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 border-2 border-white flex items-center justify-center">
+            <i class="fas fa-comment-dots text-[8px] text-white"></i>
+        </span>
+    </a>
+    <style>
+    @keyframes whatsapp-float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+    .anim-whatsapp-float {
+        animation: whatsapp-float 2.5s ease-in-out infinite;
+        box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
+    }
+    .anim-whatsapp-float:hover {
+        animation: none;
+        box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
+    }
+    </style>
+    <?php endif; ?>
+    <?php endif; ?>
 </body>
 </html>

@@ -209,6 +209,10 @@ $adminPrefix = '/admin';
                         <span class="w-8 h-8 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-xs"><i class="fas fa-truck"></i></span>
                         <span>ຜູ້ສະໜອງ</span>
                     </a>
+                    <a href="<?= url($adminPrefix . '/promotions') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/promotions') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-xs"><i class="fas fa-bullhorn"></i></span>
+                        <span>ໂປຣໂມຊັ້ນ</span>
+                    </a>
 
                     <div class="border-t border-border my-3 mx-3"></div>
                     <div class="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-3 pb-2">ຮັບ-ຈ່າຍ</div>
@@ -301,6 +305,9 @@ $adminPrefix = '/admin';
                             <a href="<?= url($adminPrefix . '/suppliers') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/suppliers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground/80' ?>">
                                 <span class="w-5 h-5 rounded-md bg-orange-100 flex items-center justify-center text-orange-600 text-[9px]"><i class="fas fa-truck"></i></span>ຜູ້ສະໜອງ
                             </a>
+                            <a href="<?= url($adminPrefix . '/promotions') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/promotions') ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground/80' ?>">
+                                <span class="w-5 h-5 rounded-md bg-rose-100 flex items-center justify-center text-rose-600 text-[9px]"><i class="fas fa-bullhorn"></i></span>ໂປຣໂມຊັ້ນ
+                            </a>
                             <a href="<?= url($adminPrefix . '/expenses') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/expenses') ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground/80' ?>">
                                 <span class="w-5 h-5 rounded-md bg-red-100 flex items-center justify-center text-red-600 text-[9px]"><i class="fas fa-money-bill-wave"></i></span>ລາຍຈ່າຍ
                             </a>
@@ -389,6 +396,9 @@ $adminPrefix = '/admin';
                     </a>
                     <a href="<?= url($adminPrefix . '/suppliers') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/suppliers') ? 'bg-primary/10 text-primary shadow-sm' : 'text-foreground/70 hover:bg-muted' ?>">
                         <span class="w-9 h-9 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-sm"><i class="fas fa-truck"></i></span> ຜູ້ສະໜອງ
+                    </a>
+                    <a href="<?= url($adminPrefix . '/promotions') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/promotions') ? 'bg-primary/10 text-primary shadow-sm' : 'text-foreground/70 hover:bg-muted' ?>">
+                        <span class="w-9 h-9 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-sm"><i class="fas fa-bullhorn"></i></span> ໂປຣໂມຊັ້ນ
                     </a>
                     <a href="<?= url($adminPrefix . '/expenses') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/expenses') ? 'bg-primary/10 text-primary shadow-sm' : 'text-foreground/70 hover:bg-muted' ?>">
                         <span class="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center text-red-600 text-sm"><i class="fas fa-money-bill-wave"></i></span> ລາຍຈ່າຍ

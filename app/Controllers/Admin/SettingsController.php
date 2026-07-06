@@ -29,7 +29,7 @@ class SettingsController extends \App\Controllers\BaseController
         $settingsModel = new Settings();
 
         $keys = [
-            'store_name', 'store_phone', 'store_address', 'store_email',
+            'store_name', 'store_phone', 'store_whatsapp', 'store_address', 'store_email',
             'currency', 'tax_percent', 'paper_size', 'receipt_footer',
             'invoice_terms',
             'bill_logo_width', 'bill_logo_height', 'bill_logo_position',

@@ -85,6 +85,44 @@ class AccountController
         ]);
     }
 
+    public function ordersStatusJson()
+    {
+        if (!$this->isAjax()) {
+            http_response_code(400);
+            exit;
+        }
+
+        if (!isset($_SESSION['customer'])) {
+            $this->json(['error' => true, 'message' => 'ກະລຸນາເຂົ້າສູ່ລະບົບ'], 401);
+        }
+
+        $customerId = $_SESSION['customer']['id'];
+        $db = Database::getInstance()->getConnection();
+
+        $stmt = $db->prepare("SELECT id, order_number, order_status, payment_status, updated_at FROM orders WHERE customer_id = ? ORDER BY created_at DESC");
+        $stmt->execute([$customerId]);
+        $orders = $stmt->fetchAll();
+
+        $statusLabels = ['Pending' => 'ລໍຖ້າ', 'Confirmed' => 'ຢືນຢັນ', 'Processing' => 'ກຳລັງດຳເນີນ', 'Shipped' => 'ຈັດສົ່ງ', 'Delivered' => 'ສົ່ງແລ້ວ', 'Cancelled' => 'ຍົກເລີກ'];
+        $statusSteps = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered'];
+
+        $result = [];
+        foreach ($orders as $o) {
+            $idx = array_search($o['order_status'], $statusSteps);
+            $result[] = [
+                'id' => $o['id'],
+                'order_number' => $o['order_number'],
+                'order_status' => $o['order_status'],
+                'payment_status' => $o['payment_status'],
+                'updated_at' => $o['updated_at'],
+                'status_label' => $statusLabels[$o['order_status']] ?? $o['order_status'],
+                'current_step' => $idx !== false ? $idx : -1,
+            ];
+        }
+
+        $this->json(['success' => true, 'orders' => $result]);
+    }
+
     public function update()
     {
         if (!isset($_SESSION['customer'])) {

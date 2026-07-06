@@ -146,6 +146,26 @@ function get_store_name() {
     return 'My Store';
 }
 
+function get_store_setting($key, $default = '') {
+    try {
+        $db = \App\Core\Database::getInstance()->getConnection();
+        $stmt = $db->prepare("SELECT setting_value FROM settings WHERE setting_key = ? LIMIT 1");
+        $stmt->execute([$key]);
+        $row = $stmt->fetch();
+        return $row ? htmlspecialchars($row['setting_value'] ?: $default) : $default;
+    } catch (\Exception $e) {}
+    return $default;
+}
+
+function get_store_phone() {
+    return get_store_setting('store_phone', '');
+}
+
+function get_store_whatsapp() {
+    $wa = get_store_setting('store_whatsapp', '');
+    return $wa ?: get_store_phone();
+}
+
 function get_logo_url($logoPath) {
     if (empty($logoPath)) return '';
     if (strpos($logoPath, 'http') === 0) return $logoPath;

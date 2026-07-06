@@ -167,6 +167,44 @@ class CheckoutController
         }
     }
 
+    public function orderStatusJson($id)
+    {
+        if (!$this->isAjax()) {
+            http_response_code(400);
+            exit;
+        }
+
+        $db = Database::getInstance()->getConnection();
+        $stmt = $db->prepare("SELECT id, customer_id, order_status, payment_status, updated_at FROM orders WHERE id = ?");
+        $stmt->execute([$id]);
+        $order = $stmt->fetch();
+
+        if (!$order) {
+            $this->json(['error' => true, 'message' => 'ບໍ່ພົບຄຳສັ່ງຊື້'], 404);
+        }
+
+        if (isset($_SESSION['customer']) && (int)$order['customer_id'] !== (int)$_SESSION['customer']['id']) {
+            $this->json(['error' => true, 'message' => 'ບໍ່ມີສິດເຂົ້າເຖິງ'], 403);
+        }
+
+        $statusSteps = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered'];
+        $currentIdx = array_search($order['order_status'], $statusSteps);
+
+        $statusLabels = ['Pending' => 'ລໍຖ້າ', 'Confirmed' => 'ຢືນຢັນ', 'Processing' => 'ກຳລັງດຳເນີນ', 'Shipped' => 'ຈັດສົ່ງ', 'Delivered' => 'ສົ່ງແລ້ວ', 'Cancelled' => 'ຍົກເລີກ'];
+
+        $this->json([
+            'success' => true,
+            'id' => $order['id'],
+            'order_status' => $order['order_status'],
+            'payment_status' => $order['payment_status'],
+            'updated_at' => $order['updated_at'],
+            'current_step' => $currentIdx !== false ? $currentIdx : -1,
+            'total_steps' => count($statusSteps),
+            'steps' => $statusSteps,
+            'status_label' => $statusLabels[$order['order_status']] ?? $order['order_status'],
+        ]);
+    }
+
     public function orderDetail($id)
     {
         $db = Database::getInstance()->getConnection();

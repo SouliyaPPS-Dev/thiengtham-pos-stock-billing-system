@@ -69,25 +69,65 @@
                         <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ທີ່ຢູ່ແບບລະອຽດ <span class="text-red-500">*</span></label>
                         <textarea name="shipping_address" rows="2" required class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"><?= htmlspecialchars($customer['address'] ?? 'ຖະໜົນ ດາວທຽມ ປະສົມ, ເມືອງໄຊເສດຖາ, ນະຄອນຫຼວງວຽງຈັນ') ?></textarea>
                     </div>
-                    <div class="mt-4">
-                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ຕຳແໜ່ງທີ່ຕັ້ງ (GPS)</label>
-                        <div class="flex gap-2 mb-2">
-                            <div class="relative flex-1">
-                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs"></i>
-                                <input type="text" id="map-search-checkout" placeholder="ຄົ້ນຫາສະຖານທີ່..." class="w-full pl-8 pr-3 py-2 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" oninput="searchLocation(this.value, 'checkout')">
-                            </div>
-                            <button type="button" onclick="getCurrentLocation('checkout')" class="px-3 py-2 bg-sky-50 text-sky-600 rounded-xl text-xs font-bold hover:bg-sky-100 transition-all whitespace-nowrap flex items-center gap-1.5">
-                                <i class="fas fa-location-dot"></i> ຕຳແໜ່ງປັດຈຸບັນ
-                            </button>
-                        </div>
-                        <div id="map-checkout" class="w-full h-72 rounded-xl border border-border z-0" x-init="initMapPicker('checkout', 'shipping_latitude', 'shipping_longitude')"></div>
-                        <div class="flex gap-3 mt-2">
-                            <input type="text" name="shipping_latitude" id="shipping_latitude" value="17.977000" readonly placeholder="ເສັ້ນຂວາງ" class="flex-1 px-3 py-2 border border-border rounded-lg text-xs bg-muted text-muted-foreground">
-                            <input type="text" name="shipping_longitude" id="shipping_longitude" value="102.639000" readonly placeholder="ເສັ້ນແວງ" class="flex-1 px-3 py-2 border border-border rounded-lg text-xs bg-muted text-muted-foreground">
-                        </div>
-                        <p class="text-xs text-muted-foreground mt-1">ກົດເທິງແຜນທີ່ເພື່ອເລືອກຕຳແໜ່ງ</p>
+            </div>
+
+            <!-- GPS Location (admin-style card) -->
+            <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
+                <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-50">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                        <i class="fas fa-map-marked-alt text-sm"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-extrabold text-foreground">ຕຳແໜ່ງທີ່ຕັ້ງ</h2>
+                        <p class="text-xs text-muted-foreground">GPS ຂອງທີ່ຢູ່ຈັດສົ່ງ</p>
                     </div>
                 </div>
+                <div id="map-checkout" class="w-full h-72 rounded-xl border border-border z-10"></div>
+                <div class="flex items-center justify-between mt-2">
+                    <div class="flex gap-3">
+                        <span class="text-xs text-muted-foreground">ເສັ້ນຂວາງ: <span id="lat-display" class="font-bold text-foreground"><?= htmlspecialchars($customer['latitude'] ?? '17.977') ?></span></span>
+                        <span class="text-xs text-muted-foreground">ເສັ້ນແວງ: <span id="lng-display" class="font-bold text-foreground"><?= htmlspecialchars($customer['longitude'] ?? '102.639') ?></span></span>
+                    </div>
+                    <a id="gmaps-link" href="https://www.google.com/maps?q=<?= htmlspecialchars($customer['latitude'] ?? '17.977') ?>,<?= htmlspecialchars($customer['longitude'] ?? '102.639') ?>" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[11px] font-bold transition-all">
+                        <i class="fab fa-google"></i> Google Maps
+                    </a>
+                </div>
+                <p class="text-xs text-muted-foreground mt-1">ກົດເທິງແຜນທີ່ເພື່ອເລືອກຕຳແໜ່ງ</p>
+                <input type="hidden" name="shipping_latitude" id="shipping_latitude" value="<?= htmlspecialchars($customer['latitude'] ?? '17.977') ?>">
+                <input type="hidden" name="shipping_longitude" id="shipping_longitude" value="<?= htmlspecialchars($customer['longitude'] ?? '102.639') ?>">
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var lat = parseFloat(document.getElementById('shipping_latitude').value) || 17.977;
+                    var lng = parseFloat(document.getElementById('shipping_longitude').value) || 102.639;
+                    var el = document.getElementById('map-checkout');
+                    if (!el || typeof L === 'undefined') return;
+                    
+                    var isDark = document.documentElement.classList.contains('dark');
+                    var map = L.map(el, { zoomControl: true }).setView([lat, lng], 15);
+                    
+                    L.tileLayer(
+                        isDark 
+                            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
+                            : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+                        { 
+                            maxZoom: 19, 
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' 
+                        }
+                    ).addTo(map);
+                    
+                    var marker = L.marker([lat, lng]).addTo(map);
+                    
+                    map.on('click', function(e) {
+                        marker.setLatLng(e.latlng);
+                        document.getElementById('shipping_latitude').value = e.latlng.lat.toFixed(6);
+                        document.getElementById('shipping_longitude').value = e.latlng.lng.toFixed(6);
+                        document.getElementById('lat-display').textContent = e.latlng.lat.toFixed(6);
+                        document.getElementById('lng-display').textContent = e.latlng.lng.toFixed(6);
+                        document.getElementById('gmaps-link').href = 'https://www.google.com/maps?q=' + e.latlng.lat.toFixed(6) + ',' + e.latlng.lng.toFixed(6);
+                    });
+                });
+                </script>
+            </div>
 
                 <!-- Payment Method -->
                 <div class="bg-card rounded-2xl border border-border p-6">

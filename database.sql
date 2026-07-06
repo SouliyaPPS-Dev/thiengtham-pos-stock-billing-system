@@ -298,6 +298,7 @@ INSERT INTO settings (setting_key, setting_value) VALUES
     ('store_name', 'Thiengtham'),
     ('store_address', ''),
     ('store_phone', ''),
+    ('store_whatsapp', ''),
     ('store_email', ''),
     ('currency', 'LAK'),
     ('currency_symbol', '₭'),
