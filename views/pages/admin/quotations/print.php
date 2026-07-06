@@ -16,18 +16,17 @@
             font-size: 13px;
             line-height: 1.4;
         }
-        @page { size: A5; margin: 0; }
+        @page { size: 148mm auto; margin: 0; }
         .page-wrap {
             width: 148mm;
             min-height: 210mm;
+            height: auto;
             margin: 0 auto;
             background: #fff;
         }
         .inner {
             padding: 15px 20px 20px;
-            min-height: 210mm;
-            display: flex;
-            flex-direction: column;
+            height: auto;
         }
         /* ── Top Row: Logo + Bill No ── */
         .top-row {
@@ -72,7 +71,6 @@
         .footer {
             text-align: center;
             padding-top: 12px;
-            margin-top: auto;
             border-top: 1px solid <?= $template['logo_color'] ?>;
             font-size: 10px;
             color: #94a3b8;
@@ -235,8 +233,8 @@
         .btn-print:hover { opacity: 0.9; }
         @media print {
             body { background: #fff; }
-            .page-wrap { box-shadow: none; margin: 0; width: 100%; min-height: auto; }
-            .inner { padding: 15px 20px 20px; min-height: auto; }
+            .page-wrap { box-shadow: none; margin: 0; width: 100%; min-height: auto; height: auto; }
+            .inner { padding: 15px 20px 20px; height: auto; }
             .btn-print { display: none !important; }
             .no-print { display: none !important; }
         }
@@ -265,12 +263,14 @@
     <script>
     function exportPDF() {
         const element = document.querySelector('.page-wrap');
+        const mmH = element.offsetHeight * 25.4 / 96;
+        const useA4 = mmH > 195;
         const opt = {
             margin:       [0, 0, 0, 0],
             filename:     '<?= 'quotation-' . str_pad($quotation['id'], 4, '0', STR_PAD_LEFT) . '.pdf' ?>',
             image:        { type: 'jpeg', quality: 0.98 },
             html2canvas:  { scale: 2, useCORS: true, allowTaint: true, letterRendering: true },
-            jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
+            jsPDF:        { unit: 'mm', format: useA4 ? 'a4' : 'a5', orientation: 'portrait' }
         };
         html2pdf().set(opt).from(element).save();
     }

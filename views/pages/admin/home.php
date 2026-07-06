@@ -30,7 +30,7 @@
         </div>
 
         <div class="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            <div class="stat-card border-sky-200">
+            <a href="<?= url('/admin/products') ?>" class="stat-card border-sky-200 block cursor-pointer hover:shadow-md transition-shadow no-underline">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
                     <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-sky-50 to-sky-100 text-primary shadow-sm shadow-sky-200/30">
                         <i class="fas fa-box text-lg md:text-xl"></i>
@@ -41,9 +41,9 @@
                     <div class="text-2xl md:text-3xl font-black text-foreground"><?= number_format($stats['total_products']) ?></div>
                     <p class="text-[10px] md:text-xs text-muted-foreground">ລາຍການສິນຄ້າໃນລະບົບ</p>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card border-amber-200">
+            <a href="<?= url('/admin/products') ?>" class="stat-card border-amber-200 block cursor-pointer hover:shadow-md transition-shadow no-underline">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
                     <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-amber-50 to-amber-100 text-amber-500 shadow-sm shadow-amber-200/30">
                         <i class="fas fa-exclamation-triangle text-lg md:text-xl"></i>
@@ -55,9 +55,9 @@
                     <div class="text-2xl md:text-3xl font-black text-amber-600"><?= number_format($stats['low_stock']) ?></div>
                     <p class="text-[10px] md:text-xs text-muted-foreground">ຕ້ອງສັ່ງເພີ່ມ</p>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card border-emerald-200">
+            <a href="<?= url('/admin/sales') ?>" class="stat-card border-emerald-200 block cursor-pointer hover:shadow-md transition-shadow no-underline">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
                     <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-500 shadow-sm shadow-emerald-200/30">
                         <i class="fas fa-shopping-cart text-lg md:text-xl"></i>
@@ -69,9 +69,9 @@
                     <div class="text-xl md:text-2xl font-black text-emerald-600"><?= number_format($stats['sales_today']) ?> <span class="text-xs md:text-sm">ກີບ</span></div>
                     <p class="text-[10px] md:text-xs text-muted-foreground">ລາຍຮັບຈາກການຂາຍ</p>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card border-violet-200">
+            <a href="<?= url('/admin/customers') ?>" class="stat-card border-violet-200 block cursor-pointer hover:shadow-md transition-shadow no-underline">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
                     <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-violet-50 to-violet-100 text-violet-500 shadow-sm shadow-violet-200/30">
                         <i class="fas fa-users text-lg md:text-xl"></i>
@@ -82,9 +82,9 @@
                     <div class="text-2xl md:text-3xl font-black text-foreground"><?= number_format($stats['total_customers']) ?></div>
                     <p class="text-[10px] md:text-xs text-muted-foreground">ລູກຄ້າໃນລະບົບ</p>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card border-orange-200">
+            <a href="<?= url('/admin/suppliers') ?>" class="stat-card border-orange-200 block cursor-pointer hover:shadow-md transition-shadow no-underline">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
                     <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-orange-50 to-orange-100 text-orange-500 shadow-sm shadow-orange-200/30">
                         <i class="fas fa-truck text-lg md:text-xl"></i>
@@ -95,9 +95,9 @@
                     <div class="text-2xl md:text-3xl font-black text-foreground"><?= number_format($stats['total_suppliers'] ?? 0) ?></div>
                     <p class="text-[10px] md:text-xs text-muted-foreground">ຜູ້ສະໜອງໃນລະບົບ</p>
                 </div>
-            </div>
+            </a>
 
-            <div class="stat-card border-rose-200">
+            <a href="<?= url('/admin/sales') ?>" class="stat-card border-rose-200 block cursor-pointer hover:shadow-md transition-shadow no-underline">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
                     <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-rose-50 to-rose-100 text-rose-500 shadow-sm shadow-rose-200/30">
                         <i class="fas fa-chart-line text-lg md:text-xl"></i>
@@ -109,7 +109,7 @@
                     <div class="text-lg md:text-xl font-black text-rose-600"><?= number_format($stats['monthly_revenue'] ?? 0) ?> <span class="text-xs md:text-sm">ກີບ</span></div>
                     <p class="text-[10px] md:text-xs text-muted-foreground">ລາຍຮັບທັງໝົດເດືອນນີ້</p>
                 </div>
-            </div>
+            </a>
         </div>
 
         <?php
@@ -246,7 +246,7 @@
                             <p class="empty-state-desc">ລອງປ່ຽນຊ່ວງວັນທີໃໝ່</p>
                         </div>
                         <?php else: foreach($stats['recent_sales'] as $s): ?>
-                        <div class="flex items-center gap-3 md:gap-4">
+                        <a href="<?= url('/admin/sales/' . $s['id']) ?>" class="flex items-center gap-3 md:gap-4 no-underline cursor-pointer hover:bg-gray-50 rounded-xl -mx-2 px-2 py-2 transition-colors">
                             <div class="w-9 h-9 md:w-10 md:h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
                                 <i class="fas fa-receipt text-xs md:text-sm"></i>
                             </div>
@@ -255,7 +255,7 @@
                                 <p class="text-[11px] md:text-xs text-muted-foreground truncate">ໃບເກັບເງິນ #<?= htmlspecialchars($s['invoice_number']) ?> • <?= date('H:i', strtotime($s['created_at'])) ?></p>
                             </div>
                             <div class="ml-auto font-bold text-emerald-600 text-xs md:text-sm whitespace-nowrap"><?= number_format($s['grand_total']) ?> ກີບ</div>
-                        </div>
+                        </a>
                         <?php endforeach; endif; ?>
                     </div>
                 </div>
@@ -278,7 +278,7 @@
                         <p class="empty-state-desc">ລອງປ່ຽນຊ່ວງວັນທີໃໝ່</p>
                     </div>
                     <?php else: foreach($stats['popular_products'] as $index => $item): ?>
-                    <div class="flex items-center gap-3 md:gap-4">
+                    <a href="<?= url('/admin/products/' . $item['id']) ?>" class="flex items-center gap-3 md:gap-4 no-underline cursor-pointer hover:bg-gray-50 rounded-xl -mx-2 px-2 py-2 transition-colors">
                         <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gray-100 flex items-center justify-center text-muted-foreground">
                             <i class="fas fa-box text-lg"></i>
                         </div>
@@ -291,10 +291,11 @@
                                 <div class="<?= $colors[$index] ?? 'bg-primary' ?> h-full transition-all duration-1000" style="width: <?= min(100, ($item['total_qty'] / 10) * 100) ?>%"></div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                     <?php endforeach; endif; ?>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<style>.no-underline{text-decoration:none!important}a.no-underline:hover{text-decoration:none!important}</style>

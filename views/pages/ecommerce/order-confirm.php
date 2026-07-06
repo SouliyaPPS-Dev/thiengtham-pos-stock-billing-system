@@ -78,6 +78,17 @@
                 <p><span class="text-muted-foreground">ອີເມວ:</span> <span class="font-bold"><?= htmlspecialchars($order['customer_email']) ?></span></p>
                 <?php endif; ?>
                 <p><span class="text-muted-foreground">ທີ່ຢູ່:</span> <span class="font-bold"><?= htmlspecialchars($order['shipping_address']) ?></span></p>
+                <?php if (!empty($order['shipping_latitude']) && !empty($order['shipping_longitude'])): ?>
+                <div id="map-order" class="w-full h-40 rounded-xl border border-border mt-3 z-0"></div>
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var isDark = document.documentElement.classList.contains('dark');
+                    var map = L.map('map-order', { zoomControl: false, dragging: false, scrollWheelZoom: false }).setView([<?= $order['shipping_latitude'] ?>, <?= $order['shipping_longitude'] ?>], 15);
+                    L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OSM' }).addTo(map);
+                    L.marker([<?= $order['shipping_latitude'] ?>, <?= $order['shipping_longitude'] ?>]).addTo(map);
+                });
+                </script>
+                <?php endif; ?>
             </div>
         </div>
     </div>

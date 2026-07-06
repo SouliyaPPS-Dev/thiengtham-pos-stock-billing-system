@@ -40,6 +40,8 @@ $adminPrefix = '/admin';
 
     <link rel="stylesheet" href="<?= url('/public/css/app.css') ?>?v=<?= filemtime(dirname(__DIR__, 2) . '/public/css/app.css') ?>">
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('theme', () => ({
@@ -191,6 +193,10 @@ $adminPrefix = '/admin';
                         <span class="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-xs"><i class="fas fa-receipt"></i></span>
                         <span>ປະຫວັດການຂາຍ</span>
                     </a>
+                    <a href="<?= url($adminPrefix . '/orders') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/orders') ?>">
+                        <span class="w-8 h-8 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs"><i class="fas fa-shopping-cart"></i></span>
+                        <span>ສັ່ງຊື້</span>
+                    </a>
                     <a href="<?= url($adminPrefix . '/quotations') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/quotations') ?>">
                         <span class="w-8 h-8 rounded-xl bg-teal-100 flex items-center justify-center text-teal-600 text-xs"><i class="fas fa-file-invoice"></i></span>
                         <span>ໃບສະເໜີລາຄາ</span>
@@ -283,6 +289,9 @@ $adminPrefix = '/admin';
                             <a href="<?= url($adminPrefix . '/sales') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/sales') ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground/80' ?>">
                                 <span class="w-5 h-5 rounded-md bg-amber-100 flex items-center justify-center text-amber-600 text-[9px]"><i class="fas fa-receipt"></i></span>ປະຫວັດ
                             </a>
+                            <a href="<?= url($adminPrefix . '/orders') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/orders') ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground/80' ?>">
+                                <span class="w-5 h-5 rounded-md bg-indigo-100 flex items-center justify-center text-indigo-600 text-[9px]"><i class="fas fa-shopping-cart"></i></span>ສັ່ງຊື້
+                            </a>
                             <a href="<?= url($adminPrefix . '/quotations') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/quotations') ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground/80' ?>">
                                 <span class="w-5 h-5 rounded-md bg-teal-100 flex items-center justify-center text-teal-600 text-[9px]"><i class="fas fa-file-invoice"></i></span>ໃບສະເໜີ
                             </a>
@@ -368,6 +377,9 @@ $adminPrefix = '/admin';
                     </a>
                     <a href="<?= url($adminPrefix . '/sales') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/sales') ? 'bg-primary/10 text-primary shadow-sm' : 'text-foreground/70 hover:bg-muted' ?>">
                         <span class="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 text-sm"><i class="fas fa-receipt"></i></span> ປະຫວັດການຂາຍ
+                    </a>
+                    <a href="<?= url($adminPrefix . '/orders') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/orders') ? 'bg-primary/10 text-primary shadow-sm' : 'text-foreground/70 hover:bg-muted' ?>">
+                        <span class="w-9 h-9 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600 text-sm"><i class="fas fa-shopping-cart"></i></span> ສັ່ງຊື້
                     </a>
                     <a href="<?= url($adminPrefix . '/quotations') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/quotations') ? 'bg-primary/10 text-primary shadow-sm' : 'text-foreground/70 hover:bg-muted' ?>">
                         <span class="w-9 h-9 rounded-xl bg-teal-100 flex items-center justify-center text-teal-600 text-sm"><i class="fas fa-file-invoice"></i></span> ໃບສະເໜີລາຄາ
@@ -466,5 +478,7 @@ $adminPrefix = '/admin';
         }
     })();
     </script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </body>
 </html>

@@ -23,6 +23,8 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
     <link rel="stylesheet" href="<?= url('/public/css/app.css') ?>?v=<?= filemtime(dirname(__DIR__, 2) . '/public/css/app.css') ?>">
 
     <script>
@@ -109,6 +111,10 @@
                                 <p class="text-sm font-bold text-foreground"><?= htmlspecialchars($_SESSION['customer']['fullname']) ?></p>
                                 <p class="text-xs text-muted-foreground"><?= htmlspecialchars($_SESSION['customer']['email'] ?? $_SESSION['customer']['phone'] ?? '') ?></p>
                             </div>
+                            <a href="<?= url('/account') ?>" class="flex items-center gap-3 px-3 py-2.5 text-foreground/85 hover:bg-gray-50 rounded-lg text-xs font-bold transition-all">
+                                <i class="fas fa-user"></i>
+                                <span>ບັນຊີຂອງຂ້ອຍ</span>
+                            </a>
                             <a href="<?= url('/logout-customer') ?>" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-lg text-xs font-bold transition-all">
                                 <i class="fas fa-sign-out-alt"></i>
                                 <span>ອອກຈາກລະບົບ</span>
@@ -425,6 +431,76 @@
         .catch(() => {
             Swal.fire({ icon: 'error', title: 'ເກີດຂໍ້ຜິດພາດ', text: 'ກະລຸນາລອງໃໝ່' });
         });
+    }
+    </script>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    function initMapPicker(mapId, latInputId, lngInputId) {
+        var isDark = document.documentElement.classList.contains('dark');
+        var mapEl = document.getElementById('map-' + mapId);
+        var map = L.map(mapEl).setView([17.97700, 102.63900], 15);
+        L.tileLayer(isDark
+            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+            : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://openstreetmap.org/copyright">OSM</a>'
+        }).addTo(map);
+        var marker = null;
+        var latInput = document.getElementById(latInputId);
+        var lngInput = document.getElementById(lngInputId);
+        var initialLat = parseFloat(latInput.value);
+        var initialLng = parseFloat(lngInput.value);
+        if (initialLat && initialLng) {
+            marker = L.marker([initialLat, initialLng]).addTo(map);
+            map.setView([initialLat, initialLng], 15);
+        }
+        map.on('click', function(e) {
+            placeMarker(e.latlng);
+        });
+        function placeMarker(latlng) {
+            if (marker) map.removeLayer(marker);
+            marker = L.marker(latlng).addTo(map);
+            latInput.value = latlng.lat.toFixed(6);
+            lngInput.value = latlng.lng.toFixed(6);
+        }
+        window['__map_' + mapId] = { map: map, placeMarker: placeMarker };
+        setTimeout(function() { map.invalidateSize(); }, 300);
+    }
+
+    function searchLocation(query, mapId) {
+        if (query.length < 3) return;
+        var ctx = window['__map_' + mapId];
+        if (!ctx) return;
+        fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&limit=5&countrycodes=LA')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.length === 0) return;
+                var loc = data[0];
+                ctx.placeMarker([loc.lat, loc.lon]);
+                ctx.map.setView([loc.lat, loc.lon], 15);
+            })
+            .catch(function() {});
+    }
+
+    function getCurrentLocation(mapId) {
+        var ctx = window['__map_' + mapId];
+        if (!ctx) return;
+        if (!navigator.geolocation) {
+            Swal.fire({ icon: 'warning', title: 'ບໍ່ສາມາດເຂົ້າເຖິງຕຳແໜ່ງ', text: 'ບຣາວເຊີຂອງທ່ານບໍ່ຮອງຮັບ' });
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            function(pos) {
+                var latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                ctx.placeMarker(latlng);
+                ctx.map.setView([latlng.lat, latlng.lng], 16);
+            },
+            function() {
+                Swal.fire({ icon: 'warning', title: 'ບໍ່ສາມາດເຂົ້າເຖິງຕຳແໜ່ງ', text: 'ກະລຸນາອະນຸຍາດການເຂົ້າເຖິງຕຳແໜ່ງ' });
+            }
+        );
     }
     </script>
 </body>

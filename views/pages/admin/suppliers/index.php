@@ -61,7 +61,7 @@
                             <td class="py-3 px-2 text-foreground/70"><?= htmlspecialchars($s['phone'] ?? '-') ?></td>
                             <td class="py-3 px-2 text-foreground/70"><?= htmlspecialchars($s['email'] ?? '-') ?></td>
                             <td class="py-3 px-2">
-                                <?php if (($s['status'] ?? 'active') === 'active'): ?>
+                                <?php if ((strtolower($s['status'] ?? 'active')) === 'active'): ?>
                                 <span class="status-badge status-badge-green"><span class="dot"></span> ເປີດໃຊ້</span>
                                 <?php else: ?>
                                 <span class="status-badge status-badge-gray"><span class="dot"></span> ປິດໃຊ້</span>

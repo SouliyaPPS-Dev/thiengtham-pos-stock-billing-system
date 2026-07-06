@@ -54,11 +54,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ແຂວງ</label>
-                            <input type="text" name="shipping_province" value="<?= htmlspecialchars($customer['province'] ?? '') ?>" class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <input type="text" name="shipping_province" value="<?= htmlspecialchars($customer['province'] ?? 'ນະຄອນຫຼວງວຽງຈັນ') ?>" class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         </div>
                         <div>
                             <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ເມືອງ</label>
-                            <input type="text" name="shipping_district" value="<?= htmlspecialchars($customer['district'] ?? '') ?>" class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <input type="text" name="shipping_district" value="<?= htmlspecialchars($customer['district'] ?? 'ໄຊເສດຖາ') ?>" class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         </div>
                         <div>
                             <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ບ້ານ</label>
@@ -67,7 +67,25 @@
                     </div>
                     <div class="mt-4">
                         <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ທີ່ຢູ່ແບບລະອຽດ <span class="text-red-500">*</span></label>
-                        <textarea name="shipping_address" rows="2" required class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"><?= htmlspecialchars($customer['address'] ?? '') ?></textarea>
+                        <textarea name="shipping_address" rows="2" required class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"><?= htmlspecialchars($customer['address'] ?? 'ຖະໜົນ ດາວທຽມ ປະສົມ, ເມືອງໄຊເສດຖາ, ນະຄອນຫຼວງວຽງຈັນ') ?></textarea>
+                    </div>
+                    <div class="mt-4">
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ຕຳແໜ່ງທີ່ຕັ້ງ (GPS)</label>
+                        <div class="flex gap-2 mb-2">
+                            <div class="relative flex-1">
+                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs"></i>
+                                <input type="text" id="map-search-checkout" placeholder="ຄົ້ນຫາສະຖານທີ່..." class="w-full pl-8 pr-3 py-2 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" oninput="searchLocation(this.value, 'checkout')">
+                            </div>
+                            <button type="button" onclick="getCurrentLocation('checkout')" class="px-3 py-2 bg-sky-50 text-sky-600 rounded-xl text-xs font-bold hover:bg-sky-100 transition-all whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fas fa-location-dot"></i> ຕຳແໜ່ງປັດຈຸບັນ
+                            </button>
+                        </div>
+                        <div id="map-checkout" class="w-full h-72 rounded-xl border border-border z-0" x-init="initMapPicker('checkout', 'shipping_latitude', 'shipping_longitude')"></div>
+                        <div class="flex gap-3 mt-2">
+                            <input type="text" name="shipping_latitude" id="shipping_latitude" value="17.977000" readonly placeholder="ເສັ້ນຂວາງ" class="flex-1 px-3 py-2 border border-border rounded-lg text-xs bg-muted text-muted-foreground">
+                            <input type="text" name="shipping_longitude" id="shipping_longitude" value="102.639000" readonly placeholder="ເສັ້ນແວງ" class="flex-1 px-3 py-2 border border-border rounded-lg text-xs bg-muted text-muted-foreground">
+                        </div>
+                        <p class="text-xs text-muted-foreground mt-1">ກົດເທິງແຜນທີ່ເພື່ອເລືອກຕຳແໜ່ງ</p>
                     </div>
                 </div>
 

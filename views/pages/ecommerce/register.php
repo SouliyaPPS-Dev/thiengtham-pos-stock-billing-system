@@ -29,7 +29,7 @@
                             <input type="text" name="fullname" required value="<?= htmlspecialchars($old['fullname'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         </div>
                     </div>
-                    <div>
+                    <div class="md:col-span-2">
                         <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ເບີໂທລະສັບ <span class="text-red-500">*</span></label>
                         <div class="flex gap-2">
                             <select name="phone_prefix" class="w-[110px] px-3 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm bg-card">
@@ -56,7 +56,7 @@
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div class="md:col-span-2">
                         <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ອີເມວ</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground"><i class="fas fa-envelope"></i></span>
@@ -101,6 +101,24 @@
                     <div class="md:col-span-2">
                         <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ທີ່ຢູ່</label>
                         <textarea name="address" rows="2" class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"><?= htmlspecialchars($old['address'] ?? '') ?></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ຕຳແໜ່ງທີ່ຕັ້ງ (GPS)</label>
+                        <div class="flex gap-2 mb-2">
+                            <div class="relative flex-1">
+                                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs"></i>
+                                <input type="text" id="map-search-map-register" placeholder="ຄົ້ນຫາສະຖານທີ່..." class="w-full pl-8 pr-3 py-2 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" oninput="searchLocation(this.value, 'map-register')">
+                            </div>
+                            <button type="button" onclick="getCurrentLocation('map-register')" class="px-3 py-2 bg-sky-50 text-sky-600 rounded-xl text-xs font-bold hover:bg-sky-100 transition-all whitespace-nowrap flex items-center gap-1.5">
+                                <i class="fas fa-location-dot"></i> ຕຳແໜ່ງປັດຈຸບັນ
+                            </button>
+                        </div>
+                        <div id="map-map-register" class="w-full h-56 rounded-xl border border-border z-0" x-init="initMapPicker('map-register', 'latitude', 'longitude')"></div>
+                        <div class="flex gap-3 mt-2">
+                            <input type="text" name="latitude" id="latitude" value="<?= htmlspecialchars($old['latitude'] ?? '') ?>" readonly placeholder="ເສັ້ນຂວາງ" class="flex-1 px-3 py-2 border border-border rounded-lg text-xs bg-muted text-muted-foreground">
+                            <input type="text" name="longitude" id="longitude" value="<?= htmlspecialchars($old['longitude'] ?? '') ?>" readonly placeholder="ເສັ້ນແວງ" class="flex-1 px-3 py-2 border border-border rounded-lg text-xs bg-muted text-muted-foreground">
+                        </div>
+                        <p class="text-xs text-muted-foreground mt-1">ກົດເທິງແຜນທີ່ເພື່ອເລືອກຕຳແໜ່ງ</p>
                     </div>
                 </div>
 

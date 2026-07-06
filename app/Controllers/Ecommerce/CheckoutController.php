@@ -83,6 +83,8 @@ class CheckoutController
         $shippingProvince = trim($_POST['shipping_province'] ?? $_SESSION['customer']['province'] ?? '');
         $shippingDistrict = trim($_POST['shipping_district'] ?? $_SESSION['customer']['district'] ?? '');
         $shippingVillage = trim($_POST['shipping_village'] ?? $_SESSION['customer']['village'] ?? '');
+        $shippingLatitude = !empty($_POST['shipping_latitude']) ? $_POST['shipping_latitude'] : null;
+        $shippingLongitude = !empty($_POST['shipping_longitude']) ? $_POST['shipping_longitude'] : null;
         $paymentMethod = $_POST['payment_method'] ?? 'cod';
         $notes = trim($_POST['notes'] ?? '');
 
@@ -108,9 +110,10 @@ class CheckoutController
 
             $stmt = $db->prepare("INSERT INTO orders (order_number, customer_id, customer_name, customer_phone, customer_email,
                                                        shipping_address, shipping_province, shipping_district, shipping_village,
+                                                       shipping_latitude, shipping_longitude,
                                                        shipping_fee, subtotal, discount, grand_total, payment_method, payment_status,
                                                        order_status, notes, created_at, updated_at)
-                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', 'Pending', ?, NOW(), NOW())");
+                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pending', 'Pending', ?, NOW(), NOW())");
             $stmt->execute([
                 $orderNumber,
                 $customerId,
@@ -121,6 +124,8 @@ class CheckoutController
                 $shippingProvince,
                 $shippingDistrict,
                 $shippingVillage,
+                $shippingLatitude,
+                $shippingLongitude,
                 $shippingFee,
                 $subtotal,
                 $discount,

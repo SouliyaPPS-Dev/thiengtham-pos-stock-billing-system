@@ -60,6 +60,13 @@ class HomeController
             $newArrivals = $stmt->fetchAll();
         } catch (\Exception $e) {}
 
+        $promotions = [];
+        try {
+            $db = Database::getInstance()->getConnection();
+            $stmt = $db->query("SELECT * FROM promotions WHERE status = 'Active' ORDER BY sort_order ASC LIMIT 5");
+            $promotions = $stmt->fetchAll();
+        } catch (\Exception $e) {}
+
         $cartCount = $this->getCartCount();
 
         return view('pages.ecommerce.home', [
@@ -69,6 +76,7 @@ class HomeController
             'categories' => $categories,
             'banners' => $banners,
             'newArrivals' => $newArrivals,
+            'promotions' => $promotions,
             'cartCount' => $cartCount,
             'hero' => true,
         ]);
@@ -156,6 +164,8 @@ class HomeController
             $province = trim($_POST['province'] ?? '');
             $district = trim($_POST['district'] ?? '');
             $village = trim($_POST['village'] ?? '');
+            $latitude = !empty($_POST['latitude']) ? $_POST['latitude'] : null;
+            $longitude = !empty($_POST['longitude']) ? $_POST['longitude'] : null;
 
             $errors = [];
             if (empty($fullname)) $errors[] = 'ກະລຸນາປ້ອນຊື່ ແລະ ນາມສະກຸນ';
@@ -193,8 +203,8 @@ class HomeController
 
             $hashed = password_hash($password, PASSWORD_DEFAULT);
             $db = \App\Core\Database::getInstance()->getConnection();
-            $stmt = $db->prepare("UPDATE customers SET password = ?, province = ?, district = ?, village = ? WHERE id = ?");
-            $stmt->execute([$hashed, $province, $district, $village, $customerId]);
+            $stmt = $db->prepare("UPDATE customers SET password = ?, province = ?, district = ?, village = ?, latitude = ?, longitude = ? WHERE id = ?");
+            $stmt->execute([$hashed, $province, $district, $village, $latitude, $longitude, $customerId]);
 
             $customer = $customerModel->find($customerId);
             $_SESSION['customer'] = [
@@ -206,6 +216,8 @@ class HomeController
                 'province' => $customer['province'] ?? '',
                 'district' => $customer['district'] ?? '',
                 'village' => $customer['village'] ?? '',
+                'latitude' => $customer['latitude'] ?? '',
+                'longitude' => $customer['longitude'] ?? '',
             ];
 
             $this->redirect('/', ['registered' => 1]);

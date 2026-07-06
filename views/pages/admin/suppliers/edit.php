@@ -58,8 +58,8 @@
             <div class="space-y-1.5">
                 <label class="text-sm font-bold text-foreground/85">ສະຖານະ</label>
                 <select name="status" class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
-                    <option value="active" <?= ($supplier['status'] ?? 'active') === 'active' ? 'selected' : '' ?>>ເປີດໃຊ້</option>
-                    <option value="inactive" <?= ($supplier['status'] ?? '') === 'inactive' ? 'selected' : '' ?>>ປິດໃຊ້</option>
+                    <option value="Active" <?= ($supplier['status'] ?? 'Active') === 'Active' ? 'selected' : '' ?>>ເປີດໃຊ້</option>
+                    <option value="Inactive" <?= ($supplier['status'] ?? '') === 'Inactive' ? 'selected' : '' ?>>ປິດໃຊ້</option>
                 </select>
             </div>
 

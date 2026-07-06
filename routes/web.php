@@ -16,6 +16,8 @@ return [
     '/checkout'         => ['Ecommerce\CheckoutController', 'index'],
     '/checkout/process' => ['Ecommerce\CheckoutController', 'process'],
     '/order/{id}'       => ['Ecommerce\CheckoutController', 'orderDetail'],
+    '/account'          => ['Ecommerce\AccountController', 'index'],
+    '/account/update'   => ['Ecommerce\AccountController', 'update'],
     '/login-customer'   => ['Ecommerce\HomeController', 'login'],
     '/register'         => ['Ecommerce\HomeController', 'register'],
     '/logout-customer'  => ['Ecommerce\HomeController', 'logout'],
@@ -59,6 +61,13 @@ return [
     '/admin/sales/{id}/update-status' => ['Admin\SaleController', 'updateStatus'],
     '/admin/sales/{id}/delete'        => ['Admin\SaleController', 'delete'],
     '/admin/sales/bulk-delete'        => ['Admin\SaleController', 'bulkDelete'],
+
+    // Orders (e-commerce)
+    '/admin/orders'                    => ['Admin\OrderController', 'index'],
+    '/admin/orders/{id}'               => ['Admin\OrderController', 'show'],
+    '/admin/orders/{id}/update-status' => ['Admin\OrderController', 'updateStatus'],
+    '/admin/orders/{id}/delete'        => ['Admin\OrderController', 'delete'],
+    '/admin/orders/bulk-delete'        => ['Admin\OrderController', 'bulkDelete'],
 
     // Customers
     '/admin/customers'           => ['Admin\CustomerController', 'index'],

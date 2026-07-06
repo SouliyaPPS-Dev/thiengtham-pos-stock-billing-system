@@ -54,6 +54,13 @@
                 <label class="text-sm font-bold text-foreground/85">ຫມາຍເຫດ</label>
                 <textarea name="notes" rows="2" class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none" placeholder="ຫມາຍເຫດ"><?= htmlspecialchars($_POST['notes'] ?? '') ?></textarea>
             </div>
+            <div class="space-y-1.5">
+                <label class="text-sm font-bold text-foreground/85">ສະຖານະ</label>
+                <select name="status" class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                    <option value="Active" selected>ເປີດໃຊ້</option>
+                    <option value="Inactive">ປິດໃຊ້</option>
+                </select>
+            </div>
 
             <div class="flex items-center gap-3 pt-2">
                 <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">

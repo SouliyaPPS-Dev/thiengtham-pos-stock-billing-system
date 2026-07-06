@@ -60,6 +60,7 @@ class SupplierController extends \App\Controllers\BaseController
             'address' => $_POST['address'] ?? '',
             'notes' => $_POST['notes'] ?? '',
             'tax_percent' => $_POST['tax_percent'] ?? 0,
+            'status' => $_POST['status'] ?? 'Active',
         ]);
 
         $this->redirect('/admin/suppliers', ['success' => 1]);
@@ -101,6 +102,7 @@ class SupplierController extends \App\Controllers\BaseController
             'address' => $_POST['address'] ?? '',
             'notes' => $_POST['notes'] ?? '',
             'tax_percent' => $_POST['tax_percent'] ?? 0,
+            'status' => $_POST['status'] ?? 'Active',
         ];
 
         if (empty($data['name'])) {
