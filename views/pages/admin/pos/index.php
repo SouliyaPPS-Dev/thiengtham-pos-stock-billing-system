@@ -2,26 +2,26 @@
      @mousemove="onMouseMove($event)" @mouseup="onMouseUp()">
 
     <!-- Left Column: Product Selection -->
-    <div class="flex flex-col min-w-0 bg-white shadow-sm" :style="{ width: isMobile ? '100%' : leftWidth + 'px' }">
+    <div class="flex flex-col min-w-0 bg-card shadow-sm" :style="{ width: isMobile ? '100%' : leftWidth + 'px' }">
         <!-- Search & Filter Bar -->
         <div class="p-3 md:p-4 border-b space-y-3">
             <div class="flex flex-col md:flex-row gap-3">
                 <div class="relative flex-grow">
-                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                    <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground">
                         <i class="fas fa-search text-xs"></i>
                     </span>
                     <input type="text" x-model="search" placeholder="ຄົ້ນຫາຊື່, SKU, ບາໂຄດ..."
-                           class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                           class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-border rounded-2xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                 </div>
                 <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                     <button @click="categoryFilter = 'all'"
-                            :class="categoryFilter === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                            :class="categoryFilter === 'all' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-gray-100 text-foreground/70 hover:bg-gray-200'"
                             class="px-5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap">
                         ທັງໝົດ
                     </button>
                     <?php foreach($categories as $cat): ?>
                     <button @click="categoryFilter = '<?= $cat['id'] ?>'"
-                            :class="categoryFilter == '<?= $cat['id'] ?>' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                            :class="categoryFilter == '<?= $cat['id'] ?>' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-gray-100 text-foreground/70 hover:bg-gray-200'"
                             class="px-5 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap">
                         <?= $cat['name'] ?>
                     </button>
@@ -36,7 +36,7 @@
                 <template x-for="p in filteredProducts()" :key="p.id">
                     <div @click="addToCart(p)"
                          :class="p.stock <= 0 ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:shadow-xl hover:border-primary/20 active:scale-[0.97]'"
-                         class="bg-white rounded-2xl border border-gray-100 p-2 transition-all relative overflow-hidden">
+                         class="bg-card rounded-2xl border border-border p-2 transition-all relative overflow-hidden">
 
                         <div class="aspect-square rounded-xl overflow-hidden mb-2 bg-gray-50 relative">
                             <template x-if="p.image">
@@ -54,18 +54,18 @@
                             </div>
                         </div>
 
-                        <h3 class="text-xs font-bold text-gray-800 truncate px-0.5" x-text="p.name"></h3>
-                        <p class="text-[10px] text-gray-400 truncate px-0.5" x-text="p.sku || ''"></p>
+                        <h3 class="text-xs font-bold text-foreground truncate px-0.5" x-text="p.name"></h3>
+                        <p class="text-[10px] text-muted-foreground truncate px-0.5" x-text="p.sku || ''"></p>
                         <div class="flex items-center justify-between mt-1.5 px-0.5">
                             <span class="text-sm font-black text-primary" x-text="formatPrice(p.selling_price)"></span>
-                            <span class="text-[10px] font-bold text-gray-400" x-text="p.unit || 'ຊິ້ນ'"></span>
+                            <span class="text-[10px] font-bold text-muted-foreground" x-text="p.unit || 'ຊິ້ນ'"></span>
                         </div>
                     </div>
                 </template>
             </div>
 
             <template x-if="filteredProducts().length === 0">
-                <div class="flex flex-col items-center justify-center py-20 text-gray-400">
+                <div class="flex flex-col items-center justify-center py-20 text-muted-foreground">
                     <div class="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mb-3">
                         <i class="fas fa-search text-2xl"></i>
                     </div>
@@ -82,12 +82,12 @@
     </div>
 
     <!-- Right Column: Checkout & Cart -->
-    <div class="flex flex-col bg-white border-l shadow-xl z-20" :style="{ width: isMobile ? '100%' : rightWidth + 'px' }">
+    <div class="flex flex-col bg-card border-l shadow-xl z-20" :style="{ width: isMobile ? '100%' : rightWidth + 'px' }">
 
         <!-- Header -->
-        <div class="p-3 md:p-4 border-b bg-white">
+        <div class="p-3 md:p-4 border-b bg-card">
             <div class="flex items-center justify-between">
-                <h2 class="font-bold text-gray-800 flex items-center gap-2 text-sm">
+                <h2 class="font-bold text-foreground flex items-center gap-2 text-sm">
                     <i class="fas fa-shopping-cart text-primary"></i>
                     ຕະກ້າຊື້ເຄື່ອງ
                 </h2>
@@ -102,14 +102,14 @@
 
         <!-- Bill Party: Customer / Supplier Toggle -->
         <div class="p-3 md:p-4 border-b bg-gray-50/30 space-y-3">
-            <div class="flex bg-gray-100 p-0.5 rounded-xl border border-gray-200">
+            <div class="flex bg-gray-100 p-0.5 rounded-xl border border-border">
                 <button @click="billParty = 'customer'; selectedSupplier = null; sSearch = ''; saveState()"
-                        :class="billParty === 'customer' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'"
+                        :class="billParty === 'customer' ? 'bg-card shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground/85'"
                         class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5">
                     <i class="fas fa-user"></i> ລູກຄ້າ
                 </button>
                 <button @click="billParty = 'supplier'; selectedCustomer = null; cSearch = ''; saveState()"
-                        :class="billParty === 'supplier' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'"
+                        :class="billParty === 'supplier' ? 'bg-card shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground/85'"
                         class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5">
                     <i class="fas fa-truck"></i> ຜູ້ສະໜອງ
                 </button>
@@ -122,8 +122,8 @@
                            x-model="cSearch"
                            @focus="open = true"
                            placeholder="ຄົ້ນຫາຊື່ລູກຄ້າ ຫຼື ເບີໂທ..."
-                           class="w-full pl-9 pr-8 py-2.5 bg-white border border-gray-100 rounded-2xl text-xs font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
-                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                           class="w-full pl-9 pr-8 py-2.5 bg-card border border-border rounded-2xl text-xs font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                         <i class="fas fa-user-search text-xs"></i>
                     </div>
                     <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" x-show="selectedCustomer" @click="selectedCustomer = null; cSearch = ''" style="display:none">
@@ -134,19 +134,19 @@
                      x-transition:enter="transition ease-out duration-100"
                      x-transition:enter-start="opacity-0 transform scale-95"
                      x-transition:enter-end="opacity-100 transform scale-100"
-                     class="absolute left-0 right-0 mt-1 bg-white border rounded-2xl shadow-xl z-50 max-h-48 overflow-y-auto"
+                     class="absolute left-0 right-0 mt-1 bg-card border rounded-2xl shadow-xl z-50 max-h-48 overflow-y-auto"
                      :style="{ left: $el.parentElement.parentElement.offsetLeft + 'px', right: $el.parentElement.parentElement.offsetLeft + 'px', width: $el.parentElement.parentElement.offsetWidth + 'px' }">
                     <template x-for="c in customers.filter(c => c.fullname.toLowerCase().includes(cSearch.toLowerCase()) || (c.phone || '').includes(cSearch))" :key="c.id">
                         <div @click="selectedCustomer = c; cSearch = c.fullname; open = false; saveState()"
                              class="p-2.5 hover:bg-gray-50 cursor-pointer border-b last:border-0 flex items-center justify-between">
                             <div>
-                                <div class="text-xs font-bold text-gray-800" x-text="c.fullname"></div>
-                                <div class="text-[10px] text-gray-400" x-text="c.phone || ''"></div>
+                                <div class="text-xs font-bold text-foreground" x-text="c.fullname"></div>
+                                <div class="text-[10px] text-muted-foreground" x-text="c.phone || ''"></div>
                             </div>
                         </div>
                     </template>
                     <template x-if="customers.filter(c => c.fullname.toLowerCase().includes(cSearch.toLowerCase()) || (c.phone || '').includes(cSearch)).length === 0">
-                        <div class="p-3 text-center text-xs text-gray-400">ບໍ່ພົບລູກຄ້າ</div>
+                        <div class="p-3 text-center text-xs text-muted-foreground">ບໍ່ພົບລູກຄ້າ</div>
                     </template>
                 </div>
                 <template x-if="selectedCustomer">
@@ -155,8 +155,8 @@
                             <i class="fas fa-user-check"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-xs font-bold text-gray-800 truncate" x-text="selectedCustomer.fullname"></p>
-                            <p class="text-[10px] text-gray-500" x-text="selectedCustomer.phone || ''"></p>
+                            <p class="text-xs font-bold text-foreground truncate" x-text="selectedCustomer.fullname"></p>
+                            <p class="text-[10px] text-muted-foreground" x-text="selectedCustomer.phone || ''"></p>
                         </div>
                     </div>
                 </template>
@@ -169,8 +169,8 @@
                            x-model="sSearch"
                            @focus="open = true"
                            placeholder="ຄົ້ນຫາຊື່ຜູ້ສະໜອງ..."
-                           class="w-full pl-9 pr-8 py-2.5 bg-white border border-gray-100 rounded-2xl text-xs font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
-                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                           class="w-full pl-9 pr-8 py-2.5 bg-card border border-border rounded-2xl text-xs font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
+                    <div class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                         <i class="fas fa-search text-xs"></i>
                     </div>
                     <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" x-show="selectedSupplier" @click="selectedSupplier = null; sSearch = ''" style="display:none">
@@ -181,19 +181,19 @@
                      x-transition:enter="transition ease-out duration-100"
                      x-transition:enter-start="opacity-0 transform scale-95"
                      x-transition:enter-end="opacity-100 transform scale-100"
-                     class="absolute left-0 right-0 mt-1 bg-white border rounded-2xl shadow-xl z-50 max-h-48 overflow-y-auto"
+                     class="absolute left-0 right-0 mt-1 bg-card border rounded-2xl shadow-xl z-50 max-h-48 overflow-y-auto"
                      :style="{ left: $el.parentElement.parentElement.offsetLeft + 'px', right: $el.parentElement.parentElement.offsetLeft + 'px', width: $el.parentElement.parentElement.offsetWidth + 'px' }">
                     <template x-for="s in suppliers.filter(s => s.name.toLowerCase().includes(sSearch.toLowerCase()) || (s.phone || '').includes(sSearch))" :key="s.id">
                         <div @click="selectedSupplier = s; sSearch = s.name; open = false; saveState()"
                              class="p-2.5 hover:bg-gray-50 cursor-pointer border-b last:border-0 flex items-center justify-between">
                             <div>
-                                <div class="text-xs font-bold text-gray-800" x-text="s.name"></div>
-                                <div class="text-[10px] text-gray-400" x-text="s.contact_person ? (s.contact_person + (s.phone ? ' | ' + s.phone : '')) : (s.phone || '')"></div>
+                                <div class="text-xs font-bold text-foreground" x-text="s.name"></div>
+                                <div class="text-[10px] text-muted-foreground" x-text="s.contact_person ? (s.contact_person + (s.phone ? ' | ' + s.phone : '')) : (s.phone || '')"></div>
                             </div>
                         </div>
                     </template>
                     <template x-if="suppliers.filter(s => s.name.toLowerCase().includes(sSearch.toLowerCase()) || (s.phone || '').includes(sSearch)).length === 0">
-                        <div class="p-3 text-center text-xs text-gray-400">ບໍ່ພົບຜູ້ສະໜອງ</div>
+                        <div class="p-3 text-center text-xs text-muted-foreground">ບໍ່ພົບຜູ້ສະໜອງ</div>
                     </template>
                 </div>
                 <template x-if="selectedSupplier">
@@ -202,8 +202,8 @@
                             <i class="fas fa-truck"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-xs font-bold text-gray-800 truncate" x-text="selectedSupplier.name"></p>
-                            <p class="text-[10px] text-gray-500" x-text="selectedSupplier.contact_person || selectedSupplier.phone || ''"></p>
+                            <p class="text-xs font-bold text-foreground truncate" x-text="selectedSupplier.name"></p>
+                            <p class="text-[10px] text-muted-foreground" x-text="selectedSupplier.contact_person || selectedSupplier.phone || ''"></p>
                         </div>
                     </div>
                 </template>
@@ -213,7 +213,7 @@
         <!-- Cart Items -->
         <div class="flex-1 overflow-y-auto p-3 md:p-4 space-y-2">
             <template x-for="(item, index) in cart" :key="index">
-                <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 hover:border-primary/20 transition-all flex gap-3 group">
+                <div class="bg-card p-3 rounded-2xl shadow-sm border border-border hover:border-primary/20 transition-all flex gap-3 group">
                     <div class="w-14 h-16 rounded-xl overflow-hidden bg-gray-50 flex-shrink-0">
                         <template x-if="item.image">
                             <img :src="item.image" class="w-full h-full object-cover">
@@ -224,17 +224,17 @@
                     </div>
                     <div class="flex-grow min-w-0 flex flex-col justify-between py-0.5">
                         <div class="flex justify-between items-start">
-                            <h4 class="text-xs font-bold text-gray-800 truncate pr-2" x-text="item.name"></h4>
+                            <h4 class="text-xs font-bold text-foreground truncate pr-2" x-text="item.name"></h4>
                             <button @click="removeFromCart(index)" class="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0">
                                 <i class="fas fa-times text-xs"></i>
                             </button>
                         </div>
-                        <p class="text-[10px] font-bold text-gray-400" x-text="formatPrice(item.price) + ' / ' + (item.unit || 'ຊິ້ນ')"></p>
+                        <p class="text-[10px] font-bold text-muted-foreground" x-text="formatPrice(item.price) + ' / ' + (item.unit || 'ຊິ້ນ')"></p>
                         <div class="flex items-center justify-between mt-1">
                             <div class="flex items-center bg-gray-50 rounded-lg p-0.5 border">
-                                <button @click="updateQty(index, -1)" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-primary rounded-md transition-colors"><i class="fas fa-minus text-[9px]"></i></button>
-                                <span class="w-7 text-center text-xs font-bold text-gray-700" x-text="item.qty"></span>
-                                <button @click="updateQty(index, 1)" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-primary rounded-md transition-colors"><i class="fas fa-plus text-[9px]"></i></button>
+                                <button @click="updateQty(index, -1)" class="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-primary rounded-md transition-colors"><i class="fas fa-minus text-[9px]"></i></button>
+                                <span class="w-7 text-center text-xs font-bold text-foreground/85" x-text="item.qty"></span>
+                                <button @click="updateQty(index, 1)" class="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-primary rounded-md transition-colors"><i class="fas fa-plus text-[9px]"></i></button>
                             </div>
                             <span class="text-xs font-bold text-primary" x-text="formatPrice(item.price * item.qty)"></span>
                         </div>
@@ -246,24 +246,24 @@
                 <div class="flex flex-col items-center justify-center py-16 text-gray-300">
                     <i class="fas fa-shopping-basket text-4xl mb-3"></i>
                     <p class="text-xs font-bold uppercase tracking-widest">ກະຕ່າຫວ່າງເປົ່າ</p>
-                    <p class="text-[10px] text-gray-400 mt-1">ເລືອກສິນຄ້າຢູ່ເບື້ອງຊ້າຍ</p>
+                    <p class="text-[10px] text-muted-foreground mt-1">ເລືອກສິນຄ້າຢູ່ເບື້ອງຊ້າຍ</p>
                 </div>
             </template>
         </div>
 
         <!-- Totals & Payment -->
         <div class="border-t bg-gray-50/50 p-3 md:p-4 space-y-3 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-            <div class="space-y-1.5 bg-white p-3 rounded-2xl border shadow-sm">
-                <div class="flex justify-between text-xs font-bold text-gray-500">
+            <div class="space-y-1.5 bg-card p-3 rounded-2xl border shadow-sm">
+                <div class="flex justify-between text-xs font-bold text-muted-foreground">
                     <span>ຍອດລວມ</span>
                     <span x-text="formatPrice(subtotal())"></span>
                 </div>
-                <div class="flex justify-between items-center text-xs font-bold text-gray-500">
+                <div class="flex justify-between items-center text-xs font-bold text-muted-foreground">
                     <span>ສ່ວນຫຼຸດ</span>
-                    <input type="number" x-model="discount" @input="calculateGrandTotal()" min="0" class="w-24 px-2 py-1 bg-gray-50 border border-gray-100 rounded-lg text-right text-xs font-bold text-primary focus:ring-1 focus:ring-primary outline-none" placeholder="0">
+                    <input type="number" x-model="discount" @input="calculateGrandTotal()" min="0" class="w-24 px-2 py-1 bg-gray-50 border border-border rounded-lg text-right text-xs font-bold text-primary focus:ring-1 focus:ring-primary outline-none" placeholder="0">
                 </div>
                 <div class="pt-2 border-t border-dashed flex justify-between items-end">
-                    <span class="text-sm font-bold text-gray-800">ລວມທັງໝົດ</span>
+                    <span class="text-sm font-bold text-foreground">ລວມທັງໝົດ</span>
                     <span class="text-xl font-black text-green-600" x-text="formatPrice(grandTotal)"></span>
                 </div>
             </div>
@@ -272,7 +272,7 @@
                 <div class="grid grid-cols-2 gap-2">
                     <template x-for="method in paymentMethods" :key="method.id">
                         <button @click="selectedPaymentMethod = method.name"
-                                :class="selectedPaymentMethod == method.name ? 'bg-primary text-white border-primary shadow-md' : 'bg-white text-gray-600 border-gray-100 hover:bg-gray-50'"
+                                :class="selectedPaymentMethod == method.name ? 'bg-primary text-white border-primary shadow-md' : 'bg-card text-foreground/70 border-border hover:bg-gray-50'"
                                 class="py-2.5 rounded-xl border text-[10px] font-bold transition-all flex items-center justify-center gap-1.5">
                             <i class="fas fa-credit-card text-xs"></i>
                             <span x-text="method.name"></span>
@@ -281,21 +281,21 @@
                 </div>
 
                 <div class="relative" x-data="{ editingPaid: false }">
-                    <label class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-gray-400">ຮັບເງິນ</label>
+                    <label class="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground">ຮັບເງິນ</label>
                     <template x-if="!editingPaid">
                         <div @click="editingPaid = true"
-                             class="cursor-pointer w-full pl-16 pr-3 py-3 bg-white border-2 border-gray-100 rounded-xl text-lg font-black text-right transition-all hover:border-primary/30"
+                             class="cursor-pointer w-full pl-16 pr-3 py-3 bg-card border-2 border-border rounded-xl text-lg font-black text-right transition-all hover:border-primary/30"
                              x-text="formatPrice(paidAmount)"></div>
                     </template>
                     <template x-if="editingPaid">
                         <input type="number" x-model="paidAmount" @blur="editingPaid = false" @keydown.enter="editingPaid = false"
                                x-ref="paidInput" x-init="$nextTick(() => $refs.paidInput.focus())"
-                               class="w-full pl-16 pr-3 py-3 bg-white border-2 border-primary/30 rounded-xl text-lg font-black text-right focus:ring-2 focus:ring-primary outline-none transition-all">
+                               class="w-full pl-16 pr-3 py-3 bg-card border-2 border-primary/30 rounded-xl text-lg font-black text-right focus:ring-2 focus:ring-primary outline-none transition-all">
                     </template>
                 </div>
 
-                <div class="bg-white p-3 rounded-xl border border-dashed border-gray-200 flex justify-between items-center">
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">ເງິນທອນ</span>
+                <div class="bg-card p-3 rounded-xl border border-dashed border-border flex justify-between items-center">
+                    <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">ເງິນທອນ</span>
                     <span class="text-lg font-black" :class="paidAmount - grandTotal >= 0 ? 'text-green-600' : 'text-red-500'" x-text="formatPrice(Math.max(0, paidAmount - grandTotal))"></span>
                 </div>
 
@@ -520,24 +520,24 @@ function posSystem() {
                 title: 'ຢືນຢັນການຊຳລະ?',
                 html: `<div class="text-left text-sm space-y-2">
                         <div class="bg-gray-50 p-3 rounded-xl">
-                            <p class="text-gray-500 text-xs">${partyLabel}</p>
-                            <p class="font-bold text-gray-800">${partyName}${partyDetail ? ' (' + partyDetail + ')' : ''}</p>
+                            <p class="text-muted-foreground text-xs">${partyLabel}</p>
+                            <p class="font-bold text-foreground">${partyName}${partyDetail ? ' (' + partyDetail + ')' : ''}</p>
                         </div>
                         <div class="flex justify-between px-1">
-                            <span class="text-gray-500">ຍອດລວມ</span>
+                            <span class="text-muted-foreground">ຍອດລວມ</span>
                             <span class="font-bold">${this.formatPrice(this.subtotal())}</span>
                         </div>
-                        ${Number(this.discount) > 0 ? `<div class="flex justify-between px-1"><span class="text-gray-500">ສ່ວນຫຼຸດ</span><span class="font-bold text-red-500">-${this.formatPrice(Number(this.discount))}</span></div>` : ''}
+                        ${Number(this.discount) > 0 ? `<div class="flex justify-between px-1"><span class="text-muted-foreground">ສ່ວນຫຼຸດ</span><span class="font-bold text-red-500">-${this.formatPrice(Number(this.discount))}</span></div>` : ''}
                         <div class="flex justify-between px-1 pt-1 border-t font-bold">
                             <span>ລວມທັງໝົດ</span>
                             <span class="text-primary text-lg">${this.formatPrice(this.grandTotal)}</span>
                         </div>
                         <div class="flex justify-between px-1 text-xs">
-                            <span class="text-gray-500">ຊຳລະດ້ວຍ</span>
+                            <span class="text-muted-foreground">ຊຳລະດ້ວຍ</span>
                             <span class="font-bold">${this.selectedPaymentMethod}</span>
                         </div>
                         <div class="flex justify-between px-1 text-xs">
-                            <span class="text-gray-500">ເງິນທອນ</span>
+                            <span class="text-muted-foreground">ເງິນທອນ</span>
                             <span class="font-bold text-green-600">${this.formatPrice(changeAmount)}</span>
                         </div>
                       </div>`,
@@ -594,7 +594,7 @@ function posSystem() {
                         title: 'ຊຳລະເງິນສຳເລັດ',
                         html: `<div class="text-center space-y-2">
                                 <div class="bg-primary/5 p-3 rounded-xl">
-                                    <p class="text-xs text-gray-500">ໃບເກັບເງິນເລກທີ</p>
+                                    <p class="text-xs text-muted-foreground">ໃບເກັບເງິນເລກທີ</p>
                                     <p class="font-bold text-lg text-primary">${data.invoice_number || ''}</p>
                                 </div>
                                 <p class="text-2xl font-black text-green-600">${this.formatPrice(this.grandTotal)}</p>

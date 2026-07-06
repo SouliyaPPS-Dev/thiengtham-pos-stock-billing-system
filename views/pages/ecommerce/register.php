@@ -1,12 +1,12 @@
 <div class="min-h-[70vh] flex items-center justify-center py-12 px-4">
     <div class="w-full max-w-lg">
-        <div class="bg-white rounded-2xl shadow-xl shadow-sky-100/30 border border-gray-100 p-8 md:p-10">
+        <div class="bg-card rounded-2xl shadow-xl shadow-sky-100/30 border border-border p-8 md:p-10">
             <div class="text-center mb-8">
                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-sky-200">
                     <i class="fas fa-user-plus text-2xl text-white"></i>
                 </div>
-                <h1 class="text-2xl font-black text-gray-800">ສະໝັກສະມາຊິກ</h1>
-                <p class="text-sm text-gray-500 mt-1">ສ້າງບັນຊີເພື່ອສັ່ງຊື້ສິນຄ້າ</p>
+                <h1 class="text-2xl font-black text-foreground">ສະໝັກສະມາຊິກ</h1>
+                <p class="text-sm text-muted-foreground mt-1">ສ້າງບັນຊີເພື່ອສັ່ງຊື້ສິນຄ້າ</p>
             </div>
 
             <?php if (isset($errors) && !empty($errors)): ?>
@@ -23,16 +23,16 @@
             <form method="POST" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-2">
-                        <label class="text-sm font-bold text-gray-700 mb-1.5 block">ຊື່ ແລະ ນາມສະກຸນ <span class="text-red-500">*</span></label>
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ຊື່ ແລະ ນາມສະກຸນ <span class="text-red-500">*</span></label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-user"></i></span>
-                            <input type="text" name="fullname" required value="<?= htmlspecialchars($old['fullname'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground"><i class="fas fa-user"></i></span>
+                            <input type="text" name="fullname" required value="<?= htmlspecialchars($old['fullname'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         </div>
                     </div>
                     <div>
-                        <label class="text-sm font-bold text-gray-700 mb-1.5 block">ເບີໂທລະສັບ <span class="text-red-500">*</span></label>
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ເບີໂທລະສັບ <span class="text-red-500">*</span></label>
                         <div class="flex gap-2">
-                            <select name="phone_prefix" class="w-[110px] px-3 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm bg-white">
+                            <select name="phone_prefix" class="w-[110px] px-3 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm bg-card">
                                 <option value="+856" <?= (($old['phone_prefix'] ?? '+856') === '+856') ? 'selected' : '' ?>>🇱🇦 +856</option>
                                 <option value="+66" <?= (($old['phone_prefix'] ?? '') === '+66') ? 'selected' : '' ?>>🇹🇭 +66</option>
                                 <option value="+84" <?= (($old['phone_prefix'] ?? '') === '+84') ? 'selected' : '' ?>>🇻🇳 +84</option>
@@ -51,56 +51,56 @@
                                 <option value="+61" <?= (($old['phone_prefix'] ?? '') === '+61') ? 'selected' : '' ?>>🇦🇺 +61</option>
                             </select>
                             <div class="relative flex-1">
-                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-phone"></i></span>
-                                <input type="text" name="phone" required value="<?= htmlspecialchars($old['phone'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground"><i class="fas fa-phone"></i></span>
+                                <input type="text" name="phone" required value="<?= htmlspecialchars($old['phone'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                             </div>
                         </div>
                     </div>
                     <div>
-                        <label class="text-sm font-bold text-gray-700 mb-1.5 block">ອີເມວ <span class="text-red-500">*</span></label>
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ອີເມວ</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-envelope"></i></span>
-                            <input type="email" name="email" required value="<?= htmlspecialchars($old['email'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground"><i class="fas fa-envelope"></i></span>
+                            <input type="email" name="email" value="<?= htmlspecialchars($old['email'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         </div>
                     </div>
                     <div>
-                        <label class="text-sm font-bold text-gray-700 mb-1.5 block">ລະຫັດຜ່ານ <span class="text-red-500">*</span></label>
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ລະຫັດຜ່ານ <span class="text-red-500">*</span></label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-lock"></i></span>
-                            <input type="password" name="password" required class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground"><i class="fas fa-lock"></i></span>
+                            <input type="password" name="password" required class="w-full pl-11 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         </div>
                     </div>
                     <div>
-                        <label class="text-sm font-bold text-gray-700 mb-1.5 block">ຢືນຢັນລະຫັດຜ່ານ <span class="text-red-500">*</span></label>
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ຢືນຢັນລະຫັດຜ່ານ <span class="text-red-500">*</span></label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-lock"></i></span>
-                            <input type="password" name="confirm_password" required class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground"><i class="fas fa-lock"></i></span>
+                            <input type="password" name="confirm_password" required class="w-full pl-11 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         </div>
                     </div>
                     <div>
-                        <label class="text-sm font-bold text-gray-700 mb-1.5 block">ແຂວງ</label>
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ແຂວງ</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-map-marker-alt"></i></span>
-                            <input type="text" name="province" value="<?= htmlspecialchars($old['province'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground"><i class="fas fa-map-marker-alt"></i></span>
+                            <input type="text" name="province" value="<?= htmlspecialchars($old['province'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         </div>
                     </div>
                     <div>
-                        <label class="text-sm font-bold text-gray-700 mb-1.5 block">ເມືອງ</label>
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ເມືອງ</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-map-pin"></i></span>
-                            <input type="text" name="district" value="<?= htmlspecialchars($old['district'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground"><i class="fas fa-map-pin"></i></span>
+                            <input type="text" name="district" value="<?= htmlspecialchars($old['district'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         </div>
                     </div>
                     <div>
-                        <label class="text-sm font-bold text-gray-700 mb-1.5 block">ບ້ານ</label>
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ບ້ານ</label>
                         <div class="relative">
-                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fas fa-home"></i></span>
-                            <input type="text" name="village" value="<?= htmlspecialchars($old['village'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-muted-foreground"><i class="fas fa-home"></i></span>
+                            <input type="text" name="village" value="<?= htmlspecialchars($old['village'] ?? '') ?>" class="w-full pl-11 pr-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         </div>
                     </div>
                     <div class="md:col-span-2">
-                        <label class="text-sm font-bold text-gray-700 mb-1.5 block">ທີ່ຢູ່</label>
-                        <textarea name="address" rows="2" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"><?= htmlspecialchars($old['address'] ?? '') ?></textarea>
+                        <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ທີ່ຢູ່</label>
+                        <textarea name="address" rows="2" class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"><?= htmlspecialchars($old['address'] ?? '') ?></textarea>
                     </div>
                 </div>
 
@@ -110,14 +110,14 @@
             </form>
 
             <div class="mt-6 text-center">
-                <p class="text-sm text-gray-500">
+                <p class="text-sm text-muted-foreground">
                     ມີບັນຊີຢູ່ແລ້ວ?
                     <a href="<?= url('/login-customer') ?>" class="text-sky-600 font-bold hover:text-sky-700">ເຂົ້າສູ່ລະບົບ</a>
                 </p>
             </div>
 
             <div class="mt-4 text-center">
-                <a href="<?= url('/') ?>" class="text-sm text-gray-400 hover:text-gray-600">
+                <a href="<?= url('/') ?>" class="text-sm text-muted-foreground hover:text-foreground/70">
                     <i class="fas fa-arrow-left mr-1"></i> ກັບໄປໜ້າຫຼັກ
                 </a>
             </div>

@@ -1,30 +1,30 @@
-<div class="bg-gradient-to-br from-gray-50 via-white to-sky-50/30 p-4 md:p-8 min-h-full">
+<div class="bg-background p-4 md:p-8 min-h-full">
     <div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
 
         <div>
             <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">ປະຫວັດການຂາຍ</h1>
-            <p class="text-sm text-gray-500 mt-0.5">ບັນທຶກການຂາຍທັງໝົດ</p>
+            <p class="text-sm text-muted-foreground mt-0.5">ບັນທຶກການຂາຍທັງໝົດ</p>
         </div>
 
         <?php $saleIds = $saleIds ?? []; ?>
 
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+        <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
             <form method="GET" action="<?= url('/admin/sales') ?>" class="flex flex-col sm:flex-row gap-3 mb-6">
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-gray-400">ຈາກ</label>
+                    <label class="text-xs font-bold text-muted-foreground">ຈາກ</label>
                     <input type="date" name="from_date" value="<?= htmlspecialchars($_GET['from_date'] ?? '') ?>"
-                           class="px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                           class="px-3 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                 </div>
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-gray-400">ຫາ</label>
+                    <label class="text-xs font-bold text-muted-foreground">ຫາ</label>
                     <input type="date" name="to_date" value="<?= htmlspecialchars($_GET['to_date'] ?? '') ?>"
-                           class="px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                           class="px-3 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                 </div>
                 <div class="flex-1 relative group">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 group-focus-within:text-primary transition-colors pointer-events-none">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted-foreground group-focus-within:text-primary transition-colors pointer-events-none">
                         <i class="fas fa-search text-xs"></i>
                     </span>
-                    <input type="text" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="ຄົ້ນຫາໃບບິນ ຫຼື ລູກຄ້າ..." class="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                    <input type="text" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="ຄົ້ນຫາໃບບິນ ຫຼື ລູກຄ້າ..." class="w-full pl-9 pr-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                 </div>
                 <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-sky-50 text-sky-600 rounded-xl font-bold text-sm hover:bg-sky-100 transition-all">
                     <i class="fas fa-search"></i> ຄົ້ນຫາ
@@ -34,19 +34,19 @@
             <div x-data="salesBulkDelete()" class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b border-gray-100">
+                        <tr class="border-b border-border">
                             <th class="py-3 px-2 text-center" style="width:40px">
                                 <input type="checkbox" @click="toggleAll" :checked="allSelected" class="rounded border-gray-300 text-primary focus:ring-primary cursor-pointer">
                             </th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ໃບບິນ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວັນທີ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລູກຄ້າ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລາຍການ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວິທີຊຳລະ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຍອດລວມ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ສະຖານະ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider"></th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ໃບບິນ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ວັນທີ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ລູກຄ້າ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ລາຍການ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ວິທີຊຳລະ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ຍອດລວມ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ສະຖານະ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,8 +57,8 @@
                                     <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                         <i class="fas fa-receipt text-2xl"></i>
                                     </div>
-                                    <p class="text-base font-bold text-gray-600">ຍັງບໍ່ມີປະຫວັດການຂາຍ</p>
-                                    <p class="text-sm text-gray-400 mt-1">ປະຫວັດການຂາຍຈະສະແດງຢູ່ນີ້</p>
+                                    <p class="text-base font-bold text-foreground/70">ຍັງບໍ່ມີປະຫວັດການຂາຍ</p>
+                                    <p class="text-sm text-muted-foreground mt-1">ປະຫວັດການຂາຍຈະສະແດງຢູ່ນີ້</p>
                                 </div>
                             </td>
                         </tr>
@@ -69,13 +69,13 @@
                             <td class="py-3 px-2 text-center">
                                 <input type="checkbox" :value="<?= $s['id'] ?>" x-model="selected" class="rounded border-gray-300 text-primary focus:ring-primary cursor-pointer">
                             </td>
-                            <td class="py-3 px-2 text-gray-400 text-sm text-center"><?= $i ?></td>
+                            <td class="py-3 px-2 text-muted-foreground text-sm text-center"><?= $i ?></td>
                             <td class="py-3 px-2">
-                                <a href="<?= url('/admin/sales/' . $s['id']) ?>" class="font-mono font-bold text-gray-800 hover:text-primary">#<?= htmlspecialchars($s['invoice_number'] ?? str_pad($s['id'], 6, '0', STR_PAD_LEFT)) ?></a>
+                                <a href="<?= url('/admin/sales/' . $s['id']) ?>" class="font-mono font-bold text-foreground hover:text-primary">#<?= htmlspecialchars($s['invoice_number'] ?? str_pad($s['id'], 6, '0', STR_PAD_LEFT)) ?></a>
                             </td>
-                            <td class="py-3 px-2 text-gray-600"><?= date('d/m/Y H:i', strtotime($s['created_at'])) ?></td>
-                            <td class="py-3 px-2 text-gray-600"><?= htmlspecialchars($s['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></td>
-                            <td class="py-3 px-2 text-gray-600"><?= (int)($s['items_count'] ?? 0) ?></td>
+                            <td class="py-3 px-2 text-foreground/70"><?= date('d/m/Y H:i', strtotime($s['created_at'])) ?></td>
+                            <td class="py-3 px-2 text-foreground/70"><?= htmlspecialchars($s['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></td>
+                            <td class="py-3 px-2 text-foreground/70"><?= (int)($s['items_count'] ?? 0) ?></td>
                             <td class="py-3 px-2">
                                 <?php
                                 $pm = $s['payment_method'] ?? 'ເງິນສົດ';
@@ -86,7 +86,7 @@
                                     'bg-amber-50 text-amber-600' => ['credit', 'card', 'visa', 'mastercard'],
                                     'bg-rose-50 text-rose-600' => ['mobile', 'wallet', 'truewallet'],
                                 ];
-                                $pmClass = 'bg-gray-50 text-gray-600';
+                                $pmClass = 'bg-gray-50 text-foreground/70';
                                 foreach ($pmColors as $class => $keywords) {
                                     foreach ($keywords as $kw) {
                                         if (str_contains(mb_strtolower($pm), $kw)) {
@@ -101,7 +101,7 @@
                                     <?= htmlspecialchars($pm) ?>
                                 </span>
                             </td>
-                            <td class="py-3 px-2 font-medium text-gray-800"><?= number_format($s['grand_total'] ?: 0, 0) ?> ກີບ</td>
+                            <td class="py-3 px-2 font-medium text-foreground"><?= number_format($s['grand_total'] ?: 0, 0) ?> ກີບ</td>
                             <td class="py-3 px-2">
                                 <?php $st = strtolower($s['status'] ?? 'Completed'); ?>
                                 <?php if ($st === 'completed'): ?>
@@ -160,9 +160,9 @@
             </div>
 
             <!-- Mobile Bulk Action Bar -->
-            <div x-show="selected.length > 0" class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-2xl px-4 py-3 z-50 md:hidden">
+            <div x-show="selected.length > 0" class="fixed bottom-0 left-0 right-0 bg-card border-t shadow-2xl px-4 py-3 z-50 md:hidden">
                 <div class="flex items-center justify-between">
-                    <span class="text-sm font-bold text-gray-600">
+                    <span class="text-sm font-bold text-foreground/70">
                         ເລືອກ <span x-text="selected.length" class="text-primary font-black"></span> ລາຍການ
                     </span>
                     <button @click="confirmBulkDelete" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all shadow-lg" style="background:#dc2626">

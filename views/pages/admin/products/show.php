@@ -1,14 +1,14 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-sky-50/30 p-4 md:p-8">
+<div class="min-h-screen bg-background p-4 md:p-8">
     <div class="max-w-5xl mx-auto space-y-6 animate-fade-in">
 
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <a href="<?= url('/admin/products') ?>" class="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all">
+                <a href="<?= url('/admin/products') ?>" class="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-muted-foreground hover:bg-gray-200 transition-all">
                     <i class="fas fa-arrow-left"></i>
                 </a>
                 <div>
                     <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight"><?= htmlspecialchars($product['name']) ?></h1>
-                    <p class="text-sm text-gray-500 mt-0.5">ລາຍລະອຽດສິນຄ້າ</p>
+                    <p class="text-sm text-muted-foreground mt-0.5">ລາຍລະອຽດສິນຄ້າ</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -21,14 +21,14 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div class="lg:col-span-2 space-y-6">
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                         <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center text-white shadow-lg shadow-sky-200">
                             <i class="fas fa-image text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-extrabold text-gray-800">ຮູບສິນຄ້າ</h2>
-                            <p class="text-xs text-gray-400">ຮູບພາບສິນຄ້າ</p>
+                            <h2 class="text-base font-extrabold text-foreground">ຮູບສິນຄ້າ</h2>
+                            <p class="text-xs text-muted-foreground">ຮູບພາບສິນຄ້າ</p>
                         </div>
                     </div>
                     <?php
@@ -57,7 +57,7 @@
                                 <template x-for="(img, i) in images" :key="i">
                                     <button @click.prevent="activeImage = i; imageError = false"
                                             class="flex-shrink-0 h-16 w-16 rounded-xl overflow-hidden border-2 transition-all"
-                                            :class="activeImage === i ? 'border-sky-500 shadow-sm' : 'border-gray-100 hover:border-gray-300'">
+                                            :class="activeImage === i ? 'border-sky-500 shadow-sm' : 'border-border hover:border-gray-300'">
                                         <img :src="img" class="h-full w-full object-cover" @error="$el.classList.add('hidden')">
                                     </button>
                                 </template>
@@ -68,61 +68,61 @@
             </div>
 
             <div class="lg:col-span-3 space-y-6">
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                         <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-400 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-violet-200">
                             <i class="fas fa-info-circle text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-extrabold text-gray-800">ຂໍ້ມູນສິນຄ້າ</h2>
-                            <p class="text-xs text-gray-400">ລາຍລະອຽດສິນຄ້າທົ່ວໄປ</p>
+                            <h2 class="text-base font-extrabold text-foreground">ຂໍ້ມູນສິນຄ້າ</h2>
+                            <p class="text-xs text-muted-foreground">ລາຍລະອຽດສິນຄ້າທົ່ວໄປ</p>
                         </div>
                     </div>
                     <div class="space-y-5">
                         <div class="flex items-center justify-between py-3 border-b border-gray-50">
-                            <span class="text-sm text-gray-500">ຊື່ສິນຄ້າ</span>
-                            <span class="text-sm font-bold text-gray-800"><?= htmlspecialchars($product['name']) ?></span>
+                            <span class="text-sm text-muted-foreground">ຊື່ສິນຄ້າ</span>
+                            <span class="text-sm font-bold text-foreground"><?= htmlspecialchars($product['name']) ?></span>
                         </div>
                         <div class="flex items-center justify-between py-3 border-b border-gray-50">
-                            <span class="text-sm text-gray-500">SKU</span>
-                            <span class="text-sm font-bold text-gray-800"><?= htmlspecialchars($product['sku'] ?? '-') ?></span>
+                            <span class="text-sm text-muted-foreground">SKU</span>
+                            <span class="text-sm font-bold text-foreground"><?= htmlspecialchars($product['sku'] ?? '-') ?></span>
                         </div>
                         <div class="flex items-center justify-between py-3 border-b border-gray-50">
-                            <span class="text-sm text-gray-500">Barcode</span>
-                            <span class="text-sm font-bold text-gray-800"><?= htmlspecialchars($product['barcode'] ?? '-') ?></span>
+                            <span class="text-sm text-muted-foreground">Barcode</span>
+                            <span class="text-sm font-bold text-foreground"><?= htmlspecialchars($product['barcode'] ?? '-') ?></span>
                         </div>
                         <div class="flex items-center justify-between py-3 border-b border-gray-50">
-                            <span class="text-sm text-gray-500">ໝວດສິນຄ້າ</span>
-                            <span class="text-sm font-bold text-gray-800"><?= htmlspecialchars($product['category_name'] ?? '-') ?></span>
+                            <span class="text-sm text-muted-foreground">ໝວດສິນຄ້າ</span>
+                            <span class="text-sm font-bold text-foreground"><?= htmlspecialchars($product['category_name'] ?? '-') ?></span>
                         </div>
                         <div class="flex items-center justify-between py-3 border-b border-gray-50">
-                            <span class="text-sm text-gray-500">ໜ່ວຍ</span>
-                            <span class="text-sm font-bold text-gray-800"><?= htmlspecialchars($product['unit'] ?? '-') ?></span>
+                            <span class="text-sm text-muted-foreground">ໜ່ວຍ</span>
+                            <span class="text-sm font-bold text-foreground"><?= htmlspecialchars($product['unit'] ?? '-') ?></span>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                         <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-200">
                             <i class="fas fa-coins text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-extrabold text-gray-800">ລາຄາ ແລະ ສະຕ໋ອກ</h2>
-                            <p class="text-xs text-gray-400">ຂໍ້ມູນລາຄາ ແລະ ຈຳນວນສິນຄ້າຄົງເຫຼືອ</p>
+                            <h2 class="text-base font-extrabold text-foreground">ລາຄາ ແລະ ສະຕ໋ອກ</h2>
+                            <p class="text-xs text-muted-foreground">ຂໍ້ມູນລາຄາ ແລະ ຈຳນວນສິນຄ້າຄົງເຫຼືອ</p>
                         </div>
                     </div>
                     <div class="space-y-5">
                         <div class="flex items-center justify-between py-3 border-b border-gray-50">
-                            <span class="text-sm text-gray-500">ລາຄາຊື້ (Cost Price)</span>
-                            <span class="text-sm font-bold text-gray-800"><?= number_format($product['cost_price'] ?? 0, 0) ?> ກີບ</span>
+                            <span class="text-sm text-muted-foreground">ລາຄາຊື້ (Cost Price)</span>
+                            <span class="text-sm font-bold text-foreground"><?= number_format($product['cost_price'] ?? 0, 0) ?> ກີບ</span>
                         </div>
                         <div class="flex items-center justify-between py-3 border-b border-gray-50">
-                            <span class="text-sm text-gray-500">ລາຄາຂາຍ (Selling Price)</span>
+                            <span class="text-sm text-muted-foreground">ລາຄາຂາຍ (Selling Price)</span>
                             <span class="text-sm font-bold text-primary"><?= number_format($product['selling_price'] ?? 0, 0) ?> ກີບ</span>
                         </div>
                         <div class="flex items-center justify-between py-3 border-b border-gray-50">
-                            <span class="text-sm text-gray-500">ສະຕ໋ອກປັດຈຸບັນ</span>
+                            <span class="text-sm text-muted-foreground">ສະຕ໋ອກປັດຈຸບັນ</span>
                             <?php
                             $stock = (int)($product['stock'] ?? 0);
                             $stockColor = $stock <= 0 ? 'text-red-600' : ($stock <= ($product['min_stock'] ?? 10) ? 'text-amber-600' : 'text-green-600');
@@ -130,17 +130,17 @@
                             <span class="text-sm font-bold <?= $stockColor ?>"><?= $stock ?> <?= htmlspecialchars($product['unit'] ?? 'ຊິ້ນ') ?></span>
                         </div>
                         <div class="flex items-center justify-between py-3 border-b border-gray-50">
-                            <span class="text-sm text-gray-500">ສະຕ໋ອກຕ່ຳສຸດ (Min Stock)</span>
-                            <span class="text-sm font-bold text-gray-800"><?= $product['min_stock'] ?? 0 ?></span>
+                            <span class="text-sm text-muted-foreground">ສະຕ໋ອກຕ່ຳສຸດ (Min Stock)</span>
+                            <span class="text-sm font-bold text-foreground"><?= $product['min_stock'] ?? 0 ?></span>
                         </div>
                         <div class="flex items-center justify-between py-3">
-                            <span class="text-sm text-gray-500">ສະຖານະ</span>
+                            <span class="text-sm text-muted-foreground">ສະຖານະ</span>
                             <div class="flex items-center gap-2">
                                 <?php $isActive = strtolower($product['status'] ?? 'active') === 'active'; ?>
-                                <span class="px-3 py-1 rounded-lg text-xs font-bold <?= $isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' ?>">
+                                <span class="px-3 py-1 rounded-lg text-xs font-bold <?= $isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-muted-foreground' ?>">
                                     <i class="fas fa-circle text-[6px] mr-1"></i> <?= $isActive ? 'ເປີດໃຊ້' : 'ປິດໃຊ້ງານ' ?>
                                 </span>
-                                <button type="button" onclick="confirmToggleStatus(<?= $product['id'] ?>, <?= $isActive ? 'true' : 'false' ?>)" class="px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all <?= $isActive ? 'bg-gray-100 text-gray-600 hover:bg-gray-200' : 'bg-green-100 text-green-700 hover:bg-green-200' ?>">
+                                <button type="button" onclick="confirmToggleStatus(<?= $product['id'] ?>, <?= $isActive ? 'true' : 'false' ?>)" class="px-3 py-1.5 rounded-lg text-[10px] font-bold transition-all <?= $isActive ? 'bg-gray-100 text-foreground/70 hover:bg-gray-200' : 'bg-green-100 text-green-700 hover:bg-green-200' ?>">
                                     <i class="fas <?= $isActive ? 'fa-toggle-off' : 'fa-toggle-on' ?>"></i>
                                     <?= $isActive ? 'ປິດ' : 'ເປີດ' ?>
                                 </button>
@@ -148,7 +148,7 @@
                         </div>
                     </div>
                     <div class="mt-6 pt-4 border-t border-gray-50">
-                        <div class="flex items-center justify-between text-xs text-gray-400 mb-2">
+                        <div class="flex items-center justify-between text-xs text-muted-foreground mb-2">
                             <span>ສະຕ໋ອກ</span>
                             <span><?= $stock ?> / <?= max($product['min_stock'] * 3, $stock) ?></span>
                         </div>
@@ -163,41 +163,41 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                         <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center text-white shadow-lg shadow-red-200">
                             <i class="fas fa-align-left text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-extrabold text-gray-800">ລາຍລະອຽດ</h2>
-                            <p class="text-xs text-gray-400">ລາຍລະອຽດເພີ່ມເຕີມ</p>
+                            <h2 class="text-base font-extrabold text-foreground">ລາຍລະອຽດ</h2>
+                            <p class="text-xs text-muted-foreground">ລາຍລະອຽດເພີ່ມເຕີມ</p>
                         </div>
                     </div>
                     <?php if (!empty($product['description'])): ?>
-                    <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line"><?= nl2br(htmlspecialchars($product['description'])) ?></p>
+                    <p class="text-sm text-foreground/70 leading-relaxed whitespace-pre-line"><?= nl2br(htmlspecialchars($product['description'])) ?></p>
                     <?php else: ?>
-                    <p class="text-sm text-gray-400 italic">ບໍ່ມີລາຍລະອຽດ</p>
+                    <p class="text-sm text-muted-foreground italic">ບໍ່ມີລາຍລະອຽດ</p>
                     <?php endif; ?>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+                <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                         <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-200">
                             <i class="fas fa-clock text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-extrabold text-gray-800">ຂໍ້ມູນລະບົບ</h2>
-                            <p class="text-xs text-gray-400">ວັນທີສ້າງ ແລະ ອັບເດດ</p>
+                            <h2 class="text-base font-extrabold text-foreground">ຂໍ້ມູນລະບົບ</h2>
+                            <p class="text-xs text-muted-foreground">ວັນທີສ້າງ ແລະ ອັບເດດ</p>
                         </div>
                     </div>
                     <div class="space-y-5">
                         <div class="flex items-center justify-between py-3 border-b border-gray-50">
-                            <span class="text-sm text-gray-500">ສ້າງເມື່ອ</span>
-                            <span class="text-sm font-bold text-gray-800"><?= date('d/m/Y H:i', strtotime($product['created_at'])) ?></span>
+                            <span class="text-sm text-muted-foreground">ສ້າງເມື່ອ</span>
+                            <span class="text-sm font-bold text-foreground"><?= date('d/m/Y H:i', strtotime($product['created_at'])) ?></span>
                         </div>
                         <div class="flex items-center justify-between py-3">
-                            <span class="text-sm text-gray-500">ອັບເດດລ່າສຸດ</span>
-                            <span class="text-sm font-bold text-gray-800"><?= !empty($product['updated_at']) ? date('d/m/Y H:i', strtotime($product['updated_at'])) : '-' ?></span>
+                            <span class="text-sm text-muted-foreground">ອັບເດດລ່າສຸດ</span>
+                            <span class="text-sm font-bold text-foreground"><?= !empty($product['updated_at']) ? date('d/m/Y H:i', strtotime($product['updated_at'])) : '-' ?></span>
                         </div>
                     </div>
                 </div>

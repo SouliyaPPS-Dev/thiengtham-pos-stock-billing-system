@@ -1,14 +1,14 @@
 <?php $isEdit = !is_null($quotation); ?>
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-sky-50/30 p-4 md:p-8" x-data="quotationForm()" @scroll.window="closeOpenDropdowns()">
+<div class="min-h-screen bg-background p-4 md:p-8" x-data="quotationForm()" @scroll.window="closeOpenDropdowns()">
     <div class="max-w-6xl mx-auto space-y-6 animate-fade-in">
 
         <div class="flex items-center gap-4">
-            <a href="<?= url('/admin/quotations') ?>" class="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all">
+            <a href="<?= url('/admin/quotations') ?>" class="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-muted-foreground hover:bg-gray-200 transition-all">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight"><?= $isEdit ? 'ແກ້ໄຂໃບສະເໜີລາຄາ' : 'ສ້າງໃບສະເໜີລາຄາໃໝ່' ?></h1>
-                <p class="text-sm text-gray-500 mt-0.5"><?= $isEdit ? 'ແກ້ໄຂຂໍ້ມູນໃບສະເໜີລາຄາ' : 'ສ້າງໃບສະເໜີລາຄາຕາມແບບຟອມ Excel' ?></p>
+                <p class="text-sm text-muted-foreground mt-0.5"><?= $isEdit ? 'ແກ້ໄຂຂໍ້ມູນໃບສະເໜີລາຄາ' : 'ສ້າງໃບສະເໜີລາຄາຕາມແບບຟອມ Excel' ?></p>
             </div>
         </div>
 
@@ -17,12 +17,12 @@
 
                 <!-- Left: Settings -->
                 <div class="space-y-6">
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                        <h2 class="text-base font-extrabold text-gray-800 mb-4">ຂໍ້ມູນຜູ້ສະໜອງ</h2>
+                    <div class="bg-card rounded-2xl border border-border shadow-sm p-6">
+                        <h2 class="text-base font-extrabold text-foreground mb-4">ຂໍ້ມູນຜູ້ສະໜອງ</h2>
                         <div class="space-y-3">
                             <div>
-                                <label class="text-xs font-bold text-gray-500 mb-1 block">ເລືອກຜູ້ສະໜອງ</label>
-                                <select x-model="supplierId" @change="selectSupplier()" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ເລືອກຜູ້ສະໜອງ</label>
+                                <select x-model="supplierId" @change="selectSupplier()" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                     <option value="">-- ເລືອກ --</option>
                                     <?php foreach ($suppliers as $s): ?>
                                     <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name']) ?></option>
@@ -31,17 +31,17 @@
                                 <input type="hidden" name="supplier_id" x-model="supplierId">
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-gray-500 mb-1 block">ຊື່ຜູ້ສະໜອງ</label>
-                                <input type="text" name="supplier_name" x-model="supplierName" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" required>
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ຊື່ຜູ້ສະໜອງ</label>
+                                <input type="text" name="supplier_name" x-model="supplierName" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" required>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-gray-500 mb-1 block">ຜູ້ຕິດຕໍ່ / ເບີໂທ</label>
-                                <input type="text" name="supplier_contact" x-model="supplierContact" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ຜູ້ຕິດຕໍ່ / ເບີໂທ</label>
+                                <input type="text" name="supplier_contact" x-model="supplierContact" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-gray-500 mb-1 block">ອາກອນມູນຄ່າເພີ້ມ (VAT %)</label>
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ອາກອນມູນຄ່າເພີ້ມ (VAT %)</label>
                                 <div class="flex items-center gap-2">
-                                    <input type="number" name="tax_percent" x-model="taxPercent" @input="calcTotals()" min="0" max="100" step="0.01" list="vat-options" class="w-24 px-3 py-2.5 border border-gray-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    <input type="number" name="tax_percent" x-model="taxPercent" @input="calcTotals()" min="0" max="100" step="0.01" list="vat-options" class="w-24 px-3 py-2.5 border border-border rounded-xl text-sm font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                     <datalist id="vat-options">
                                         <option value="0">
                                         <option value="5">
@@ -51,30 +51,30 @@
                                     <button type="button" @click="saveSupplierTax()" :disabled="!supplierId" class="px-3 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap" :class="supplierId ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-gray-50 text-gray-300 cursor-not-allowed'">
                                         <i class="fas fa-save mr-1"></i> ບັນທຶກ
                                     </button>
-                                    <span class="text-xs text-gray-400 ml-1">(ຕັ້ງອັດຕາອາກອນຕາມຜູ້ສະໜອງ)</span>
+                                    <span class="text-xs text-muted-foreground ml-1">(ຕັ້ງອັດຕາອາກອນຕາມຜູ້ສະໜອງ)</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-                        <h2 class="text-base font-extrabold text-gray-800 mb-4">ຂໍ້ມູນເພີ່ມເຕີມ</h2>
+                    <div class="bg-card rounded-2xl border border-border shadow-sm p-6">
+                        <h2 class="text-base font-extrabold text-foreground mb-4">ຂໍ້ມູນເພີ່ມເຕີມ</h2>
                         <div class="space-y-3">
                             <div>
-                                <label class="text-xs font-bold text-gray-500 mb-1 block">ເລກອ້າງອີງ (Ref No.)</label>
-                                <input type="text" name="ref_no" x-model="refNo" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="z.B. PR-2026-...">
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ເລກອ້າງອີງ (Ref No.)</label>
+                                <input type="text" name="ref_no" x-model="refNo" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="z.B. PR-2026-...">
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-gray-500 mb-1 block">ວັນທີ</label>
-                                <input type="date" name="date" x-model="date" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ວັນທີ</label>
+                                <input type="date" name="date" x-model="date" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-gray-500 mb-1 block">ເງື່ອນໄຂ / Terms</label>
-                                <textarea name="terms" x-model="terms" rows="4" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none"></textarea>
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ເງື່ອນໄຂ / Terms</label>
+                                <textarea name="terms" x-model="terms" rows="4" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none"></textarea>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-gray-500 mb-1 block">ສະຖານະ</label>
-                                <select name="status" x-model="status" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ສະຖານະ</label>
+                                <select name="status" x-model="status" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                     <option value="Draft">ຮ່າງ</option>
                                     <option value="Sent">ສົ່ງແລ້ວ</option>
                                     <option value="Approved">ອະນຸມັດ</option>
@@ -82,22 +82,22 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-gray-500 mb-1 block">ໝາຍເຫດ</label>
-                                <textarea name="notes" x-model="notes" rows="2" class="w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none"></textarea>
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ໝາຍເຫດ</label>
+                                <textarea name="notes" x-model="notes" rows="2" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none"></textarea>
                             </div>
                         </div>
                     </div>
 
                     <!-- Bill Settings Section -->
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6" id="bill-settings-section">
-                        <h2 class="text-base font-extrabold text-gray-800 mb-4">ຕັ້ງຄ່າຮູບພາບໃບບິນ</h2>
+                    <div class="bg-card rounded-2xl border border-border shadow-sm p-6" id="bill-settings-section">
+                        <h2 class="text-base font-extrabold text-foreground mb-4">ຕັ້ງຄ່າຮູບພາບໃບບິນ</h2>
                         <div class="space-y-4">
 
                             <!-- Logo Section -->
                             <div class="space-y-3">
-                                <h4 class="text-sm font-extrabold text-gray-800">ໂລໂກ້ໃບບິນ</h4>
+                                <h4 class="text-sm font-extrabold text-foreground">ໂລໂກ້ໃບບິນ</h4>
                                 <div x-data="{ preview: null, currentLogo: '<?= htmlspecialchars($settings['bill_logo'] ?? '') ?>' }" class="flex items-center gap-3">
-                                    <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden border shrink-0">
+                                    <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-muted to-muted flex items-center justify-center overflow-hidden border shrink-0">
                                         <template x-if="currentLogo && !preview">
                                             <img :src="currentLogo" class="h-full w-full object-cover">
                                         </template>
@@ -113,19 +113,19 @@
                                 </div>
                                 <div class="flex gap-2">
                                     <div class="flex-1 min-w-0">
-                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ກ້ວາງ</label>
+                                        <label class="text-xs font-bold text-muted-foreground mb-1 block">ກ້ວາງ</label>
                                         <input type="number" name="bill_logo_width" min="20" max="500" value="<?= htmlspecialchars($settings['bill_logo_width'] ?? '150') ?>"
-                                               class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                               class="w-full px-3 py-2 border border-border rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ສູງ</label>
+                                        <label class="text-xs font-bold text-muted-foreground mb-1 block">ສູງ</label>
                                         <input type="number" name="bill_logo_height" min="20" max="500" value="<?= htmlspecialchars($settings['bill_logo_height'] ?? '150') ?>"
-                                               class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                               class="w-full px-3 py-2 border border-border rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ຕຳແໜ່ງ</label>
+                                        <label class="text-xs font-bold text-muted-foreground mb-1 block">ຕຳແໜ່ງ</label>
                                         <select name="bill_logo_position"
-                                                class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                                class="w-full px-3 py-2 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                             <option value="top-left" <?= ($settings['bill_logo_position'] ?? 'top-left') === 'top-left' ? 'selected' : '' ?>>ຊ້າຍ-ເທິງ</option>
                                             <option value="top-center" <?= ($settings['bill_logo_position'] ?? '') === 'top-center' ? 'selected' : '' ?>>ກາງ-ເທິງ</option>
                                             <option value="top-right" <?= ($settings['bill_logo_position'] ?? '') === 'top-right' ? 'selected' : '' ?>>ຂວາ-ເທິງ</option>
@@ -140,9 +140,9 @@
 
                             <!-- Signature Section -->
                             <div class="space-y-3">
-                                <h4 class="text-sm font-extrabold text-gray-800">ລາຍເຊັນໃບບິນ</h4>
+                                <h4 class="text-sm font-extrabold text-foreground">ລາຍເຊັນໃບບິນ</h4>
                                 <div x-data="{ preview: null, currentSig: '<?= htmlspecialchars($settings['bill_signature'] ?? '') ?>' }" class="flex items-center gap-3">
-                                    <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden border shrink-0">
+                                    <div class="h-16 w-16 rounded-xl bg-gradient-to-br from-muted to-muted flex items-center justify-center overflow-hidden border shrink-0">
                                         <template x-if="currentSig && !preview">
                                             <img :src="currentSig" class="h-full w-full object-cover">
                                         </template>
@@ -158,19 +158,19 @@
                                 </div>
                                 <div class="flex gap-2">
                                     <div class="flex-1 min-w-0">
-                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ກ້ວາງ</label>
+                                        <label class="text-xs font-bold text-muted-foreground mb-1 block">ກ້ວາງ</label>
                                         <input type="number" name="bill_signature_width" min="20" max="500" value="<?= htmlspecialchars($settings['bill_signature_width'] ?? '150') ?>"
-                                               class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                               class="w-full px-3 py-2 border border-border rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ສູງ</label>
+                                        <label class="text-xs font-bold text-muted-foreground mb-1 block">ສູງ</label>
                                         <input type="number" name="bill_signature_height" min="20" max="500" value="<?= htmlspecialchars($settings['bill_signature_height'] ?? '50') ?>"
-                                               class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                               class="w-full px-3 py-2 border border-border rounded-xl text-sm text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <label class="text-xs font-bold text-gray-500 mb-1 block">ຕຳແໜ່ງ</label>
+                                        <label class="text-xs font-bold text-muted-foreground mb-1 block">ຕຳແໜ່ງ</label>
                                         <select name="bill_signature_position"
-                                                class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                                class="w-full px-3 py-2 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                             <option value="center" <?= ($settings['bill_signature_position'] ?? 'center') === 'center' ? 'selected' : '' ?>>ກາງ</option>
                                             <option value="top-left" <?= ($settings['bill_signature_position'] ?? '') === 'top-left' ? 'selected' : '' ?>>ຊ້າຍ-ເທິງ</option>
                                             <option value="top-center" <?= ($settings['bill_signature_position'] ?? '') === 'top-center' ? 'selected' : '' ?>>ກາງ-ເທິງ</option>
@@ -187,8 +187,8 @@
 
                             <!-- Bill Terms -->
                             <div class="space-y-3">
-                                <h4 class="text-sm font-extrabold text-gray-800">ເງື່ອນໄຂໃບບິນ</h4>
-                                <textarea name="bill_terms" rows="4" class="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none" placeholder='ຕົວຢ່າງ: ເສັ້ນສະເໜີລາຄາ 60 ວັນ / ຈັດສົ່ງ 14 ວັນ ຫຼັງ PO / ເຄຣດິດ 30 ວັນ'><?= htmlspecialchars($settings['bill_terms'] ?? '') ?></textarea>
+                                <h4 class="text-sm font-extrabold text-foreground">ເງື່ອນໄຂໃບບິນ</h4>
+                                <textarea name="bill_terms" rows="4" class="w-full px-3 py-2 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none resize-none" placeholder='ຕົວຢ່າງ: ເສັ້ນສະເໜີລາຄາ 60 ວັນ / ຈັດສົ່ງ 14 ວັນ ຫຼັງ PO / ເຄຣດິດ 30 ວັນ'><?= htmlspecialchars($settings['bill_terms'] ?? '') ?></textarea>
                             </div>
 
                             <!-- Save Button -->
@@ -201,9 +201,9 @@
 
                 <!-- Right: Items -->
                 <div class="lg:col-span-2 space-y-6">
-                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                    <div class="bg-card rounded-2xl border border-border shadow-sm p-6">
                         <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-base font-extrabold text-gray-800">ລາຍການສິນຄ້າ</h2>
+                            <h2 class="text-base font-extrabold text-foreground">ລາຍການສິນຄ້າ</h2>
                             <div class="flex items-center gap-2">
                                 <button @click="openProductBrowser()" type="button" class="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-bold hover:bg-emerald-100 transition-all">
                                     <i class="fas fa-box"></i> ລາຍການສິນຄ້າ
@@ -217,21 +217,21 @@
                         <div class="overflow-x-auto" @scroll="closeOpenDropdowns()">
                             <table class="w-full text-sm">
                                 <thead>
-                                    <tr class="border-b border-gray-100">
-                                        <th class="py-2 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:36px">#</th>
-                                        <th class="py-2 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:40px">ຮູບ</th>
-                                        <th class="py-2 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລາຍການ</th>
-                                        <th class="py-2 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:70px">ຈຳນວນ</th>
-                                        <th class="py-2 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:60px">ຫົວໜ່ວຍ</th>
-                                        <th class="py-2 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-right" style="width:120px">ລາຄາ/ໜ່ວຍ</th>
-                                        <th class="py-2 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-right" style="width:120px">ຈຳນວນເງິນ</th>
+                                    <tr class="border-b border-border">
+                                        <th class="py-2 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-center" style="width:36px">#</th>
+                                        <th class="py-2 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-center" style="width:40px">ຮູບ</th>
+                                        <th class="py-2 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ລາຍການ</th>
+                                        <th class="py-2 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-center" style="width:70px">ຈຳນວນ</th>
+                                        <th class="py-2 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-center" style="width:60px">ຫົວໜ່ວຍ</th>
+                                        <th class="py-2 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-right" style="width:120px">ລາຄາ/ໜ່ວຍ</th>
+                                        <th class="py-2 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-right" style="width:120px">ຈຳນວນເງິນ</th>
                                         <th class="py-2 px-2 text-center" style="width:32px"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <template x-for="(item, index) in items" :key="index">
                                         <tr class="border-b border-gray-50">
-                                            <td class="py-2 px-2 text-gray-400 text-xs text-center" x-text="index + 1"></td>
+                                            <td class="py-2 px-2 text-muted-foreground text-xs text-center" x-text="index + 1"></td>
                                             <td class="py-2 px-2 text-center">
                                                 <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center overflow-hidden mx-auto">
                                                     <template x-if="item.image">
@@ -244,9 +244,9 @@
                                             </td>
                                             <td class="py-2 px-2">
                                                 <div class="relative" @click.away="item.showDropdown = false">
-                                                    <input type="text" x-model="item.product_name" @focus="searchProduct(item, $el)" @input.debounce="searchProduct(item, $el)" placeholder="ຊື່ສິນຄ້າ..." class="w-full px-2 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                                    <input type="text" x-model="item.product_name" @focus="searchProduct(item, $el)" @input.debounce="searchProduct(item, $el)" placeholder="ຊື່ສິນຄ້າ..." class="w-full px-2 py-1.5 bg-gray-50 border border-border rounded-lg text-xs focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                                     <template x-if="item.showDropdown && item.searchResults?.length > 0">
-                                                        <div class="fixed z-[9999] max-h-40 overflow-y-auto bg-white border rounded-xl shadow-xl"
+                                                        <div class="fixed z-[9999] max-h-40 overflow-y-auto bg-card border rounded-xl shadow-xl"
                                                              :style="item.searchDropdownStyle">
                                                             <template x-for="p in item.searchResults" :key="p.id">
                                                                 <div @click="selectProduct(item, p)" class="px-3 py-2 hover:bg-gray-50 cursor-pointer border-b last:border-0 flex items-center gap-2">
@@ -254,8 +254,8 @@
                                                                         <img :src="p.image" class="w-full h-full object-cover">
                                                                     </div>
                                                                     <div>
-                                                                        <div class="text-xs font-bold text-gray-800" x-text="p.name"></div>
-                                                                        <div class="text-[9px] text-gray-400" x-text="p.sku || ''"></div>
+                                                                        <div class="text-xs font-bold text-foreground" x-text="p.name"></div>
+                                                                        <div class="text-[9px] text-muted-foreground" x-text="p.sku || ''"></div>
                                                                     </div>
                                                                 </div>
                                                             </template>
@@ -266,15 +266,15 @@
                                                 <input type="hidden" :name="'items[' + index + '][product_name]'" x-model="item.product_name">
                                             </td>
                                             <td class="py-2 px-2">
-                                                <input type="number" :name="'items[' + index + '][quantity]'" x-model="item.quantity" @input="calcItemAmount(item)" min="0" step="1" class="w-full px-2 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs text-center font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                                <input type="number" :name="'items[' + index + '][quantity]'" x-model="item.quantity" @input="calcItemAmount(item)" min="0" step="1" class="w-full px-2 py-1.5 bg-gray-50 border border-border rounded-lg text-xs text-center font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                             </td>
                                             <td class="py-2 px-2">
-                                                <input type="text" :name="'items[' + index + '][unit]'" x-model="item.unit" class="w-full px-2 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                                <input type="text" :name="'items[' + index + '][unit]'" x-model="item.unit" class="w-full px-2 py-1.5 bg-gray-50 border border-border rounded-lg text-xs text-center focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                             </td>
                                             <td class="py-2 px-2">
-                                                <input type="number" :name="'items[' + index + '][unit_price]'" x-model="item.unit_price" @input="calcItemAmount(item)" min="0" step="1" class="w-full px-2 py-1.5 bg-gray-50 border border-gray-100 rounded-lg text-xs text-right font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                                <input type="number" :name="'items[' + index + '][unit_price]'" x-model="item.unit_price" @input="calcItemAmount(item)" min="0" step="1" class="w-full px-2 py-1.5 bg-gray-50 border border-border rounded-lg text-xs text-right font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                             </td>
-                                            <td class="py-2 px-2 text-right font-bold text-gray-800 text-xs" x-text="formatPrice(item.amount)"></td>
+                                            <td class="py-2 px-2 text-right font-bold text-foreground text-xs" x-text="formatPrice(item.amount)"></td>
                                             <td class="py-2 px-2 text-center">
                                                 <button @click="removeItem(index)" type="button" class="text-gray-300 hover:text-red-500 transition-colors"><i class="fas fa-times text-xs"></i></button>
                                             </td>
@@ -282,7 +282,7 @@
                                     </template>
                                     <template x-if="items.length === 0">
                                         <tr>
-                                            <td colspan="8" class="py-8 text-center text-gray-400">
+                                            <td colspan="8" class="py-8 text-center text-muted-foreground">
                                                 <i class="fas fa-box-open text-2xl mb-2 block"></i>
                                                 <p class="text-xs font-bold">ຍັງບໍ່ມີລາຍການ</p>
                                                 <p class="text-[10px] mt-1">ກົດ "ເພີ່ມລາຍການ" ເພື່ອເລີ່ມຕື່ມ</p>
@@ -294,24 +294,24 @@
                         </div>
 
                         <!-- Totals -->
-                        <div class="mt-4 pt-4 border-t border-gray-100 flex flex-col items-end">
+                        <div class="mt-4 pt-4 border-t border-border flex flex-col items-end">
                             <div class="w-full max-w-xs space-y-1.5">
                                 <div class="flex justify-between text-xs">
-                                    <span class="text-gray-500">ລວມຍ່ອຍ</span>
-                                    <span class="font-bold text-gray-800" x-text="formatPrice(subtotal)"></span>
+                                    <span class="text-muted-foreground">ລວມຍ່ອຍ</span>
+                                    <span class="font-bold text-foreground" x-text="formatPrice(subtotal)"></span>
                                 </div>
                                 <div class="flex justify-between text-xs">
-                                    <span class="text-gray-500">ສ່ວນຫຼຸດ</span>
-                                    <input type="number" name="discount" x-model="discount" @input="calcTotals()" min="0" class="w-20 px-2 py-0.5 bg-gray-50 border border-gray-100 rounded text-xs text-right font-bold focus:ring-1 focus:ring-primary outline-none">
+                                    <span class="text-muted-foreground">ສ່ວນຫຼຸດ</span>
+                                    <input type="number" name="discount" x-model="discount" @input="calcTotals()" min="0" class="w-20 px-2 py-0.5 bg-gray-50 border border-border rounded text-xs text-right font-bold focus:ring-1 focus:ring-primary outline-none">
                                 </div>
                                 <div class="flex justify-between text-xs">
-                                    <span class="text-gray-500">ອາກອນມູນຄ່າເພີ້ມ</span>
+                                    <span class="text-muted-foreground">ອາກອນມູນຄ່າເພີ້ມ</span>
                                     <div class="flex items-center gap-1">
-                                        <input type="number" name="tax_percent" x-model="taxPercent" @input="calcTotals()" min="0" max="100" step="0.01" class="w-14 px-2 py-0.5 bg-gray-50 border border-gray-100 rounded text-xs text-right font-bold focus:ring-1 focus:ring-primary outline-none">
-                                        <span class="text-gray-400">%</span>
+                                        <input type="number" name="tax_percent" x-model="taxPercent" @input="calcTotals()" min="0" max="100" step="0.01" class="w-14 px-2 py-0.5 bg-gray-50 border border-border rounded text-xs text-right font-bold focus:ring-1 focus:ring-primary outline-none">
+                                        <span class="text-muted-foreground">%</span>
                                     </div>
                                 </div>
-                                <div class="flex justify-between text-base font-black text-primary border-t border-gray-100 pt-1.5">
+                                <div class="flex justify-between text-base font-black text-primary border-t border-border pt-1.5">
                                     <span>ລວມທັງໝົດ</span>
                                     <span x-text="formatPrice(grandTotal)"></span>
                                 </div>
@@ -325,7 +325,7 @@
                     <input type="hidden" name="grand_total" x-model="grandTotal">
 
                     <div class="flex items-center justify-end gap-3">
-                        <a href="<?= url('/admin/quotations') ?>" class="px-5 py-2.5 bg-gray-100 text-gray-600 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">ຍົກເລີກ</a>
+                        <a href="<?= url('/admin/quotations') ?>" class="px-5 py-2.5 bg-gray-100 text-foreground/70 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">ຍົກເລີກ</a>
                         <?php if ($isEdit): ?>
                         <a href="<?= url('/admin/quotations/' . $quotation['id'] . '/print') ?>" target="_blank" class="px-5 py-2.5 bg-red-500 text-white rounded-xl font-bold text-sm hover:bg-red-600 transition-all shadow-lg shadow-red-300 inline-flex items-center gap-2">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
@@ -346,21 +346,21 @@
              x-cloak>
             <div class="fixed inset-0 bg-black/40 z-0"
                  @click="closeProductBrowser()"></div>
-            <div class="relative z-50 w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
+            <div class="relative z-50 w-full max-w-lg bg-card rounded-2xl shadow-2xl flex flex-col max-h-[85vh] overflow-hidden">
                 <!-- Header -->
-                <div class="flex items-center justify-between p-4 border-b border-gray-100 flex-shrink-0">
-                    <h3 class="text-base font-extrabold text-gray-800">
+                <div class="flex items-center justify-between p-4 border-b border-border flex-shrink-0">
+                    <h3 class="text-base font-extrabold text-foreground">
                         <i class="fas fa-box text-primary mr-2"></i>ລາຍການສິນຄ້າ
                     </h3>
-                    <button @click="closeProductBrowser()" type="button" class="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-all">
+                    <button @click="closeProductBrowser()" type="button" class="h-8 w-8 rounded-lg bg-gray-100 flex items-center justify-center text-muted-foreground hover:bg-gray-200 transition-all">
                         <i class="fas fa-times text-xs"></i>
                     </button>
                 </div>
                 <!-- Search -->
                 <div class="p-4 border-b border-gray-50 flex-shrink-0">
                     <div class="relative">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                        <input type="text" x-model="productSearch" @input.debounce.500ms="onProductSearchInput()" placeholder="ຄົ້ນຫາຊື່ສິນຄ້າ..." class="w-full pl-8 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs"></i>
+                        <input type="text" x-model="productSearch" @input.debounce.500ms="onProductSearchInput()" placeholder="ຄົ້ນຫາຊື່ສິນຄ້າ..." class="w-full pl-8 pr-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                     </div>
                 </div>
                 <!-- Product List (scrollable, infinite scroll) -->
@@ -370,7 +370,7 @@
                             <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-3">
                                 <i class="fas fa-box-open text-2xl"></i>
                             </div>
-                            <p class="text-sm font-bold text-gray-600">ບໍ່ພົບສິນຄ້າ</p>
+                            <p class="text-sm font-bold text-foreground/70">ບໍ່ພົບສິນຄ້າ</p>
                         </div>
                     </template>
                     <div class="divide-y divide-gray-50">
@@ -378,7 +378,7 @@
                             <div @click="addProductFromBrowser(p)"
                                  class="flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-gray-50 rounded-xl mx-1"
                                  :class="isProductInItems(p.id) ? 'bg-primary/5' : ''">
-                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center text-gray-300 overflow-hidden flex-shrink-0">
+                                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-muted to-muted flex items-center justify-center text-gray-300 overflow-hidden flex-shrink-0">
                                     <template x-if="p.image">
                                         <img :src="p.image" class="h-full w-full object-cover">
                                     </template>
@@ -387,8 +387,8 @@
                                     </template>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <div class="text-sm font-bold text-gray-800 truncate" x-text="p.name"></div>
-                                    <div class="text-[11px] text-gray-400 truncate" x-text="p.sku || ''"></div>
+                                    <div class="text-sm font-bold text-foreground truncate" x-text="p.name"></div>
+                                    <div class="text-[11px] text-muted-foreground truncate" x-text="p.sku || ''"></div>
                                     <div class="text-xs font-bold text-primary mt-0.5" x-text="formatPrice(p.selling_price)"></div>
                                 </div>
                                 <template x-if="isProductInItems(p.id)">
@@ -404,17 +404,17 @@
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                             </svg>
-                            <span class="ml-2 text-xs text-gray-500">ກຳລັງໂຫຼດ...</span>
+                            <span class="ml-2 text-xs text-muted-foreground">ກຳລັງໂຫຼດ...</span>
                         </div>
                     </template>
                     <template x-if="!loading && !hasMore && filteredProducts.length > 0">
-                        <div class="py-4 text-center text-[10px] text-gray-400">— ທັງໝົດແລ້ວ —</div>
+                        <div class="py-4 text-center text-[10px] text-muted-foreground">— ທັງໝົດແລ້ວ —</div>
                     </template>
                 </div>
                 <!-- Footer -->
-                <div class="p-4 border-t border-gray-100 flex items-center justify-between rounded-b-2xl bg-gray-50/50 flex-shrink-0">
-                    <span class="text-xs text-gray-500" x-text="filteredProducts.length + ' ລາຍການ'"></span>
-                    <button @click="closeProductBrowser()" type="button" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold hover:bg-gray-200 transition-all">ປິດ</button>
+                <div class="p-4 border-t border-border flex items-center justify-between rounded-b-2xl bg-gray-50/50 flex-shrink-0">
+                    <span class="text-xs text-muted-foreground" x-text="filteredProducts.length + ' ລາຍການ'"></span>
+                    <button @click="closeProductBrowser()" type="button" class="px-4 py-2 bg-gray-100 text-foreground/70 rounded-xl text-xs font-bold hover:bg-gray-200 transition-all">ປິດ</button>
                 </div>
             </div>
         </div>

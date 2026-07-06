@@ -160,14 +160,13 @@ class HomeController
             $errors = [];
             if (empty($fullname)) $errors[] = 'ກະລຸນາປ້ອນຊື່ ແລະ ນາມສະກຸນ';
             if (empty($phone)) $errors[] = 'ກະລຸນາປ້ອນເບີໂທລະສັບ';
-            if (empty($email)) $errors[] = 'ກະລຸນາປ້ອນອີເມວ';
             if (empty($password)) $errors[] = 'ກະລຸນາປ້ອນລະຫັດຜ່ານ';
             if ($password !== $confirm) $errors[] = 'ລະຫັດຜ່ານບໍ່ກົງກັນ';
             if (strlen($password) < 6) $errors[] = 'ລະຫັດຜ່ານຕ້ອງມີຢ່າງໜ້ອຍ 6 ຕົວອັກສອນ';
 
             $customerModel = new Customer();
 
-            if ($customerModel->findByEmail($email)) {
+            if (!empty($email) && $customerModel->findByEmail($email)) {
                 $errors[] = 'ອີເມວນີ້ຖືກນຳໃຊ້ແລ້ວ';
             }
             if ($customerModel->findByPhone($phone)) {

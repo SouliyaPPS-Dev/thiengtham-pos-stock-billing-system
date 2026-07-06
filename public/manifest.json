@@ -10,6 +10,8 @@
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#0ea5e9",
+  "background_color_dark": "#0f172a",
+  "theme_color_dark": "#0f172a",
   "categories": ["business", "productivity"],
   "icons": [
     {

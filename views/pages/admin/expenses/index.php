@@ -1,10 +1,10 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-sky-50/30 p-4 md:p-8" x-data="expenseApp()" x-init="init()">
+<div class="min-h-screen bg-background p-4 md:p-8" x-data="expenseApp()" x-init="init()">
     <div class="max-w-7xl mx-auto space-y-6 animate-fade-in">
 
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">ລາຍຈ່າຍ</h1>
-                <p class="text-sm text-gray-500 mt-0.5">ຈັດການລາຍຈ່າຍຂອງຮ້ານ</p>
+                <p class="text-sm text-muted-foreground mt-0.5">ຈັດການລາຍຈ່າຍຂອງຮ້ານ</p>
             </div>
             <button @click="openAddModal()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
                 <i class="fas fa-plus"></i>
@@ -12,16 +12,16 @@
             </button>
         </div>
 
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+        <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
             <div class="flex flex-col sm:flex-row gap-3 mb-6">
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-bold text-gray-400">ເດືອນ</label>
+                    <label class="text-xs font-bold text-muted-foreground">ເດືອນ</label>
                     <input type="month" name="month" x-model="selectedMonth" @change="fetchExpenses()"
-                           class="px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                           class="px-3 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                 </div>
                 <div class="flex-1"></div>
                 <div class="text-right">
-                    <p class="text-xs text-gray-500">ລວມລາຍຈ່າຍທັງໝົດ</p>
+                    <p class="text-xs text-muted-foreground">ລວມລາຍຈ່າຍທັງໝົດ</p>
                     <p class="text-2xl font-black text-red-600" x-text="formatPrice(totalExpenses)"></p>
                 </div>
             </div>
@@ -29,13 +29,13 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b border-gray-100">
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ວັນທີ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ໝວດ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ລາຍການ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຈຳນວນເງິນ</th>
-                            <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider"></th>
+                        <tr class="border-b border-border">
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ວັນທີ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ໝວດ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ລາຍການ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ຈຳນວນເງິນ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,23 +46,23 @@
                                         <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                             <i class="fas fa-money-bill-wave text-2xl"></i>
                                         </div>
-                                        <p class="text-base font-bold text-gray-600">ຍັງບໍ່ມີລາຍຈ່າຍ</p>
-                                        <p class="text-sm text-gray-400 mt-1">ລາຍຈ່າຍຈະສະແດງຢູ່ນີ້</p>
+                                        <p class="text-base font-bold text-foreground/70">ຍັງບໍ່ມີລາຍຈ່າຍ</p>
+                                        <p class="text-sm text-muted-foreground mt-1">ລາຍຈ່າຍຈະສະແດງຢູ່ນີ້</p>
                                     </div>
                                 </td>
                             </tr>
                         </template>
                         <template x-for="(expense, index) in expenses" :key="expense.id">
                             <tr class="border-b border-gray-50 last:border-0">
-                                <td class="py-3 px-2 text-gray-400 text-sm text-center" x-text="index + 1"></td>
-                                <td class="py-3 px-2 text-gray-600" x-text="expense.date"></td>
+                                <td class="py-3 px-2 text-muted-foreground text-sm text-center" x-text="index + 1"></td>
+                                <td class="py-3 px-2 text-foreground/70" x-text="expense.date"></td>
                                 <td class="py-3 px-2">
                                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold"
                                           :class="getCategoryColor(expense.category)">
                                         <span x-text="expense.category_name || expense.category"></span>
                                     </span>
                                 </td>
-                                <td class="py-3 px-2 text-gray-800 font-medium" x-text="expense.description"></td>
+                                <td class="py-3 px-2 text-foreground font-medium" x-text="expense.description"></td>
                                 <td class="py-3 px-2 font-bold text-red-600" x-text="formatPrice(expense.amount)"></td>
                                 <td class="py-3 px-2">
                                     <div class="flex items-center gap-1">
@@ -81,20 +81,20 @@
             </div>
         </div>
 
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 md:p-8">
+        <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                 <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-purple-200">
                     <i class="fas fa-tags text-sm"></i>
                 </div>
                 <div>
-                    <h2 class="text-base font-extrabold text-gray-800">ຈັດການໝວດລາຍຈ່າຍ</h2>
-                    <p class="text-xs text-gray-400">ເພີ່ມ ຫຼື ຈັດການໝວດລາຍຈ່າຍ</p>
+                    <h2 class="text-base font-extrabold text-foreground">ຈັດການໝວດລາຍຈ່າຍ</h2>
+                    <p class="text-xs text-muted-foreground">ເພີ່ມ ຫຼື ຈັດການໝວດລາຍຈ່າຍ</p>
                 </div>
             </div>
             <div x-data="categoryManager()">
                 <form @submit.prevent="addCategory()" class="flex gap-3 mb-4">
                     <input type="text" x-model="newCategoryName" required placeholder="ຊື່ໝວດລາຍຈ່າຍໃໝ່"
-                           class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                           class="flex-1 px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                     <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-bold text-sm hover:from-purple-600 hover:to-purple-700 transition-all shadow-lg shadow-purple-200 active:scale-[0.97]">
                         <i class="fas fa-plus"></i> ເພີ່ມ
                     </button>
@@ -102,24 +102,24 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead>
-                            <tr class="border-b border-gray-100">
-                                <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
-                                <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider">ຊື່ໝວດ</th>
-                                <th class="py-3 px-2 font-bold text-gray-500 text-xs uppercase tracking-wider" style="width:120px"></th>
+                            <tr class="border-b border-border">
+                                <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
+                                <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ຊື່ໝວດ</th>
+                                <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider" style="width:120px"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <template x-if="categories.length === 0">
                                 <tr>
-                                    <td colspan="3" class="py-8 text-center text-gray-400 text-sm">ຍັງບໍ່ມີໝວດລາຍຈ່າຍ</td>
+                                    <td colspan="3" class="py-8 text-center text-muted-foreground text-sm">ຍັງບໍ່ມີໝວດລາຍຈ່າຍ</td>
                                 </tr>
                             </template>
                             <template x-for="(cat, index) in categories" :key="cat.id">
                                 <tr class="border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors">
-                                    <td class="py-3 px-2 text-gray-400 text-sm text-center" x-text="index + 1"></td>
+                                    <td class="py-3 px-2 text-muted-foreground text-sm text-center" x-text="index + 1"></td>
                                     <td class="py-3 px-2">
                                         <template x-if="editingId !== cat.id">
-                                            <span class="font-medium text-gray-800" x-text="cat.name"></span>
+                                            <span class="font-medium text-foreground" x-text="cat.name"></span>
                                         </template>
                                         <template x-if="editingId === cat.id">
                                             <input type="text" x-model="editName" @keydown.enter="updateCategory(cat.id)"
@@ -217,23 +217,23 @@
     </div>
 
     <div id="expenseModal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4" onclick="closeModal(event)">
-        <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-md" onclick="event.stopPropagation()">
+        <div class="bg-card rounded-2xl shadow-xl p-6 md:p-8 w-full max-w-md" onclick="event.stopPropagation()">
             <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                 <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-red-400 to-red-500 flex items-center justify-center text-white shadow-lg shadow-red-200">
                     <i class="fas fa-money-bill-wave text-sm"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-extrabold text-gray-800" x-text="isEditing ? 'ແກ້ໄຂລາຍຈ່າຍ' : 'ເພີ່ມລາຍຈ່າຍ'"></h3>
+                    <h3 class="text-base font-extrabold text-foreground" x-text="isEditing ? 'ແກ້ໄຂລາຍຈ່າຍ' : 'ເພີ່ມລາຍຈ່າຍ'"></h3>
                 </div>
             </div>
             <form @submit.prevent="saveExpense()" class="space-y-4">
                 <div class="space-y-1.5">
-                    <label class="text-sm font-bold text-gray-700">ວັນທີ <span class="text-red-400">*</span></label>
-                    <input type="date" x-model="form.date" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                    <label class="text-sm font-bold text-foreground/85">ວັນທີ <span class="text-red-400">*</span></label>
+                    <input type="date" x-model="form.date" required class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-sm font-bold text-gray-700">ໝວດ <span class="text-red-400">*</span></label>
-                    <select x-model="form.category" required class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                    <label class="text-sm font-bold text-foreground/85">ໝວດ <span class="text-red-400">*</span></label>
+                    <select x-model="form.category" required class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                         <option value="">-- ເລືອກໝວດ --</option>
                         <?php foreach ($expenseCategories ?? [] as $cat): ?>
                         <option value="<?= $cat['id'] ?>"><?= htmlspecialchars($cat['name']) ?></option>
@@ -241,20 +241,20 @@
                     </select>
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-sm font-bold text-gray-700">ລາຍການ <span class="text-red-400">*</span></label>
+                    <label class="text-sm font-bold text-foreground/85">ລາຍການ <span class="text-red-400">*</span></label>
                     <input type="text" x-model="form.description" required placeholder="ລາຍລະອຽດລາຍຈ່າຍ"
-                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                           class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                 </div>
                 <div class="space-y-1.5">
-                    <label class="text-sm font-bold text-gray-700">ຈຳນວນເງິນ <span class="text-red-400">*</span></label>
+                    <label class="text-sm font-bold text-foreground/85">ຈຳນວນເງິນ <span class="text-red-400">*</span></label>
                     <input type="number" x-model="form.amount" min="0" required placeholder="0"
-                           class="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                           class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                 </div>
                 <div class="flex items-center gap-3 pt-2">
                     <button type="submit" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
                         <i class="fas fa-save"></i> <span x-text="isEditing ? 'ບັນທຶກການແກ້ໄຂ' : 'ບັນທຶກ'"></span>
                     </button>
-                    <button type="button" @click="closeModalWindow()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">
+                    <button type="button" @click="closeModalWindow()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-100 text-foreground/85 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">
                         <i class="fas fa-times"></i> ຍົກເລີກ
                     </button>
                 </div>
@@ -299,7 +299,7 @@ function expenseApp() {
 
         getCategoryColor(category) {
             const colors = ['bg-blue-50 text-blue-600', 'bg-green-50 text-green-600', 'bg-purple-50 text-purple-600', 'bg-amber-50 text-amber-600', 'bg-rose-50 text-rose-600', 'bg-cyan-50 text-cyan-600'];
-            return colors[parseInt(category) % colors.length] || 'bg-gray-50 text-gray-600';
+            return colors[parseInt(category) % colors.length] || 'bg-gray-50 text-foreground/70';
         },
 
         openAddModal() {

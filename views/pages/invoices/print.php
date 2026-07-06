@@ -237,7 +237,7 @@
             <tbody>
                 <?php foreach ($invoice['items'] ?? [] as $i => $item): ?>
                 <tr>
-                    <td class="text-center text-gray-400"><?= $i + 1 ?></td>
+                    <td class="text-center text-muted-foreground"><?= $i + 1 ?></td>
                     <td><?= htmlspecialchars($item['product_name'] ?? $item['name']) ?></td>
                     <td class="text-center"><?= (int)($item['quantity'] ?? $item['qty']) ?></td>
                     <td class="text-right"><?= number_format($item['price'], 0) ?></td>

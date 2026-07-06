@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="lo">
+<html lang="lo" x-data="theme">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,15 @@
     <meta name="description" content="<?= htmlspecialchars($metaDescription ?? 'ຮ້ານຄ້າອອນລາຍ') ?>">
 
     <link rel="icon" type="image/png" href="<?= url('/public/icon-192.png') ?>">
+
+    <script>
+    (function() {
+        var t = localStorage.getItem('theme');
+        if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+    })();
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,6 +25,18 @@
 
     <link rel="stylesheet" href="<?= url('/public/css/app.css') ?>?v=<?= filemtime(dirname(__DIR__, 2) . '/public/css/app.css') ?>">
 
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('theme', () => ({
+                isDark: document.documentElement.classList.contains('dark'),
+                toggle() {
+                    this.isDark = !this.isDark;
+                    document.documentElement.classList.toggle('dark', this.isDark);
+                    localStorage.setItem('theme', this.isDark ? 'dark' : 'light');
+                }
+            }));
+        });
+    </script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -28,21 +49,21 @@
         .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
-<body x-data="{ mobileMenu: false, searchOpen: false, cartOpen: false }" class="bg-gray-50 min-h-screen flex flex-col">
+<body x-data="{ mobileMenu: false, searchOpen: false, cartOpen: false }" class="bg-background min-h-screen flex flex-col">
 
     <!-- Top Header Bar -->
-    <header class="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+    <header class="bg-card shadow-sm border-b border-border sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 lg:h-20">
 
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
-                    <button @click="mobileMenu = !mobileMenu" class="lg:hidden h-10 w-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors">
+                    <button @click="mobileMenu = !mobileMenu" class="lg:hidden h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
                         <i class="fas fa-bars text-lg"></i>
                     </button>
                     <a href="<?= url('/') ?>" class="flex items-center gap-2.5 flex-shrink-0">
                         <?php $__logo = get_store_logo(); if ($__logo): ?>
-                        <div class="h-10 w-10 rounded-xl overflow-hidden flex-shrink-0 bg-white border border-gray-100">
+                        <div class="h-10 w-10 rounded-xl overflow-hidden flex-shrink-0 bg-card border border-border">
                             <img src="<?= htmlspecialchars($__logo) ?>" class="h-full w-full object-cover">
                         </div>
                         <?php else: ?>
@@ -50,15 +71,15 @@
                             <i class="fas fa-store text-sm"></i>
                         </div>
                         <?php endif; ?>
-                        <span class="font-black text-lg text-gray-800 hidden sm:block"><?= htmlspecialchars(get_store_name()) ?></span>
+                        <span class="font-black text-lg text-foreground hidden sm:block"><?= htmlspecialchars(get_store_name()) ?></span>
                     </a>
                 </div>
 
                 <!-- Search Bar (Desktop) -->
                 <div class="hidden lg:flex flex-1 max-w-lg mx-8">
                     <form action="<?= url('/products') ?>" method="GET" class="w-full relative">
-                        <input type="text" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="ຄົ້ນຫາສິນຄ້າ..." class="w-full pl-11 pr-4 py-2.5 bg-gray-100 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm transition-all focus:bg-white">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
+                        <input type="text" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="ຄົ້ນຫາສິນຄ້າ..." class="w-full pl-11 pr-4 py-2.5 bg-muted border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm transition-all focus:bg-card">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted-foreground">
                             <i class="fas fa-search text-sm"></i>
                         </span>
                     </form>
@@ -68,25 +89,25 @@
                 <div class="flex items-center gap-2">
 
                     <!-- Search (Mobile) -->
-                    <button @click="searchOpen = !searchOpen" class="lg:hidden h-10 w-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors">
+                    <button @click="searchOpen = !searchOpen" class="lg:hidden h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
                         <i class="fas fa-search text-lg"></i>
                     </button>
 
                     <!-- Account -->
                     <a href="<?= isset($_SESSION['customer']) ? '#' : url('/login-customer') ?>"
                        @click="<?= isset($_SESSION['customer']) ? 'cartOpen = !cartOpen' : '' ?>"
-                       class="hidden sm:flex items-center gap-2 h-10 px-3 rounded-xl hover:bg-gray-100 transition-colors group relative">
+                       class="hidden sm:flex items-center gap-2 h-10 px-3 rounded-xl hover:bg-muted transition-colors group relative">
                         <div class="h-8 w-8 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 group-hover:bg-sky-100 transition-colors">
                             <i class="fas fa-user text-sm"></i>
                         </div>
-                        <span class="text-sm font-bold text-gray-700 hidden md:block">
+                        <span class="text-sm font-bold text-foreground/85 hidden md:block">
                             <?= isset($_SESSION['customer']) ? htmlspecialchars($_SESSION['customer']['fullname']) : 'ເຂົ້າສູ່ລະບົບ' ?>
                         </span>
                         <?php if (isset($_SESSION['customer'])): ?>
-                        <div x-show="cartOpen" @click.away="cartOpen = false" class="absolute top-full right-0 mt-1 w-56 bg-white rounded-xl border border-gray-100 shadow-xl p-2 z-50" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
-                            <div class="p-3 border-b border-gray-100 mb-1">
-                                <p class="text-sm font-bold text-gray-800"><?= htmlspecialchars($_SESSION['customer']['fullname']) ?></p>
-                                <p class="text-xs text-gray-500"><?= htmlspecialchars($_SESSION['customer']['email'] ?? $_SESSION['customer']['phone'] ?? '') ?></p>
+                        <div x-show="cartOpen" @click.away="cartOpen = false" class="absolute top-full right-0 mt-1 w-56 bg-card rounded-xl border border-border shadow-xl p-2 z-50" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+                            <div class="p-3 border-b border-border mb-1">
+                                <p class="text-sm font-bold text-foreground"><?= htmlspecialchars($_SESSION['customer']['fullname']) ?></p>
+                                <p class="text-xs text-muted-foreground"><?= htmlspecialchars($_SESSION['customer']['email'] ?? $_SESSION['customer']['phone'] ?? '') ?></p>
                             </div>
                             <a href="<?= url('/logout-customer') ?>" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-lg text-xs font-bold transition-all">
                                 <i class="fas fa-sign-out-alt"></i>
@@ -96,15 +117,20 @@
                         <?php endif; ?>
                     </a>
 
+                    <!-- Theme Toggle -->
+                    <button @click="toggle()" class="h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors" :title="isDark ? 'ເປີດໂໝດກາງເວັນ' : 'ເປີດໂໝດກາງຄືນ'">
+                        <i class="fas text-lg" :class="isDark ? 'fa-sun' : 'fa-moon'"></i>
+                    </button>
+
                     <!-- Cart -->
-                    <a href="<?= url('/cart') ?>" class="relative h-10 w-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors">
+                    <a href="<?= url('/cart') ?>" class="relative h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
                         <i class="fas fa-shopping-cart text-lg"></i>
                         <span id="cart-count-badge"
                               class="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-sky-500 text-white text-[11px] font-black flex items-center justify-center shadow-sm shadow-sky-200 <?= ((int)($cartCount ?? 0) > 0) ? '' : 'hidden' ?>"><?= (int)($cartCount ?? 0) ?></span>
                     </a>
 
                     <!-- Mobile Menu Toggle -->
-                    <button @click="mobileMenu = !mobileMenu" class="lg:hidden h-10 w-10 rounded-xl flex items-center justify-center text-gray-500 hover:bg-gray-100 transition-colors">
+                    <button @click="mobileMenu = !mobileMenu" class="lg:hidden h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
                         <i class="fas fa-ellipsis-v"></i>
                     </button>
                 </div>
@@ -113,8 +139,8 @@
             <!-- Mobile Search -->
             <div x-show="searchOpen" x-collapse class="lg:hidden pb-3">
                 <form action="<?= url('/products') ?>" method="GET" class="relative">
-                    <input type="text" name="search" placeholder="ຄົ້ນຫາສິນຄ້າ..." class="w-full pl-11 pr-4 py-3 bg-gray-100 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
+                    <input type="text" name="search" placeholder="ຄົ້ນຫາສິນຄ້າ..." class="w-full pl-11 pr-4 py-3 bg-muted border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted-foreground">
                         <i class="fas fa-search"></i>
                     </span>
                 </form>
@@ -122,13 +148,13 @@
         </div>
 
         <!-- Navigation -->
-        <nav class="hidden lg:block border-t border-gray-100 bg-white">
+        <nav class="hidden lg:block border-t border-border bg-card">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center gap-1 h-12">
-                    <a href="<?= url('/') ?>" class="px-4 py-2 text-sm font-bold text-gray-600 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all <?= ($_SERVER['REQUEST_URI'] ?? '/') === '/' || ($_SERVER['REQUEST_URI'] ?? '/') === '/index.php' ? 'text-sky-600 bg-sky-50' : '' ?>">
+                    <a href="<?= url('/') ?>" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all <?= ($_SERVER['REQUEST_URI'] ?? '/') === '/' || ($_SERVER['REQUEST_URI'] ?? '/') === '/index.php' ? 'text-sky-600 bg-sky-50' : '' ?>">
                         <i class="fas fa-home mr-1.5"></i>ໜ້າຫຼັກ
                     </a>
-                    <a href="<?= url('/products') ?>" class="px-4 py-2 text-sm font-bold text-gray-600 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/products') === 0 ? 'text-sky-600 bg-sky-50' : '' ?>">
+                    <a href="<?= url('/products') ?>" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/products') === 0 ? 'text-sky-600 bg-sky-50' : '' ?>">
                         <i class="fas fa-box mr-1.5"></i>ສິນຄ້າທັງໝົດ
                     </a>
 
@@ -142,21 +168,21 @@
                     ?>
 
                     <div x-data="{ catOpen: false }" class="relative">
-                        <button @click="catOpen = !catOpen" class="px-4 py-2 text-sm font-bold text-gray-600 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all flex items-center gap-1.5">
+                        <button @click="catOpen = !catOpen" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all flex items-center gap-1.5">
                             <i class="fas fa-tags mr-0.5"></i>ໝວດສິນຄ້າ
                             <i class="fas fa-chevron-down text-[10px]" :class="catOpen ? 'rotate-180' : ''"></i>
                         </button>
                         <div x-show="catOpen" @click.away="catOpen = false"
-                             class="absolute top-full left-0 mt-1 w-56 bg-white rounded-xl border border-gray-100 shadow-xl p-2 z-50"
+                             class="absolute top-full left-0 mt-1 w-56 bg-card rounded-xl border border-border shadow-xl p-2 z-50"
                              x-transition:enter="transition ease-out duration-100"
                              x-transition:enter-start="opacity-0 scale-95"
                              x-transition:enter-end="opacity-100 scale-100">
                             <?php if (empty($navCategories)): ?>
-                            <div class="px-3 py-4 text-sm text-gray-400 text-center">ຍັງບໍ່ມີໝວດສິນຄ້າ</div>
+                            <div class="px-3 py-4 text-sm text-muted-foreground text-center">ຍັງບໍ່ມີໝວດສິນຄ້າ</div>
                             <?php else: ?>
                             <?php foreach ($navCategories as $cat): ?>
-                            <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-sky-50 text-sm font-bold text-gray-700 hover:text-sky-600 transition-all">
-                                <span class="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500 text-xs"><i class="fas fa-tag"></i></span>
+                            <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-sky-50 text-sm font-bold text-foreground/85 hover:text-sky-600 transition-all">
+                                <span class="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xs"><i class="fas fa-tag"></i></span>
                                 <?= htmlspecialchars($cat['name']) ?>
                             </a>
                             <?php endforeach; ?>
@@ -168,26 +194,26 @@
         </nav>
 
         <!-- Mobile Menu -->
-        <div x-show="mobileMenu" x-collapse class="lg:hidden border-t border-gray-100 bg-white">
+        <div x-show="mobileMenu" x-collapse class="lg:hidden border-t border-border bg-card">
             <div class="px-4 py-3 space-y-1">
-                <a href="<?= url('/') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-sky-600 transition-all">
+                <a href="<?= url('/') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-sky-50 hover:text-sky-600 transition-all">
                     <span class="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600"><i class="fas fa-home"></i></span>
                     ໜ້າຫຼັກ
                 </a>
-                <a href="<?= url('/products') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-sky-600 transition-all">
+                <a href="<?= url('/products') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-sky-50 hover:text-sky-600 transition-all">
                     <span class="w-8 h-8 rounded-lg bg-fuchsia-50 flex items-center justify-center text-fuchsia-600"><i class="fas fa-box"></i></span>
                     ສິນຄ້າທັງໝົດ
                 </a>
                 <?php foreach ($navCategories as $cat): ?>
-                <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-gray-700 hover:bg-sky-50 hover:text-sky-600 transition-all">
+                <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-sky-50 hover:text-sky-600 transition-all">
                     <span class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600"><i class="fas fa-tag"></i></span>
                     <?= htmlspecialchars($cat['name']) ?>
                 </a>
                 <?php endforeach; ?>
-                <div class="border-t border-gray-100 my-2"></div>
+                <div class="border-t border-border my-2"></div>
                 <?php if (isset($_SESSION['customer'])): ?>
-                <div class="px-3 py-2 text-sm text-gray-500">
-                    <span class="font-bold text-gray-800"><?= htmlspecialchars($_SESSION['customer']['fullname']) ?></span>
+                <div class="px-3 py-2 text-sm text-muted-foreground">
+                    <span class="font-bold text-foreground"><?= htmlspecialchars($_SESSION['customer']['fullname']) ?></span>
                 </div>
                 <a href="<?= url('/logout-customer') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-all">
                     <span class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500"><i class="fas fa-sign-out-alt"></i></span>

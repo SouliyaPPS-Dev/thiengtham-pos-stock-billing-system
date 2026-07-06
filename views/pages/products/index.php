@@ -1,8 +1,8 @@
 <div class="p-4 md:p-6 space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800">ສິນຄ້າ</h1>
-            <p class="text-sm text-gray-500">ຈັດການຂໍ້ມູນສິນຄ້າທັງໝົດ</p>
+            <h1 class="text-2xl font-bold text-foreground">ສິນຄ້າ</h1>
+            <p class="text-sm text-muted-foreground">ຈັດການຂໍ້ມູນສິນຄ້າທັງໝົດ</p>
         </div>
         <a href="<?= url('/products/create') ?>" class="bg-primary text-white rounded-xl px-4 py-2 font-bold hover:opacity-90 inline-flex items-center gap-2">
             <i class="fas fa-plus"></i>
@@ -13,7 +13,7 @@
     <div class="table-wrap">
         <form method="GET" action="<?= url('/products') ?>" class="flex flex-col sm:flex-row gap-3 mb-4">
             <div class="flex-1 relative">
-                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground text-sm"></i>
                 <input type="text" name="search" value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" placeholder="ຄົ້ນຫາສິນຄ້າ..." class="w-full pl-10 pr-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
             </div>
             <div>
@@ -63,9 +63,9 @@
                     <?php $i = 0; ?>
                     <?php foreach ($products as $p): $i++; ?>
                     <tr>
-                        <td class="text-gray-400 text-sm text-center"><?= $i ?></td>
+                        <td class="text-muted-foreground text-sm text-center"><?= $i ?></td>
                         <td>
-                            <div class="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 overflow-hidden">
+                            <div class="h-10 w-10 rounded-xl bg-gray-50 flex items-center justify-center text-muted-foreground overflow-hidden">
                                 <?php if (!empty($p['image'])): ?>
                                 <img src="<?= htmlspecialchars($p['image']) ?>" class="h-full w-full object-cover" alt="">
                                 <?php else: ?>

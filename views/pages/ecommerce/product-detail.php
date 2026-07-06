@@ -3,8 +3,8 @@
     <div class="w-24 h-24 rounded-2xl bg-gray-100 flex items-center justify-center mx-auto mb-4">
         <i class="fas fa-exclamation-circle text-4xl text-gray-300"></i>
     </div>
-    <h1 class="text-2xl font-bold text-gray-800 mb-4">ບໍ່ພົບສິນຄ້າ</h1>
-    <p class="text-gray-500 mb-8">ສິນຄ້າທີ່ທ່ານຊອກຫາບໍ່ມີຢູ່ໃນລະບົບ</p>
+    <h1 class="text-2xl font-bold text-foreground mb-4">ບໍ່ພົບສິນຄ້າ</h1>
+    <p class="text-muted-foreground mb-8">ສິນຄ້າທີ່ທ່ານຊອກຫາບໍ່ມີຢູ່ໃນລະບົບ</p>
     <a href="<?= url('/products') ?>" class="inline-flex items-center gap-2 bg-sky-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-sky-700 transition-all">
         <i class="fas fa-arrow-left"></i> ກັບໄປສິນຄ້າທັງໝົດ
     </a>
@@ -12,7 +12,7 @@
 <?php else: ?>
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Breadcrumb -->
-    <div class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+    <div class="flex items-center gap-2 text-sm text-muted-foreground mb-6">
         <a href="<?= url('/') ?>" class="hover:text-sky-600 transition-colors"><i class="fas fa-home"></i></a>
         <span>/</span>
         <a href="<?= url('/products') ?>" class="hover:text-sky-600 transition-colors">ສິນຄ້າທັງໝົດ</a>
@@ -21,14 +21,14 @@
         <a href="<?= url('/category/' . htmlspecialchars($product['category_slug'] ?? '')) ?>" class="hover:text-sky-600 transition-colors"><?= htmlspecialchars($product['category_name']) ?></a>
         <?php endif; ?>
         <span>/</span>
-        <span class="text-gray-700 font-bold"><?= htmlspecialchars($product['name']) ?></span>
+        <span class="text-foreground/85 font-bold"><?= htmlspecialchars($product['name']) ?></span>
     </div>
 
     <!-- Product Detail -->
-    <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+    <div class="bg-card rounded-2xl border border-border overflow-hidden">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
             <!-- Product Images -->
-            <div class="p-6 lg:p-8 border-b lg:border-b-0 lg:border-r border-gray-100">
+            <div class="p-6 lg:p-8 border-b lg:border-b-0 lg:border-r border-border">
                 <div x-data="{ activeImage: 0, images: [<?php
                     $imgUrls = [];
                     if (!empty($product['image'])) $imgUrls[] = "'" . htmlspecialchars($product['image'], ENT_QUOTES) . "'";
@@ -58,7 +58,7 @@
                     <!-- Thumbnails -->
                     <div class="flex gap-3 overflow-x-auto scrollbar-hide" x-show="images.length > 1">
                         <template x-for="(img, index) in images" :key="index">
-                            <button @click="activeImage = index" class="w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all" :class="activeImage === index ? 'border-sky-500' : 'border-gray-200 hover:border-gray-300'">
+                            <button @click="activeImage = index" class="w-20 h-20 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all" :class="activeImage === index ? 'border-sky-500' : 'border-border hover:border-gray-300'">
                                 <img :src="img" class="w-full h-full object-cover">
                             </button>
                         </template>
@@ -74,17 +74,17 @@
                 </span>
                 <?php endif; ?>
 
-                <h1 class="text-2xl lg:text-3xl font-black text-gray-800 mb-4"><?= htmlspecialchars($product['name']) ?></h1>
+                <h1 class="text-2xl lg:text-3xl font-black text-foreground mb-4"><?= htmlspecialchars($product['name']) ?></h1>
 
                 <?php if (!empty($product['short_description'])): ?>
-                <p class="text-gray-500 text-sm mb-4"><?= htmlspecialchars($product['short_description']) ?></p>
+                <p class="text-muted-foreground text-sm mb-4"><?= htmlspecialchars($product['short_description']) ?></p>
                 <?php endif; ?>
 
                 <!-- Price -->
                 <div class="flex items-baseline gap-3 mb-6">
                     <span class="text-3xl font-black text-sky-600"><?= number_format((float)$product['selling_price'], 0) ?> ກີບ</span>
                     <?php if (!empty($product['compare_price']) && (float)$product['compare_price'] > (float)$product['selling_price']): ?>
-                    <span class="text-lg text-gray-400 line-through"><?= number_format((float)$product['compare_price'], 0) ?> ກີບ</span>
+                    <span class="text-lg text-muted-foreground line-through"><?= number_format((float)$product['compare_price'], 0) ?> ກີບ</span>
                     <?php endif; ?>
                 </div>
 
@@ -105,14 +105,14 @@
                 </div>
 
                 <?php if (!empty($product['sku'])): ?>
-                <p class="text-xs text-gray-400 mb-4">SKU: <?= htmlspecialchars($product['sku']) ?></p>
+                <p class="text-xs text-muted-foreground mb-4">SKU: <?= htmlspecialchars($product['sku']) ?></p>
                 <?php endif; ?>
 
                 <!-- Description -->
                 <?php if (!empty($product['description'])): ?>
                 <div class="mb-6">
-                    <h3 class="text-sm font-black text-gray-800 mb-2">ລາຍລະອຽດ</h3>
-                    <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line"><?= htmlspecialchars($product['description']) ?></p>
+                    <h3 class="text-sm font-black text-foreground mb-2">ລາຍລະອຽດ</h3>
+                    <p class="text-sm text-foreground/70 leading-relaxed whitespace-pre-line"><?= htmlspecialchars($product['description']) ?></p>
                 </div>
                 <?php endif; ?>
 
@@ -120,12 +120,12 @@
                 <div class="mt-auto space-y-4">
                     <?php if ($stock > 0): ?>
                     <div class="flex items-center gap-4">
-                        <div id="qty-selector" x-data="{ qty: 1 }" class="flex items-center border border-gray-200 rounded-xl overflow-hidden">
-                            <button @click="qty = Math.max(1, qty - 1)" class="h-11 w-11 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+                        <div id="qty-selector" x-data="{ qty: 1 }" class="flex items-center border border-border rounded-xl overflow-hidden">
+                            <button @click="qty = Math.max(1, qty - 1)" class="h-11 w-11 flex items-center justify-center text-muted-foreground hover:bg-gray-50 transition-colors">
                                 <i class="fas fa-minus text-xs"></i>
                             </button>
-                            <input type="number" x-model="qty" min="1" max="<?= $stock ?>" class="h-11 w-16 text-center text-sm font-bold border-x border-gray-200 outline-none" value="1">
-                            <button @click="qty = Math.min(<?= $stock ?>, qty + 1)" class="h-11 w-11 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors">
+                            <input type="number" x-model="qty" min="1" max="<?= $stock ?>" class="h-11 w-16 text-center text-sm font-bold border-x border-border outline-none" value="1">
+                            <button @click="qty = Math.min(<?= $stock ?>, qty + 1)" class="h-11 w-11 flex items-center justify-center text-muted-foreground hover:bg-gray-50 transition-colors">
                                 <i class="fas fa-plus text-xs"></i>
                             </button>
                         </div>
@@ -134,7 +134,7 @@
                         </button>
                     </div>
                     <?php else: ?>
-                    <button disabled class="w-full h-11 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
+                    <button disabled class="w-full h-11 bg-gray-300 text-muted-foreground font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-2">
                         <i class="fas fa-times-circle"></i> ສິນຄ້າໝົດ
                     </button>
                     <?php endif; ?>
@@ -146,10 +146,10 @@
     <!-- Related Products -->
     <?php if (!empty($related)): ?>
     <section class="mt-12">
-        <h2 class="text-2xl font-black text-gray-800 mb-6">ສິນຄ້າທີ່ກ່ຽວຂ້ອງ</h2>
+        <h2 class="text-2xl font-black text-foreground mb-6">ສິນຄ້າທີ່ກ່ຽວຂ້ອງ</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             <?php foreach ($related as $r): ?>
-            <div class="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl hover:shadow-sky-100/30 transition-all duration-300 hover:-translate-y-1">
+            <div class="group bg-card rounded-2xl border border-border overflow-hidden hover:shadow-xl hover:shadow-sky-100/30 transition-all duration-300 hover:-translate-y-1">
                 <a href="<?= url('/products/' . htmlspecialchars($r['slug'])) ?>" class="block aspect-[4/3] bg-gray-50 overflow-hidden">
                     <?php if (!empty($r['image'])): ?>
                     <img src="<?= htmlspecialchars($r['image']) ?>" alt="<?= htmlspecialchars($r['name']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -161,7 +161,7 @@
                 </a>
                 <div class="p-4">
                     <a href="<?= url('/products/' . htmlspecialchars($r['slug'])) ?>" class="block">
-                        <h3 class="text-sm font-bold text-gray-800 line-clamp-2 group-hover:text-sky-600 transition-colors"><?= htmlspecialchars($r['name']) ?></h3>
+                        <h3 class="text-sm font-bold text-foreground line-clamp-2 group-hover:text-sky-600 transition-colors"><?= htmlspecialchars($r['name']) ?></h3>
                     </a>
                     <div class="mt-2">
                         <span class="text-lg font-black text-sky-600"><?= number_format((float)$r['selling_price'], 0) ?> ກີບ</span>

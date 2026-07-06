@@ -2,26 +2,26 @@
     <div class="flex flex-col gap-4 md:gap-6">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-                <h1 class="text-xl md:text-3xl font-bold tracking-tight text-gray-800 mb-2">ໜ້າຫຼັກ</h1>
-                <p class="text-gray-500 text-xs md:text-sm">ສະຫຼຸບສະຖານະການຂາຍ ແລະ ສາງສິນຄ້າ</p>
+                <h1 class="text-xl md:text-3xl font-bold tracking-tight text-foreground mb-2">ໜ້າຫຼັກ</h1>
+                <p class="text-muted-foreground text-xs md:text-sm">ສະຫຼຸບສະຖານະການຂາຍ ແລະ ສາງສິນຄ້າ</p>
             </div>
             <form method="GET" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
                 <div class="flex items-center gap-1.5">
-                    <label class="text-[11px] font-bold text-gray-400 whitespace-nowrap">ຈາກ</label>
+                    <label class="text-[11px] font-bold text-muted-foreground whitespace-nowrap">ຈາກ</label>
                     <input type="date" name="from_date" value="<?= htmlspecialchars($fromDate ?? '') ?>"
-                           class="flex-1 sm:flex-none px-3 py-2 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                           class="flex-1 sm:flex-none px-3 py-2 rounded-xl border border-border text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                 </div>
                 <div class="flex items-center gap-1.5">
-                    <label class="text-[11px] font-bold text-gray-400 whitespace-nowrap">ຫາ</label>
+                    <label class="text-[11px] font-bold text-muted-foreground whitespace-nowrap">ຫາ</label>
                     <input type="date" name="to_date" value="<?= htmlspecialchars($toDate ?? '') ?>"
-                           class="flex-1 sm:flex-none px-3 py-2 rounded-xl border border-gray-200 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                           class="flex-1 sm:flex-none px-3 py-2 rounded-xl border border-border text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                 </div>
                 <div class="flex gap-2">
                     <button type="submit" class="flex-1 sm:flex-none px-4 py-2 bg-primary text-white rounded-xl text-sm font-bold hover:opacity-90 transition-all">
                         <i class="fas fa-filter mr-1"></i>ກັ່ນຕອງ
                     </button>
                     <?php if ($fromDate || $toDate): ?>
-                    <a href="<?= url('/admin') ?>" class="flex-1 sm:flex-none px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all text-center">
+                    <a href="<?= url('/admin') ?>" class="flex-1 sm:flex-none px-4 py-2 bg-gray-100 text-foreground/70 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all text-center">
                         <i class="fas fa-times mr-1"></i>ລຶບ
                     </a>
                     <?php endif; ?>
@@ -37,9 +37,9 @@
                     </div>
                 </div>
                 <div class="space-y-1">
-                    <h3 class="text-[11px] md:text-sm font-medium text-gray-500">ສິນຄ້າທັງໝົດ</h3>
-                    <div class="text-2xl md:text-3xl font-black text-gray-800"><?= number_format($stats['total_products']) ?></div>
-                    <p class="text-[10px] md:text-xs text-gray-400">ລາຍການສິນຄ້າໃນລະບົບ</p>
+                    <h3 class="text-[11px] md:text-sm font-medium text-muted-foreground">ສິນຄ້າທັງໝົດ</h3>
+                    <div class="text-2xl md:text-3xl font-black text-foreground"><?= number_format($stats['total_products']) ?></div>
+                    <p class="text-[10px] md:text-xs text-muted-foreground">ລາຍການສິນຄ້າໃນລະບົບ</p>
                 </div>
             </div>
 
@@ -51,9 +51,9 @@
                     <span class="text-[10px] md:text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-lg">ໃກ້ໝົດ</span>
                 </div>
                 <div class="space-y-1">
-                    <h3 class="text-[11px] md:text-sm font-medium text-gray-500">ສິນຄ້າໃກ້ໝົດສາງ</h3>
+                    <h3 class="text-[11px] md:text-sm font-medium text-muted-foreground">ສິນຄ້າໃກ້ໝົດສາງ</h3>
                     <div class="text-2xl md:text-3xl font-black text-amber-600"><?= number_format($stats['low_stock']) ?></div>
-                    <p class="text-[10px] md:text-xs text-gray-400">ຕ້ອງສັ່ງເພີ່ມ</p>
+                    <p class="text-[10px] md:text-xs text-muted-foreground">ຕ້ອງສັ່ງເພີ່ມ</p>
                 </div>
             </div>
 
@@ -65,9 +65,9 @@
                     <span class="text-[10px] md:text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">ມື້ນີ້</span>
                 </div>
                 <div class="space-y-1">
-                    <h3 class="text-[11px] md:text-sm font-medium text-gray-500">ຍອດຂາຍມື້ນີ້</h3>
+                    <h3 class="text-[11px] md:text-sm font-medium text-muted-foreground">ຍອດຂາຍມື້ນີ້</h3>
                     <div class="text-xl md:text-2xl font-black text-emerald-600"><?= number_format($stats['sales_today']) ?> <span class="text-xs md:text-sm">ກີບ</span></div>
-                    <p class="text-[10px] md:text-xs text-gray-400">ລາຍຮັບຈາກການຂາຍ</p>
+                    <p class="text-[10px] md:text-xs text-muted-foreground">ລາຍຮັບຈາກການຂາຍ</p>
                 </div>
             </div>
 
@@ -78,9 +78,9 @@
                     </div>
                 </div>
                 <div class="space-y-1">
-                    <h3 class="text-[11px] md:text-sm font-medium text-gray-500">ລູກຄ້າທັງໝົດ</h3>
-                    <div class="text-2xl md:text-3xl font-black text-gray-800"><?= number_format($stats['total_customers']) ?></div>
-                    <p class="text-[10px] md:text-xs text-gray-400">ລູກຄ້າໃນລະບົບ</p>
+                    <h3 class="text-[11px] md:text-sm font-medium text-muted-foreground">ລູກຄ້າທັງໝົດ</h3>
+                    <div class="text-2xl md:text-3xl font-black text-foreground"><?= number_format($stats['total_customers']) ?></div>
+                    <p class="text-[10px] md:text-xs text-muted-foreground">ລູກຄ້າໃນລະບົບ</p>
                 </div>
             </div>
 
@@ -91,9 +91,9 @@
                     </div>
                 </div>
                 <div class="space-y-1">
-                    <h3 class="text-[11px] md:text-sm font-medium text-gray-500">ຜູ້ສະໜອງທັງໝົດ</h3>
-                    <div class="text-2xl md:text-3xl font-black text-gray-800"><?= number_format($stats['total_suppliers'] ?? 0) ?></div>
-                    <p class="text-[10px] md:text-xs text-gray-400">ຜູ້ສະໜອງໃນລະບົບ</p>
+                    <h3 class="text-[11px] md:text-sm font-medium text-muted-foreground">ຜູ້ສະໜອງທັງໝົດ</h3>
+                    <div class="text-2xl md:text-3xl font-black text-foreground"><?= number_format($stats['total_suppliers'] ?? 0) ?></div>
+                    <p class="text-[10px] md:text-xs text-muted-foreground">ຜູ້ສະໜອງໃນລະບົບ</p>
                 </div>
             </div>
 
@@ -105,9 +105,9 @@
                     <span class="text-[10px] md:text-xs font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-lg">ເດືອນນີ້</span>
                 </div>
                 <div class="space-y-1">
-                    <h3 class="text-[11px] md:text-sm font-medium text-gray-500">ລາຍຮັບປະຈຳເດືອນ</h3>
+                    <h3 class="text-[11px] md:text-sm font-medium text-muted-foreground">ລາຍຮັບປະຈຳເດືອນ</h3>
                     <div class="text-lg md:text-xl font-black text-rose-600"><?= number_format($stats['monthly_revenue'] ?? 0) ?> <span class="text-xs md:text-sm">ກີບ</span></div>
-                    <p class="text-[10px] md:text-xs text-gray-400">ລາຍຮັບທັງໝົດເດືອນນີ້</p>
+                    <p class="text-[10px] md:text-xs text-muted-foreground">ລາຍຮັບທັງໝົດເດືອນນີ້</p>
                 </div>
             </div>
         </div>
@@ -167,11 +167,11 @@
         $salesPts = $hasData ? calcPoints2($salesDayData, $pointCount, $plotW, $plotH, $maxVal) : '';
         ?>
 
-        <div class="bg-white rounded-2xl border p-4 md:p-6">
+        <div class="bg-card rounded-2xl border p-4 md:p-6">
             <div class="flex items-center justify-between mb-4 md:mb-6">
                 <div>
-                    <h3 class="font-bold text-gray-800 text-sm md:text-base">ກຣາຟຍອດຂາຍ (ລາຍວັນ)</h3>
-                    <p class="text-xs md:text-sm text-gray-500 mt-1"><?= $fromDate && $toDate ? htmlspecialchars($fromDate) . ' ເຖິງ ' . htmlspecialchars($toDate) : 'ປະຈຳເດືອນ ' . date('m/Y') ?></p>
+                    <h3 class="font-bold text-foreground text-sm md:text-base">ກຣາຟຍອດຂາຍ (ລາຍວັນ)</h3>
+                    <p class="text-xs md:text-sm text-muted-foreground mt-1"><?= $fromDate && $toDate ? htmlspecialchars($fromDate) . ' ເຖິງ ' . htmlspecialchars($toDate) : 'ປະຈຳເດືອນ ' . date('m/Y') ?></p>
                 </div>
             </div>
 
@@ -227,11 +227,11 @@
         </div>
 
         <div class="grid gap-6 grid-cols-1 lg:grid-cols-7">
-            <div class="lg:col-span-4 bg-white rounded-2xl border flex flex-col">
+            <div class="lg:col-span-4 bg-card rounded-2xl border flex flex-col">
                 <div class="p-4 md:p-6 border-b flex items-center justify-between">
                     <div>
-                        <h3 class="font-bold text-gray-800 text-sm md:text-base">ລາຍການຂາຍຫຼ້າສຸດ</h3>
-                        <p class="text-xs md:text-sm text-gray-500 mt-1">ລາຍການທີ່ມີການເຄື່ອນໄຫວຫຼ້າສຸດ</p>
+                        <h3 class="font-bold text-foreground text-sm md:text-base">ລາຍການຂາຍຫຼ້າສຸດ</h3>
+                        <p class="text-xs md:text-sm text-muted-foreground mt-1">ລາຍການທີ່ມີການເຄື່ອນໄຫວຫຼ້າສຸດ</p>
                     </div>
                     <a href="<?= url('/admin/sales') ?>" class="text-primary text-xs md:text-sm font-bold hover:underline">ເບິ່ງທັງໝົດ</a>
                 </div>
@@ -251,8 +251,8 @@
                                 <i class="fas fa-receipt text-xs md:text-sm"></i>
                             </div>
                             <div class="flex-1 min-w-0 space-y-0.5">
-                                <p class="text-sm font-bold text-gray-800 leading-none truncate"><?= htmlspecialchars($s['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></p>
-                                <p class="text-[11px] md:text-xs text-gray-500 truncate">ໃບເກັບເງິນ #<?= htmlspecialchars($s['invoice_number']) ?> • <?= date('H:i', strtotime($s['created_at'])) ?></p>
+                                <p class="text-sm font-bold text-foreground leading-none truncate"><?= htmlspecialchars($s['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></p>
+                                <p class="text-[11px] md:text-xs text-muted-foreground truncate">ໃບເກັບເງິນ #<?= htmlspecialchars($s['invoice_number']) ?> • <?= date('H:i', strtotime($s['created_at'])) ?></p>
                             </div>
                             <div class="ml-auto font-bold text-emerald-600 text-xs md:text-sm whitespace-nowrap"><?= number_format($s['grand_total']) ?> ກີບ</div>
                         </div>
@@ -261,10 +261,10 @@
                 </div>
             </div>
 
-            <div class="lg:col-span-3 bg-white rounded-2xl border">
+            <div class="lg:col-span-3 bg-card rounded-2xl border">
                 <div class="p-4 md:p-6 border-b">
-                    <h3 class="font-bold text-gray-800 text-sm md:text-base">ສິນຄ້າຂາຍດີ</h3>
-                    <p class="text-xs md:text-sm text-gray-500 mt-1">ສິນຄ້າທີ່ຂາຍດີທີ່ສຸດ</p>
+                    <h3 class="font-bold text-foreground text-sm md:text-base">ສິນຄ້າຂາຍດີ</h3>
+                    <p class="text-xs md:text-sm text-muted-foreground mt-1">ສິນຄ້າທີ່ຂາຍດີທີ່ສຸດ</p>
                 </div>
                 <div class="p-4 md:p-6 space-y-4 md:space-y-6">
                     <?php
@@ -279,13 +279,13 @@
                     </div>
                     <?php else: foreach($stats['popular_products'] as $index => $item): ?>
                     <div class="flex items-center gap-3 md:gap-4">
-                        <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400">
+                        <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-gray-100 flex items-center justify-center text-muted-foreground">
                             <i class="fas fa-box text-lg"></i>
                         </div>
                         <div class="flex-1 min-w-0 space-y-1.5 md:space-y-2">
                             <div class="flex items-center justify-between">
-                                <p class="text-sm font-bold text-gray-800 truncate"><?= htmlspecialchars($item['name']) ?></p>
-                                <span class="text-[11px] md:text-xs font-bold text-gray-500 whitespace-nowrap ml-2"><?= $item['total_qty'] ?> ຊິ້ນ</span>
+                                <p class="text-sm font-bold text-foreground truncate"><?= htmlspecialchars($item['name']) ?></p>
+                                <span class="text-[11px] md:text-xs font-bold text-muted-foreground whitespace-nowrap ml-2"><?= $item['total_qty'] ?> ຊິ້ນ</span>
                             </div>
                             <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
                                 <div class="<?= $colors[$index] ?? 'bg-primary' ?> h-full transition-all duration-1000" style="width: <?= min(100, ($item['total_qty'] / 10) * 100) ?>%"></div>
