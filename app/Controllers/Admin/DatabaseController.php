@@ -9,7 +9,7 @@ class DatabaseController extends \App\Controllers\BaseController
         $host = $_ENV['DB_HOST'] ?? 'localhost';
         $user = $_ENV['DB_USERNAME'] ?? 'root';
         $pass = $_ENV['DB_PASSWORD'] ?? '';
-        $name = $_ENV['DB_DATABASE'] ?? 'pos_stock_db';
+        $name = $_ENV['DB_DATABASE'] ?? 'if0_42353445_thiengtham';
 
         $mysqli = new \mysqli($host, $user, $pass, $name);
         if ($mysqli->connect_error) {
@@ -76,7 +76,7 @@ class DatabaseController extends \App\Controllers\BaseController
                 $host = $_ENV['DB_HOST'] ?? 'localhost';
                 $user = $_ENV['DB_USERNAME'] ?? 'root';
                 $pass = $_ENV['DB_PASSWORD'] ?? '';
-                $name = $_ENV['DB_DATABASE'] ?? 'pos_stock_db';
+                $name = $_ENV['DB_DATABASE'] ?? 'if0_42353445_thiengtham';
 
                 $mysqli = new \mysqli($host, $user, $pass, $name);
                 if ($mysqli->connect_error) {

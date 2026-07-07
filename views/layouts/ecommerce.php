@@ -108,7 +108,7 @@
                             </span>
                         </button>
                         <div x-show="accountOpen" @click.away="accountOpen = false"
-                             class="absolute bottom-full right-0 mb-2 w-64 bg-card rounded-xl border border-border shadow-xl p-2.5 z-50"
+                             class="absolute top-full right-0 mt-2 w-64 bg-card rounded-xl border border-border shadow-xl p-2.5 z-50"
                              x-transition:enter="transition ease-out duration-100"
                              x-transition:enter-start="opacity-0 scale-95"
                              x-transition:enter-end="opacity-100 scale-100"

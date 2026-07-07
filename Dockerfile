@@ -2,6 +2,14 @@ FROM php:8.2-apache
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Install system dependencies and MySQL-compatible server (MariaDB)
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        mariadb-server \
+        mariadb-client && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN a2enmod rewrite headers
 
 RUN docker-php-ext-install pdo pdo_mysql && \
@@ -31,6 +39,11 @@ RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 777 /var/www/html/public/css
 
 RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf
+
+# MySQL data directory - use persistent /data volume on HF Spaces
+RUN mkdir -p /data/mysql /var/run/mysqld && \
+    chown -R mysql:mysql /data/mysql /var/run/mysqld && \
+    chmod 777 /var/run/mysqld
 
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh

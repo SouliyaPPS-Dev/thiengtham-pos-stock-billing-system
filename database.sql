@@ -1,10 +1,10 @@
 -- POS Stock Billing System + E-Commerce Database Schema
--- Database: pos_stock_db
+-- Database: if0_42353445_thiengtham
 -- Supports two systems: /admin (POS) and / (E-commerce)
 
-DROP DATABASE IF EXISTS pos_stock_db;
-CREATE DATABASE pos_stock_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE pos_stock_db;
+DROP DATABASE IF EXISTS if0_42353445_thiengtham;
+CREATE DATABASE if0_42353445_thiengtham CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE if0_42353445_thiengtham;
 
 -- Users / Staff (Admin POS only)
 CREATE TABLE users (
