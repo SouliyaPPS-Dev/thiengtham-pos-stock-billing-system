@@ -1,8 +1,8 @@
 ---
 title: POS & Stock
 emoji: 🛒
-colorFrom: sky
-colorTo: blue
+colorFrom: blue
+colorTo: indigo
 sdk: docker
 pinned: false
 license: mit
