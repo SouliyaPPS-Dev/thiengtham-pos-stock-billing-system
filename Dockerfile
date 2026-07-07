@@ -12,8 +12,8 @@ RUN apt-get update && \
 
 RUN a2enmod rewrite headers
 
-RUN docker-php-ext-install pdo pdo_mysql && \
-    docker-php-ext-enable pdo_mysql
+RUN docker-php-ext-install pdo pdo_mysql mysqli && \
+    docker-php-ext-enable pdo_mysql mysqli
 
 COPY . /var/www/html/
 
