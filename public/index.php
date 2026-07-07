@@ -71,7 +71,7 @@ if ($isLocalhost) {
     $_ENV['APP_ENV'] = 'production';
 }
 
-$isDebug = ($_ENV['APP_DEBUG'] ?? getenv('APP_DEBUG') ?? $_SERVER['APP_DEBUG'] ?? 'false') === 'true';
+$isDebug = (getenv('APP_DEBUG') ?: $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? 'false') === 'true';
 if ($isDebug) {
     error_reporting(E_ALL);
     ini_set('display_errors', 1);
