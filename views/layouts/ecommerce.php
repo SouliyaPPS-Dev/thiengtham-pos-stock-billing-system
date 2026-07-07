@@ -106,17 +106,17 @@
                             <?= isset($_SESSION['customer']) ? htmlspecialchars($_SESSION['customer']['fullname']) : 'ເຂົ້າສູ່ລະບົບ' ?>
                         </span>
                         <?php if (isset($_SESSION['customer'])): ?>
-                        <div x-show="cartOpen" @click.away="cartOpen = false" class="absolute top-full right-0 mt-1 w-56 bg-card rounded-xl border border-border shadow-xl p-2 z-50" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
-                            <div class="p-3 border-b border-border mb-1">
+                        <div x-show="cartOpen" @click.away="cartOpen = false" class="absolute top-full right-0 mt-1 w-64 bg-card rounded-xl border border-border shadow-xl p-2.5 z-50" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+                            <div class="px-4 py-3.5 border-b border-border mb-1.5">
                                 <p class="text-sm font-bold text-foreground"><?= htmlspecialchars($_SESSION['customer']['fullname']) ?></p>
-                                <p class="text-xs text-muted-foreground"><?= htmlspecialchars($_SESSION['customer']['email'] ?? $_SESSION['customer']['phone'] ?? '') ?></p>
+                                <p class="text-xs text-muted-foreground mt-0.5"><?= htmlspecialchars($_SESSION['customer']['email'] ?? $_SESSION['customer']['phone'] ?? '') ?></p>
                             </div>
-                            <a href="<?= url('/account') ?>" class="flex items-center gap-3 px-3 py-2.5 text-foreground/85 hover:bg-gray-50 rounded-lg text-xs font-bold transition-all">
-                                <i class="fas fa-user"></i>
+                            <a href="<?= url('/account') ?>" class="flex items-center gap-3.5 px-4 py-3.5 text-foreground/85 hover:bg-gray-50 rounded-lg text-sm font-bold transition-all">
+                                <i class="fas fa-user w-4 text-center"></i>
                                 <span>ບັນຊີຂອງຂ້ອຍ</span>
                             </a>
-                            <a href="<?= url('/logout-customer') ?>" class="flex items-center gap-3 px-3 py-2.5 text-red-500 hover:bg-red-50 rounded-lg text-xs font-bold transition-all">
-                                <i class="fas fa-sign-out-alt"></i>
+                            <a href="<?= url('/logout-customer') ?>" class="flex items-center gap-3.5 px-4 py-3.5 text-red-500 hover:bg-red-50 rounded-lg text-sm font-bold transition-all">
+                                <i class="fas fa-sign-out-alt w-4 text-center"></i>
                                 <span>ອອກຈາກລະບົບ</span>
                             </a>
                         </div>
@@ -245,7 +245,7 @@
     <div x-data="{ current: 0, slides: <?= count($banners) ?>, touchX: 0 }"
          x-init="let t = setInterval(() => { current = (current + 1) % slides }, 5000)"
          class="relative overflow-hidden bg-gray-900 select-none w-full">
-        <div class="relative h-[250px] sm:h-[380px] lg:h-[500px] w-full">
+        <div class="relative h-[300px] sm:h-[420px] lg:h-[560px] xl:h-[600px] w-full">
             <?php foreach ($banners as $i => $banner): ?>
             <div x-show="current === <?= $i ?>"
                  x-transition:enter="transition-all ease-out duration-700"
@@ -266,11 +266,11 @@
                         <div class="max-w-3xl mx-auto space-y-4 sm:space-y-6">
                             <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight drop-shadow-lg"><?= htmlspecialchars($banner['title'] ?? '') ?></h2>
                             <?php if (!empty($banner['subtitle'])): ?>
-                            <p class="text-sm sm:text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md leading-relaxed"><?= htmlspecialchars($banner['subtitle']) ?></p>
+                            <p class="text-sm sm:text-lg md:text-xl text-white max-w-2xl mx-auto drop-shadow-md leading-relaxed"><?= htmlspecialchars($banner['subtitle']) ?></p>
                             <?php endif; ?>
                             <?php if (!empty($banner['link'])): ?>
                             <div class="pt-2 sm:pt-4">
-                                <a href="<?= url($banner['link']) ?>" class="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-gray-900 font-extrabold px-8 py-3.5 rounded-2xl shadow-xl shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 duration-200 text-sm md:text-base">
+                                <a href="<?= url($banner['link']) ?>" class="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold px-8 py-3.5 rounded-2xl shadow-xl shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 duration-200 text-sm md:text-base">
                                     ສັ່ງຊື້ເລີຍ <i class="fas fa-shopping-bag"></i>
                                 </a>
                             </div>

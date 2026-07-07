@@ -209,9 +209,9 @@
                         </div>
                         <?php 
                         $ranks = [
-                            0 => ['color' => 'text-amber-600 bg-amber-100 dark:bg-amber-950/30 border-amber-200/40'],
-                            1 => ['color' => 'text-slate-500 bg-slate-100 dark:bg-slate-900/30 border-slate-200/40'],
-                            2 => ['color' => 'text-orange-700 bg-orange-100 dark:bg-orange-950/30 border-orange-200/40']
+                            0 => ['color' => 'text-amber-600 bg-transparent border-amber-200/40'],
+                            1 => ['color' => 'text-slate-500 bg-transparent border-slate-200/40'],
+                            2 => ['color' => 'text-orange-700 bg-transparent border-orange-200/40']
                         ];
                         $rankClass = $ranks[$i % 3]['color'];
                         ?>

@@ -46,28 +46,90 @@
                 </div>
 
                 <!-- Shipping Address -->
-                <div class="bg-card rounded-2xl border border-border p-6">
+                <div class="bg-card rounded-2xl border border-border p-6"
+                     x-data="addressPicker({
+                        province: '<?= htmlspecialchars($customer['province'] ?? 'ນະຄອນຫຼວງວຽງຈັນ') ?>',
+                        district: '<?= htmlspecialchars($customer['district'] ?? 'ໄຊເສດຖາ') ?>',
+                        village: '<?= htmlspecialchars($customer['village'] ?? '') ?>'
+                     })">
                     <h3 class="text-lg font-black text-foreground mb-4 flex items-center gap-2">
                         <span class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 text-sm"><i class="fas fa-map-marker-alt"></i></span>
                         ທີ່ຢູ່ຈັດສົ່ງ
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
+                        <!-- Province -->
+                        <div class="relative" @click.outside="provinceOpen = false">
                             <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ແຂວງ</label>
-                            <input type="text" name="shipping_province" value="<?= htmlspecialchars($customer['province'] ?? 'ນະຄອນຫຼວງວຽງຈັນ') ?>" class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <div class="relative">
+                                <input type="text" x-model="provinceSearch" @focus="provinceOpen = true; provinceSearch = ''" @input="provinceOpen = true"
+                                       placeholder="ຄົ້ນຫາແຂວງ..." autocomplete="off"
+                                       class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm pr-10">
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs" x-show="!provinceOpen">
+                                    <i class="fas fa-chevron-down"></i>
+                                </span>
+                            </div>
+                            <template x-if="provinceOpen && filteredProvinces.length">
+                                <div class="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                                    <template x-for="p in filteredProvinces" :key="p">
+                                        <div @click="selectProvince(p)" class="px-4 py-2.5 cursor-pointer text-sm hover:bg-primary/10 hover:text-primary transition-colors"
+                                             :class="p === province ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'">
+                                            <span x-text="p"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <input type="hidden" name="shipping_province" x-model="province">
                         </div>
-                        <div>
+                        <!-- District -->
+                        <div class="relative" @click.outside="districtOpen = false">
                             <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ເມືອງ</label>
-                            <input type="text" name="shipping_district" value="<?= htmlspecialchars($customer['district'] ?? 'ໄຊເສດຖາ') ?>" class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <div class="relative">
+                                <input type="text" x-model="districtSearch" @focus="districtOpen = true; districtSearch = ''" @input="districtOpen = true"
+                                       placeholder="ຄົ້ນຫາເມືອງ..." autocomplete="off"
+                                       class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm pr-10">
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs" x-show="!districtOpen">
+                                    <i class="fas fa-chevron-down"></i>
+                                </span>
+                            </div>
+                            <template x-if="districtOpen && filteredDistricts.length">
+                                <div class="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                                    <template x-for="d in filteredDistricts" :key="d">
+                                        <div @click="selectDistrict(d)" class="px-4 py-2.5 cursor-pointer text-sm hover:bg-primary/10 hover:text-primary transition-colors"
+                                             :class="d === district ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'">
+                                            <span x-text="d"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <input type="hidden" name="shipping_district" x-model="district">
                         </div>
-                        <div>
+                        <!-- Village -->
+                        <div class="relative" @click.outside="villageOpen = false">
                             <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ບ້ານ</label>
-                            <input type="text" name="shipping_village" value="<?= htmlspecialchars($customer['village'] ?? '') ?>" class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                            <div class="relative">
+                                <input type="text" x-model="villageSearch" @focus="villageOpen = true" @input="searchVillage($el.value)"
+                                       placeholder="ຄົ້ນຫາບ້ານ..." autocomplete="off"
+                                       class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm pr-10">
+                                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs" x-show="villageLoading">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </span>
+                            </div>
+                            <template x-if="villageOpen && villageResults.length">
+                                <div class="absolute z-50 mt-1 w-full bg-card border border-border rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                                    <template x-for="v in villageResults" :key="v">
+                                        <div @click="selectVillage(v)" class="px-4 py-2.5 cursor-pointer text-sm hover:bg-primary/10 hover:text-primary transition-colors"
+                                             :class="v === village ? 'bg-primary/10 text-primary font-bold' : 'text-foreground'">
+                                            <span x-text="v"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                            <input type="hidden" name="shipping_village" x-model="village">
                         </div>
                     </div>
                     <div class="mt-4">
                         <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ທີ່ຢູ່ແບບລະອຽດ <span class="text-red-500">*</span></label>
-                        <textarea name="shipping_address" rows="2" required class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"><?= htmlspecialchars($customer['address'] ?? 'ຖະໜົນ ດາວທຽມ ປະສົມ, ເມືອງໄຊເສດຖາ, ນະຄອນຫຼວງວຽງຈັນ') ?></textarea>
+                        <textarea name="shipping_address" rows="2" required class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm" placeholder="ເລກທີ, ຖະໜົນ, ຂໍ້ມູນເພີ່ມເຕີມ..."><?= htmlspecialchars($customer['address'] ?? '') ?></textarea>
                     </div>
             </div>
 
@@ -173,6 +235,126 @@
                 </button>
             </form>
         </div>
+
+        <script>
+        var LAOS_ADDRESSES = {
+            "ນະຄອນຫຼວງວຽງຈັນ": ["ຈັນທະບູລີ", "ສີໂຄດຕະບອງ", "ໄຊເສດຖາ", "ສີສັດຕະນາກ", "ນາຊາຍທອງ", "ໄຊທານີ", "ຫາດຊາຍຟອງ", "ສັງທອງ", "ປາກງື່ມ"],
+            "ຜົ້ງສາລີ": ["ຜົ້ງສາລີ", "ໃໝ່", "ຂາ", "ສຳພັນ", "ບຸນເໜືອ", "ຍອດອູ", "ບຸນໃຕ້"],
+            "ຫຼວງນໍ້າທາ": ["ຫຼວງນໍ້າທາ", "ສິງ", "ລອງ", "ວຽງພູຄາ", "ນາແລ"],
+            "ອຸດົມໄຊ": ["ໄຊ", "ຫຼາ", "ນາໝໍ້", "ງາ", "ແບງ", "ຮຸນ", "ປາກແບງ"],
+            "ບໍ່ແກ້ວ": ["ຫ້ວຍຊາຍ", "ຕົ້ນເຜິ້ງ", "ເມິງ", "ຜາອຸດົມ", "ປາກທາ"],
+            "ຫຼວງພະບາງ": ["ຫຼວງພະບາງ", "ຊຽງເງິນ", "ນານ", "ປາກອູ", "ນ້ຳບາກ", "ງອຍ", "ປາກແຊງ", "ໂພນໄຊ", "ຈອມເພັດ", "ວຽງຄຳ", "ພູຄູນ", "ໂພນທອງ"],
+            "ຫົວພັນ": ["ຊຳເໜືອ", "ຊຽງຄໍ້", "ຮ້າມ", "ແວງ", "ແພກ", "ສົບເບົາ", "ບໍ່ແຕນ", "ກວັນ", "ຊຳໃຕ້", "ເມືອງຊຳ"],
+            "ໄຊຍະບູລີ": ["ໄຊຍະບູລີ", "ຄອບ", "ຫົງສາ", "ເງິນ", "ຊຽງຮ່ອນ", "ພຽງ", "ປາກລາຍ", "ແກ່ນທ້າວ", "ບໍ່ແກ່ນ", "ທົ່ງມີໄຊ"],
+            "ຊຽງຂວາງ": ["ແປກ", "ຄຳ", "ໜອງແຮດ", "ຄູນ", "ໝອກ", "ພູກູດ", "ພວານ"],
+            "ວຽງຈັນ": ["ໂພນໂຮງ", "ທຸລະຄົມ", "ແກ້ວອຸດົມ", "ກາສີ", "ວັງວຽງ", "ເຟືອງ", "ຊະນະຄາມ", "ແມດ", "ວຽງຄຳ", "ຫີນເໝືອງ", "ໝື່ນ"],
+            "ບໍລິຄຳໄຊ": ["ປາກຊັນ", "ທ່າພະບາດ", "ປາກກະດິງ", "ບໍລິຄັນ", "ວຽງທອງ", "ໄຊຈຳພອນ"],
+            "ຄຳມ່ວນ": ["ທ່າແຂກ", "ມະຫາໄຊ", "ໜອງບົກ", "ຫີນບູນ", "ຍົມມະລາດ", "ບົວລະພາ", "ນາກາຍ", "ຊຽງບົວທອງ", "ຄູນຄຳ"],
+            "ສະຫວັນນະເຂດ": ["ໄກສອນ ພົມວິຫານ", "ອຸດູມພອນ", "ອາດສະພັງທອງ", "ພີນ", "ເຊໂປນ", "ນອງ", "ທ່າປາງທອງ", "ສອງຄອນ", "ຈຳພອນ", "ຊົນບູລີ", "ໄຊບູລີ", "ວຽງໄຊ"],
+            "ສາລະວັນ": ["ສາລະວັນ", "ຕະໂອ້ຍ", "ຕຸ້ມລານ", "ລະຄອນເພັງ", "ວາປີ", "ຄົງເຊໂດນ", "ເລົ່າງາມ", "ສະມ້ວຍ"],
+            "ເຊກອງ": ["ເຊກອງ", "ລະມາມ", "ກະເຕື", "ທ່າແຕງ"],
+            "ຈຳປາສັກ": ["ປາກເຊ", "ຊະນະສົມບູນ", "ປາກຊ່ອງ", "ຈຳປາສັກ", "ມຸນລະປະໂມກ", "ໂຂງ", "ສຸຂຸມາ", "ບາຈຽງຈະເລີນສຸກ"],
+            "ອັດຕະປື": ["ສະໝັກຊີ", "ຊຽງໃໝ່", "ບົງ", "ສານໄຊ", "ກົກມ່ວງ"],
+            "ໄຊສົມບູນ": ["ອະນຸວັງ", "ລ້ອງແຈ້ງ", "ຮົ່ມ", "ທ່າໂທມ"]
+        };
+
+        function addressPicker(initial) {
+            return {
+                province: initial.province || '',
+                district: initial.district || '',
+                village: initial.village || '',
+                provinceSearch: initial.province || '',
+                districtSearch: initial.district || '',
+                villageSearch: initial.village || '',
+                provinceOpen: false,
+                districtOpen: false,
+                villageOpen: false,
+                villageLoading: false,
+                villageResults: [],
+                _villageTimer: null,
+
+                get provinces() {
+                    return Object.keys(LAOS_ADDRESSES);
+                },
+
+                get filteredProvinces() {
+                    var s = (this.provinceSearch || '').trim().toLowerCase();
+                    if (!s) return this.provinces;
+                    return this.provinces.filter(function(p) { return p.toLowerCase().indexOf(s) !== -1; });
+                },
+
+                get districts() {
+                    return LAOS_ADDRESSES[this.province] || [];
+                },
+
+                get filteredDistricts() {
+                    var s = (this.districtSearch || '').trim().toLowerCase();
+                    var d = this.districts;
+                    if (!s) return d;
+                    return d.filter(function(d) { return d.toLowerCase().indexOf(s) !== -1; });
+                },
+
+                selectProvince: function(p) {
+                    this.province = p;
+                    this.provinceSearch = p;
+                    this.provinceOpen = false;
+                    this.district = '';
+                    this.districtSearch = '';
+                    this.village = '';
+                    this.villageSearch = '';
+                    this.villageResults = [];
+                },
+
+                selectDistrict: function(d) {
+                    this.district = d;
+                    this.districtSearch = d;
+                    this.districtOpen = false;
+                    this.village = '';
+                    this.villageSearch = '';
+                    this.villageResults = [];
+                },
+
+                searchVillage: function(q) {
+                    var self = this;
+                    if (this._villageTimer) clearTimeout(this._villageTimer);
+                    q = (q || '').trim();
+                    if (q.length < 2) {
+                        this.villageResults = [];
+                        this.villageOpen = false;
+                        return;
+                    }
+                    this._villageTimer = setTimeout(function() {
+                        self.villageLoading = true;
+                        var bounds = '';
+                        var pName = self.province;
+                        if (pName === 'ນະຄອນຫຼວງວຽງຈັນ') bounds = '18.0,102.4,18.2,102.8';
+                        var url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(q + ', ' + pName + ', ລາວ') + '&limit=10&countrycodes=la' + (bounds ? '&bounded=1&viewbox=' + bounds : '');
+                        fetch(url)
+                            .then(function(r) { return r.json(); })
+                            .then(function(data) {
+                                var names = [];
+                                for (var i = 0; i < data.length; i++) {
+                                    var name = data[i].display_name.split(',')[0].trim();
+                                    if (names.indexOf(name) === -1 && name.length > 0) names.push(name);
+                                }
+                                self.villageResults = names;
+                                self.villageOpen = names.length > 0;
+                                self.villageLoading = false;
+                            })
+                            .catch(function() {
+                                self.villageLoading = false;
+                            });
+                    }, 400);
+                },
+
+                selectVillage: function(v) {
+                    this.village = v;
+                    this.villageSearch = v;
+                    this.villageOpen = false;
+                }
+            };
+        }
+        </script>
 
         <!-- Order Summary -->
         <div class="lg:col-span-1">

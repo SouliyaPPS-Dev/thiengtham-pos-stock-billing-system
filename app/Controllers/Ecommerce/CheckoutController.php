@@ -157,6 +157,30 @@ class CheckoutController
 
             $db->commit();
 
+            $updateStmt = $db->prepare("UPDATE customers SET fullname = ?, phone = ?, email = ?, address = ?, province = ?, district = ?, village = ?, latitude = ?, longitude = ? WHERE id = ?");
+            $updateStmt->execute([
+                $customerName,
+                $customerPhone,
+                $customerEmail,
+                $shippingAddress,
+                $shippingProvince,
+                $shippingDistrict,
+                $shippingVillage,
+                $shippingLatitude,
+                $shippingLongitude,
+                $customerId,
+            ]);
+
+            $_SESSION['customer']['fullname'] = $customerName;
+            $_SESSION['customer']['phone'] = $customerPhone;
+            $_SESSION['customer']['email'] = $customerEmail;
+            $_SESSION['customer']['address'] = $shippingAddress;
+            $_SESSION['customer']['province'] = $shippingProvince;
+            $_SESSION['customer']['district'] = $shippingDistrict;
+            $_SESSION['customer']['village'] = $shippingVillage;
+            $_SESSION['customer']['latitude'] = $shippingLatitude;
+            $_SESSION['customer']['longitude'] = $shippingLongitude;
+
             unset($_SESSION['cart']);
 
             $this->redirect('/order/' . $orderId);
