@@ -11,12 +11,29 @@ class CustomerController extends \App\Controllers\BaseController
         $customerModel = new Customer();
 
         $search = $_GET['search'] ?? '';
+        $type = $_GET['type'] ?? '';
         $page = max(1, (int)($_GET['page'] ?? 1));
         $perPage = 20;
 
+        $where = [];
+        $params = [];
+
         if ($search) {
-            $customers = $customerModel->search($search);
-            $total = $customerModel->countSearch($search);
+            $where[] = "(fullname LIKE ? OR phone LIKE ?)";
+            $params[] = "%{$search}%";
+            $params[] = "%{$search}%";
+        }
+
+        if ($type) {
+            $where[] = "customer_type = ?";
+            $params[] = $type;
+        }
+
+        $whereClause = $where ? implode(' AND ', $where) : '';
+
+        if ($whereClause) {
+            $customers = $customerModel->getAll($whereClause, $params, $perPage, ($page - 1) * $perPage);
+            $total = $customerModel->countWhere($whereClause, $params);
         } else {
             $customers = $customerModel->paginate($page, $perPage);
             $total = $customerModel->countAll();
@@ -28,6 +45,7 @@ class CustomerController extends \App\Controllers\BaseController
             'title' => 'ລູກຄ້າ',
             'customers' => $customers,
             'search' => $search,
+            'type' => $type,
             'page' => $page,
             'totalPages' => $totalPages,
             'total' => $total,
@@ -50,6 +68,7 @@ class CustomerController extends \App\Controllers\BaseController
                 'fullname' => $fullname,
                 'phone' => $_POST['phone'] ?? '',
                 'email' => $_POST['email'] ?? '',
+                'customer_type' => $_POST['customer_type'] ?? 'regular',
                 'address' => $_POST['address'] ?? '',
                 'notes' => $_POST['notes'] ?? '',
             ]);
@@ -94,6 +113,7 @@ class CustomerController extends \App\Controllers\BaseController
             'fullname' => $_POST['fullname'] ?? '',
             'phone' => $_POST['phone'] ?? '',
             'email' => $_POST['email'] ?? '',
+            'customer_type' => $_POST['customer_type'] ?? 'regular',
             'address' => $_POST['address'] ?? '',
             'notes' => $_POST['notes'] ?? '',
         ];

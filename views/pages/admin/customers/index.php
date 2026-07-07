@@ -9,9 +9,9 @@
             <div class="flex items-center gap-2">
                 <select name="customer_type" onchange="window.location.href=this.value" class="px-3 py-2 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                     <option value="<?= url('/admin/customers') ?>">ທຸກປະເພດ</option>
-                    <option value="<?= url('/admin/customers?type=regular') ?>" <?= (($_GET['type'] ?? '') === 'regular') ? 'selected' : '' ?>>ທົ່ວໄປ</option>
-                    <option value="<?= url('/admin/customers?type=wholesale') ?>" <?= (($_GET['type'] ?? '') === 'wholesale') ? 'selected' : '' ?>>ສົ່ງ</option>
-                    <option value="<?= url('/admin/customers?type=vip') ?>" <?= (($_GET['type'] ?? '') === 'vip') ? 'selected' : '' ?>>VIP</option>
+                    <option value="<?= url('/admin/customers?type=regular') ?>" <?= ($type === 'regular') ? 'selected' : '' ?>>ທົ່ວໄປ</option>
+                    <option value="<?= url('/admin/customers?type=wholesale') ?>" <?= ($type === 'wholesale') ? 'selected' : '' ?>>ສົ່ງ</option>
+                    <option value="<?= url('/admin/customers?type=vip') ?>" <?= ($type === 'vip') ? 'selected' : '' ?>>VIP</option>
                 </select>
                 <a href="<?= url('/admin/customers/create') ?>" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
                     <i class="fas fa-plus"></i>
@@ -41,6 +41,7 @@
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ຊື່</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ເບີໂທ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ອີເມວ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ປະເພດ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ທີ່ຢູ່</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ວັນທີສ້າງ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider"></th>
@@ -49,7 +50,7 @@
                     <tbody>
                         <?php if (empty($customers)): ?>
                         <tr>
-                            <td colspan="7" class="py-3 px-2">
+                            <td colspan="8" class="py-3 px-2">
                                 <div class="flex flex-col items-center justify-center py-12 text-center">
                                     <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                         <i class="fas fa-users text-2xl"></i>
@@ -74,6 +75,16 @@
                             </td>
                             <td class="py-3 px-2 text-foreground/70"><?= htmlspecialchars($c['phone'] ?? '-') ?></td>
                             <td class="py-3 px-2 text-foreground/70"><?= htmlspecialchars($c['email'] ?? '-') ?></td>
+                            <td class="py-3 px-2">
+                                <?php $ct = $c['customer_type'] ?? 'regular'; ?>
+                                <?php if ($ct === 'vip'): ?>
+                                <span class="inline-block px-2 py-0.5 bg-yellow-50 text-yellow-700 rounded-full text-[11px] font-bold">VIP</span>
+                                <?php elseif ($ct === 'wholesale'): ?>
+                                <span class="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[11px] font-bold">ສົ່ງ</span>
+                                <?php else: ?>
+                                <span class="inline-block px-2 py-0.5 bg-gray-50 text-gray-600 rounded-full text-[11px] font-bold">ທົ່ວໄປ</span>
+                                <?php endif; ?>
+                            </td>
                             <td class="py-3 px-2 text-foreground/70 max-w-[200px] truncate"><?= htmlspecialchars($c['address'] ?? '-') ?></td>
                             <td class="py-3 px-2 text-foreground/70"><?= date('d/m/Y', strtotime($c['created_at'])) ?></td>
                             <td class="py-3 px-2">
@@ -113,6 +124,7 @@
             <div class="flex justify-between py-2 border-b"><span class="text-sm text-muted-foreground">ຊື່</span><span class="text-sm font-bold text-foreground" id="mName"></span></div>
             <div class="flex justify-between py-2 border-b"><span class="text-sm text-muted-foreground">ເບີໂທ</span><span class="text-sm font-bold text-foreground" id="mPhone"></span></div>
             <div class="flex justify-between py-2 border-b"><span class="text-sm text-muted-foreground">ອີເມວ</span><span class="text-sm font-bold text-foreground" id="mEmail"></span></div>
+            <div class="flex justify-between py-2 border-b"><span class="text-sm text-muted-foreground">ປະເພດ</span><span class="text-sm font-bold text-foreground" id="mType"></span></div>
             <div class="flex justify-between py-2 border-b"><span class="text-sm text-muted-foreground">ທີ່ຢູ່</span><span class="text-sm font-bold text-foreground" id="mAddress"></span></div>
             <div class="flex justify-between py-2"><span class="text-sm text-muted-foreground">ຫມາຍເຫດ</span><span class="text-sm font-bold text-foreground" id="mNotes"></span></div>
         </div>
@@ -126,9 +138,10 @@
 
 <script>
 function viewCustomer(c) {
-    document.getElementById('mName').textContent = c.name;
+    document.getElementById('mName').textContent = c.fullname;
     document.getElementById('mPhone').textContent = c.phone || '-';
     document.getElementById('mEmail').textContent = c.email || '-';
+    document.getElementById('mType').textContent = {regular: 'ທົ່ວໄປ', wholesale: 'ສົ່ງ', vip: 'VIP'}[c.customer_type] || c.customer_type || 'ທົ່ວໄປ';
     document.getElementById('mAddress').textContent = c.address || '-';
     document.getElementById('mNotes').textContent = c.notes || '-';
     document.getElementById('customerModal').classList.remove('hidden');

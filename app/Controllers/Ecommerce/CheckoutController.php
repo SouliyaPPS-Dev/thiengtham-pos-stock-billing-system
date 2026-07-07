@@ -18,6 +18,14 @@ class CheckoutController
         return $count;
     }
 
+    private function json($data, $code = 200)
+    {
+        http_response_code($code);
+        header('Content-Type: application/json');
+        echo json_encode($data);
+        exit;
+    }
+
     private function redirect($path, $params = [])
     {
         $query = http_build_query($params);
@@ -67,12 +75,14 @@ class CheckoutController
     public function process()
     {
         if (!isset($_SESSION['customer'])) {
-            $this->json(['success' => false, 'message' => 'ກະລຸນາເຂົ້າສູ່ລະບົບກ່ອນ'], 401);
+            $_SESSION['flash_error'] = 'ກະລຸນາເຂົ້າສູ່ລະບົບກ່ອນ';
+            $this->redirect('/login-customer');
         }
 
         $cart = $_SESSION['cart'] ?? [];
         if (empty($cart)) {
-            $this->json(['success' => false, 'message' => 'ກະຕ່າສິນຄ້າວ່າງເປົ່າ'], 400);
+            $_SESSION['flash_error'] = 'ກະຕ່າສິນຄ້າວ່າງເປົ່າ';
+            $this->redirect('/checkout');
         }
 
         $customerId = $_SESSION['customer']['id'];
@@ -89,7 +99,8 @@ class CheckoutController
         $notes = trim($_POST['notes'] ?? '');
 
         if (empty($customerName) || empty($customerPhone) || empty($shippingAddress)) {
-            $this->json(['success' => false, 'message' => 'ກະລຸນາປ້ອນຂໍ້ມູນໃຫ້ຄົບຖ້ວນ'], 400);
+            $_SESSION['flash_error'] = 'ກະລຸນາປ້ອນຂໍ້ມູນໃຫ້ຄົບຖ້ວນ';
+            $this->redirect('/checkout');
         }
 
         $subtotal = 0;
@@ -187,7 +198,8 @@ class CheckoutController
 
         } catch (\Exception $e) {
             $db->rollBack();
-            $this->json(['success' => false, 'message' => 'ເກີດຂໍ້ຜິດພາດ: ' . $e->getMessage()], 500);
+            $_SESSION['flash_error'] = 'ເກີດຂໍ້ຜິດພາດ: ກະລຸນາລອງໃໝ່ອີກຄັ້ງ';
+            $this->redirect('/checkout');
         }
     }
 

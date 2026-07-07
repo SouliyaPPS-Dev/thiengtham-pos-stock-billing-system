@@ -76,6 +76,7 @@ CREATE TABLE customers (
     fullname VARCHAR(100) NOT NULL,
     phone VARCHAR(20) DEFAULT NULL,
     email VARCHAR(100) DEFAULT NULL,
+    customer_type VARCHAR(50) DEFAULT 'regular',
     password VARCHAR(255) DEFAULT NULL,
     address TEXT,
     province VARCHAR(100) DEFAULT NULL,

@@ -50,12 +50,13 @@ class Customer
 
     public function create($data)
     {
-        $stmt = $this->db()->prepare("INSERT INTO customers (fullname, phone, email, address, notes, created_at, updated_at)
-                                      VALUES (?, ?, ?, ?, ?, NOW(), NOW())");
+        $stmt = $this->db()->prepare("INSERT INTO customers (fullname, phone, email, customer_type, address, notes, created_at, updated_at)
+                                      VALUES (?, ?, ?, ?, ?, ?, NOW(), NOW())");
         $stmt->execute([
             $data['fullname'],
             $data['phone'] ?? '',
             $data['email'] ?? '',
+            $data['customer_type'] ?? 'regular',
             $data['address'] ?? '',
             $data['notes'] ?? '',
         ]);
@@ -123,6 +124,15 @@ class Customer
         $q = "%{$query}%";
         $stmt = $this->db()->prepare("SELECT COUNT(*) as total FROM customers WHERE fullname LIKE ? OR phone LIKE ?");
         $stmt->execute([$q, $q]);
+        return (int)$stmt->fetch()['total'];
+    }
+
+    public function countWhere($where, $params)
+    {
+        $sql = "SELECT COUNT(*) as total FROM customers";
+        if (!empty($where)) $sql .= " WHERE $where";
+        $stmt = $this->db()->prepare($sql);
+        $stmt->execute($params);
         return (int)$stmt->fetch()['total'];
     }
 

@@ -490,5 +490,280 @@ $adminPrefix = '/admin';
     </script>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    var mapTileLayers = {};
+
+    function initMapPicker(mapId, latInputId, lngInputId) {
+        var ctx = { map: null, placeMarker: null, _searchTimer: null, _searchDropdown: null };
+        window['__map_' + mapId] = ctx;
+
+        var mapEl = document.getElementById('map-' + mapId);
+        if (!mapEl) return;
+        if (typeof L === 'undefined') return;
+
+        try {
+            var map = L.map(mapEl, { zoomControl: true, scrollWheelZoom: false }).setView([17.97700, 102.63900], 15);
+
+            var streetLayer = L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
+            );
+            var satelliteLayer = L.tileLayer(
+                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                { maxZoom: 19, attribution: '&copy; <a href="https://www.esri.com">Esri</a>' }
+            );
+            var hybridLayer = L.tileLayer(
+                'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+                { maxZoom: 19, attribution: '&copy; <a href="https://www.google.com/maps">Google</a>' }
+            );
+
+            var layers = { street: streetLayer, satellite: satelliteLayer, hybrid: hybridLayer };
+            var currentLayer = 'street';
+            streetLayer.addTo(map);
+            mapTileLayers[mapId] = layers;
+
+            var marker = null;
+            var latInput = document.getElementById(latInputId);
+            var lngInput = document.getElementById(lngInputId);
+            if (!latInput || !lngInput) { ctx.map = map; return; }
+            var initialLat = parseFloat(latInput.value);
+            var initialLng = parseFloat(lngInput.value);
+            if (initialLat && initialLng) {
+                marker = L.marker([initialLat, initialLng]).addTo(map);
+                map.setView([initialLat, initialLng], 15);
+            }
+
+            function placeMarker(latlng) {
+                if (marker) map.removeLayer(marker);
+                marker = L.marker(latlng).addTo(map);
+                latInput.value = latlng.lat.toFixed(6);
+                lngInput.value = latlng.lng.toFixed(6);
+                var latDisp = document.getElementById('lat-display');
+                var lngDisp = document.getElementById('lng-display');
+                if (latDisp) latDisp.textContent = latlng.lat.toFixed(6);
+                if (lngDisp) lngDisp.textContent = latlng.lng.toFixed(6);
+                var gmaps = document.getElementById('gmaps-link');
+                if (gmaps) gmaps.href = 'https://www.google.com/maps?q=' + latlng.lat.toFixed(6) + ',' + latlng.lng.toFixed(6);
+            }
+
+            map.on('click', function(e) { placeMarker(e.latlng); });
+
+            function switchLayer(name) {
+                if (name === currentLayer) return;
+                Object.keys(layers).forEach(function(k) {
+                    if (k === name) { map.addLayer(layers[k]); }
+                    else { map.removeLayer(layers[k]); }
+                });
+                currentLayer = name;
+                var btns = mapEl.querySelectorAll('.map-layer-btn');
+                btns.forEach(function(b) {
+                    b.classList.toggle('bg-sky-600', b.dataset.layer === name);
+                    b.classList.toggle('text-white', b.dataset.layer === name);
+                    b.classList.toggle('bg-white', b.dataset.layer !== name);
+                    b.classList.toggle('text-gray-700', b.dataset.layer !== name);
+                    b.classList.toggle('shadow-sm', b.dataset.layer !== name);
+                });
+            }
+
+            var layerBar = document.createElement('div');
+            layerBar.className = 'flex gap-0.5 rounded-lg overflow-hidden shadow-md border border-gray-200';
+            layerBar.innerHTML =
+                '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-sky-600 text-white cursor-pointer leading-none" data-layer="street" onclick="switchMapLayer(\'' + mapId + '\',\'street\')">ຖະໜົນ</button>' +
+                '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-white text-gray-700 cursor-pointer leading-none" data-layer="satellite" onclick="switchMapLayer(\'' + mapId + '\',\'satellite\')">ດາວທຽມ</button>' +
+                '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-white text-gray-700 cursor-pointer leading-none" data-layer="hybrid" onclick="switchMapLayer(\'' + mapId + '\',\'hybrid\')">ປະສົມ</button>';
+            mapEl.style.position = 'relative';
+            mapEl.appendChild(layerBar);
+            layerBar.style.cssText = 'position:absolute;bottom:12px;left:12px;z-index:1001';
+
+
+            ctx.map = map;
+            ctx.placeMarker = placeMarker;
+            setTimeout(function() { map.invalidateSize(); }, 300);
+        } catch(e) {}
+    }
+
+    function switchMapLayer(mapId, name) {
+        var ctx = window['__map_' + mapId];
+        if (!ctx) return;
+        var layers = mapTileLayers[mapId];
+        if (!layers || !layers[name]) return;
+        Object.keys(layers).forEach(function(k) {
+            if (k === name) ctx.map.addLayer(layers[k]);
+            else ctx.map.removeLayer(layers[k]);
+        });
+        var el = document.getElementById('map-' + mapId);
+        var btns = el.querySelectorAll('.map-layer-btn');
+        btns.forEach(function(b) {
+            b.classList.toggle('bg-sky-600', b.dataset.layer === name);
+            b.classList.toggle('text-white', b.dataset.layer === name);
+            b.classList.toggle('bg-white', b.dataset.layer !== name);
+            b.classList.toggle('text-gray-700', b.dataset.layer !== name);
+            b.classList.toggle('shadow-sm', b.dataset.layer !== name);
+        });
+    }
+
+    function searchLocation(query, mapId) {
+        var ctx = window['__map_' + mapId];
+        if (!ctx) return;
+        if (ctx._searchTimer) clearTimeout(ctx._searchTimer);
+        query = (query || '').trim();
+        if (query.length < 3) {
+            if (ctx._searchDropdown) { ctx._searchDropdown.remove(); ctx._searchDropdown = null; }
+            return;
+        }
+        ctx._searchTimer = setTimeout(function() {
+            fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&limit=5&countrycodes=LA')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (ctx._searchDropdown) { ctx._searchDropdown.remove(); ctx._searchDropdown = null; }
+                    if (data.length === 0) return;
+                    var searchInput = document.getElementById('map-search-' + mapId);
+                    if (!searchInput) return;
+                    var dropdown = document.createElement('div');
+                    dropdown.className = 'absolute z-50 mt-1 w-full bg-white border border-border rounded-xl shadow-xl max-h-48 overflow-y-auto';
+                    dropdown.style.top = '100%';
+                    dropdown.style.left = '0';
+                    for (var i = 0; i < data.length; i++) {
+                        (function(loc) {
+                            var item = document.createElement('div');
+                            item.className = 'px-4 py-2.5 cursor-pointer text-sm hover:bg-primary/10 hover:text-primary transition-colors text-gray-700 border-b border-gray-50 last:border-b-0';
+                            item.textContent = loc.display_name;
+                            item.addEventListener('click', function() {
+                                var lat = parseFloat(loc.lat);
+                                var lng = parseFloat(loc.lon);
+                                if (ctx.placeMarker && ctx.map) {
+                                    ctx.placeMarker({lat: lat, lng: lng});
+                                    ctx.map.setView([lat, lng], 15);
+                                }
+                                searchInput.value = loc.display_name;
+                                if (ctx._searchDropdown) { ctx._searchDropdown.remove(); ctx._searchDropdown = null; }
+                                if (typeof autoFillAddress === 'function') autoFillAddress(loc);
+                            });
+                            dropdown.appendChild(item);
+                        })(data[i]);
+                    }
+                    var parent = searchInput.parentElement;
+                    parent.appendChild(dropdown);
+                    ctx._searchDropdown = dropdown;
+                })
+                .catch(function() {});
+        }, 400);
+    }
+
+    document.addEventListener('click', function(e) {
+        for (var key in window) {
+            if (key.indexOf('__map_') !== 0) continue;
+            var ctx = window[key];
+            if (!ctx._searchDropdown) continue;
+            var mapId = key.replace('__map_', '');
+            var searchInput = document.getElementById('map-search-' + mapId);
+            if (ctx._searchDropdown.contains(e.target)) continue;
+            if (searchInput && searchInput.contains(e.target)) continue;
+            ctx._searchDropdown.remove();
+            ctx._searchDropdown = null;
+        }
+    });
+
+    function getCurrentLocation(mapId) {
+        var ctx = window['__map_' + mapId];
+        if (!ctx || !ctx.map) return;
+        if (!navigator.geolocation) {
+            Swal.fire({ icon: 'warning', title: 'ບໍ່ສາມາດເຂົ້າເຖິງຕຳແໜ່ງ', text: 'ບຣາວເຊີຂອງທ່ານບໍ່ຮອງຮັບ' });
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            function(pos) {
+                var latlng = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                ctx.placeMarker(latlng);
+                ctx.map.setView([latlng.lat, latlng.lng], 16);
+            },
+            function() {
+                Swal.fire({ icon: 'warning', title: 'ບໍ່ສາມາດເຂົ້າເຖິງຕຳແໜ່ງ', text: 'ກະລຸນາອະນຸຍາດການເຂົ້າເຖິງຕຳແໜ່ງ' });
+            }
+        );
+    }
+
+    function autoFillAddress(loc) {
+        var el = document.querySelector('[x-data^="addressPicker"]');
+        if (!el || typeof Alpine === 'undefined') return;
+        var data = Alpine.$data(el);
+        var addr = loc.address || {};
+        var province = matchLaosProvince(addr.state || '');
+        if (province) {
+            data.province = province;
+            data.provinceSearch = province;
+            data.district = '';
+            data.districtSearch = '';
+            data.village = '';
+            data.villageSearch = '';
+            data.villageResults = [];
+        }
+        if (province) {
+            var district = matchLaosDistrict(addr.county || '', province);
+            if (district) {
+                data.district = district;
+                data.districtSearch = district;
+                data.village = '';
+                data.villageSearch = '';
+            }
+        }
+        var village = addr.village || addr.town || addr.city || addr.hamlet || addr.suburb || '';
+        if (village) {
+            data.village = village;
+            data.villageSearch = village;
+        }
+    }
+
+    function matchLaosProvince(state) {
+        if (!state) return '';
+        if (typeof LAOS_ADDRESSES === 'undefined') return '';
+        var s = state.toLowerCase().trim();
+        var laoKeys = Object.keys(LAOS_ADDRESSES);
+        for (var i = 0; i < laoKeys.length; i++) {
+            if (s.indexOf(laoKeys[i].toLowerCase()) !== -1) return laoKeys[i];
+        }
+        var map = {
+            'vientiane capital': laoKeys[0],
+            'vientiane prefecture': 'ວຽງຈັນ',
+            'vientiane province': 'ວຽງຈັນ',
+            'phongsaly province': 'ຜົ້ງສາລີ',
+            'luang namtha province': 'ຫຼວງນໍ້າທາ',
+            'oudomxay province': 'ອຸດົມໄຊ',
+            'bokeo province': 'ບໍ່ແກ້ວ',
+            'luang prabang province': 'ຫຼວງພະບາງ',
+            'huaphanh province': 'ຫົວພັນ',
+            'sainyabuli province': 'ໄຊຍະບູລີ',
+            'xieng khouang province': 'ຊຽງຂວາງ',
+            'bolikhamxay province': 'ບໍລິຄຳໄຊ',
+            'khammouane province': 'ຄຳມ່ວນ',
+            'savannakhet province': 'ສະຫວັນນະເຂດ',
+            'saravane province': 'ສາລະວັນ',
+            'sekong province': 'ເຊກອງ',
+            'champasack province': 'ຈຳປາສັກ',
+            'champasak province': 'ຈຳປາສັກ',
+            'attapeu province': 'ອັດຕະປື',
+            'xaysomboune province': 'ໄຊສົມບູນ',
+        };
+        return map[s] || '';
+    }
+
+    function matchLaosDistrict(name, province) {
+        if (!name || !province) return '';
+        if (typeof LAOS_ADDRESSES === 'undefined') return '';
+        var n = name.toLowerCase().replace(/\s*district\s*/gi, '').trim();
+        var districts = LAOS_ADDRESSES[province] || [];
+        for (var i = 0; i < districts.length; i++) {
+            if (districts[i].toLowerCase().indexOf(n) !== -1 || n.indexOf(districts[i].toLowerCase()) !== -1) {
+                return districts[i];
+            }
+        }
+        return '';
+    }
+
+    // Auto-init map-order-show on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('map-order-show')) initMapPicker('order-show', 'shipping_latitude', 'shipping_longitude');
+    });
+    </script>
 </body>
 </html>

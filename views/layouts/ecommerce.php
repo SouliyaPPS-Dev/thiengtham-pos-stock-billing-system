@@ -49,9 +49,10 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
         .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
-<body x-data="{ mobileMenu: false, searchOpen: false, cartOpen: false }" class="bg-background min-h-screen flex flex-col">
+<body x-data="{ mobileMenu: false, searchOpen: false }" class="bg-background min-h-screen flex flex-col">
 
     <!-- Top Header Bar -->
     <header class="bg-card/90 backdrop-blur-md border-b border-border/80 sticky top-0 z-50 transition-all duration-300 shadow-[0_2px_20px_-3px_rgba(0,0,0,0.03)]">
@@ -96,17 +97,22 @@
                     </button>
 
                     <!-- Account -->
-                    <a href="<?= isset($_SESSION['customer']) ? '#' : url('/login-customer') ?>"
-                       @click="<?= isset($_SESSION['customer']) ? 'cartOpen = !cartOpen' : '' ?>"
-                       class="hidden sm:flex items-center gap-2 h-10 px-3 rounded-xl hover:bg-muted transition-colors group relative">
-                        <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors">
-                            <i class="fas fa-user text-sm"></i>
-                        </div>
-                        <span class="text-sm font-bold text-foreground/85 hidden md:block">
-                            <?= isset($_SESSION['customer']) ? htmlspecialchars($_SESSION['customer']['fullname']) : 'ເຂົ້າສູ່ລະບົບ' ?>
-                        </span>
-                        <?php if (isset($_SESSION['customer'])): ?>
-                        <div x-show="cartOpen" @click.away="cartOpen = false" class="absolute top-full right-0 mt-1 w-64 bg-card rounded-xl border border-border shadow-xl p-2.5 z-50" x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100">
+                    <?php if (isset($_SESSION['customer'])): ?>
+                    <div x-data="{ accountOpen: false }" class="hidden sm:relative sm:flex">
+                        <button @click="accountOpen = !accountOpen" class="flex items-center gap-2 h-10 px-3 rounded-xl hover:bg-muted transition-colors group">
+                            <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors">
+                                <i class="fas fa-user text-sm"></i>
+                            </div>
+                            <span class="text-sm font-bold text-foreground/85 hidden md:block">
+                                <?= htmlspecialchars($_SESSION['customer']['fullname']) ?>
+                            </span>
+                        </button>
+                        <div x-show="accountOpen" @click.away="accountOpen = false"
+                             class="absolute bottom-full right-0 mb-2 w-64 bg-card rounded-xl border border-border shadow-xl p-2.5 z-50"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-cloak>
                             <div class="px-4 py-3.5 border-b border-border mb-1.5">
                                 <p class="text-sm font-bold text-foreground"><?= htmlspecialchars($_SESSION['customer']['fullname']) ?></p>
                                 <p class="text-xs text-muted-foreground mt-0.5"><?= htmlspecialchars($_SESSION['customer']['email'] ?? $_SESSION['customer']['phone'] ?? '') ?></p>
@@ -120,8 +126,15 @@
                                 <span>ອອກຈາກລະບົບ</span>
                             </a>
                         </div>
-                        <?php endif; ?>
+                    </div>
+                    <?php else: ?>
+                    <a href="<?= url('/login-customer') ?>" class="hidden sm:flex items-center gap-2 h-10 px-3 rounded-xl hover:bg-muted transition-colors group">
+                        <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors">
+                            <i class="fas fa-user text-sm"></i>
+                        </div>
+                        <span class="text-sm font-bold text-foreground/85 hidden md:block">ເຂົ້າສູ່ລະບົບ</span>
                     </a>
+                    <?php endif; ?>
 
                     <!-- Theme Toggle -->
                     <button @click="toggle()" class="h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors" :title="isDark ? 'ເປີດໂໝດກາງເວັນ' : 'ເປີດໂໝດກາງຄືນ'">
@@ -380,6 +393,29 @@
     <?php endif; ?>
     <?php endif; ?>
 
+    <!-- Flash Messages -->
+    <?php if (isset($_SESSION['flash_error'])): ?>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div class="flex items-center gap-3 bg-red-50 border border-red-200 text-red-700 px-5 py-4 rounded-xl text-sm font-bold">
+            <i class="fas fa-exclamation-circle text-lg"></i>
+            <span><?= htmlspecialchars($_SESSION['flash_error']) ?></span>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-red-400 hover:text-red-600"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    <?php unset($_SESSION['flash_error']); ?>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['flash_success'])): ?>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <div class="flex items-center gap-3 bg-emerald-50 border border-emerald-200 text-emerald-700 px-5 py-4 rounded-xl text-sm font-bold">
+            <i class="fas fa-check-circle text-lg"></i>
+            <span><?= htmlspecialchars($_SESSION['flash_success']) ?></span>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-emerald-400 hover:text-emerald-600"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    <?php unset($_SESSION['flash_success']); ?>
+    <?php endif; ?>
+
     <!-- Main Content -->
     <main class="flex-1">
         <?= $content ?>
@@ -493,7 +529,7 @@
             if (text) {
                 Swal.fire({ icon: icon, title: title, text: text, timer: 2500, showConfirmButton: false });
             }
-            const newUrl = window.location.pathname;
+            const newUrl = window.location.pathname + (window.location.hash || '');
             window.history.replaceState({}, document.title, newUrl);
         }
 
@@ -542,94 +578,102 @@
     var mapTileLayers = {};
 
     function initMapPicker(mapId, latInputId, lngInputId) {
+        var ctx = { map: null, placeMarker: null, _searchTimer: null, _searchDropdown: null };
+        window['__map_' + mapId] = ctx;
+
         var mapEl = document.getElementById('map-' + mapId);
         if (!mapEl) return;
-        var map = L.map(mapEl).setView([17.97700, 102.63900], 15);
+        if (typeof L === 'undefined') return;
 
-        var streetLayer = L.tileLayer(
-            'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
-        );
-        var satelliteLayer = L.tileLayer(
-            'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-            { maxZoom: 19, attribution: '&copy; <a href="https://www.esri.com">Esri</a>' }
-        );
-        var hybridLayer = L.tileLayer(
-            'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
-            { maxZoom: 19, attribution: '&copy; <a href="https://www.google.com/maps">Google</a>' }
-        );
+        try {
+            var map = L.map(mapEl).setView([17.97700, 102.63900], 15);
 
-        var layers = { street: streetLayer, satellite: satelliteLayer, hybrid: hybridLayer };
-        var currentLayer = 'street';
-        streetLayer.addTo(map);
-        mapTileLayers[mapId] = layers;
+            var streetLayer = L.tileLayer(
+                'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' }
+            );
+            var satelliteLayer = L.tileLayer(
+                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                { maxZoom: 19, attribution: '&copy; <a href="https://www.esri.com">Esri</a>' }
+            );
+            var hybridLayer = L.tileLayer(
+                'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
+                { maxZoom: 19, attribution: '&copy; <a href="https://www.google.com/maps">Google</a>' }
+            );
 
-        var marker = null;
-        var latInput = document.getElementById(latInputId);
-        var lngInput = document.getElementById(lngInputId);
-        if (!latInput || !lngInput) return;
-        var initialLat = parseFloat(latInput.value);
-        var initialLng = parseFloat(lngInput.value);
-        if (initialLat && initialLng) {
-            marker = L.marker([initialLat, initialLng]).addTo(map);
-            map.setView([initialLat, initialLng], 15);
-        }
+            var layers = { street: streetLayer, satellite: satelliteLayer, hybrid: hybridLayer };
+            var currentLayer = 'street';
+            streetLayer.addTo(map);
+            mapTileLayers[mapId] = layers;
 
-        function placeMarker(latlng) {
-            if (marker) map.removeLayer(marker);
-            marker = L.marker(latlng).addTo(map);
-            latInput.value = latlng.lat.toFixed(6);
-            lngInput.value = latlng.lng.toFixed(6);
-            var latDisp = document.getElementById('lat-display');
-            var lngDisp = document.getElementById('lng-display');
-            if (latDisp) latDisp.textContent = latlng.lat.toFixed(6);
-            if (lngDisp) lngDisp.textContent = latlng.lng.toFixed(6);
-            var gmaps = document.getElementById('gmaps-link');
-            if (gmaps) gmaps.href = 'https://www.google.com/maps?q=' + latlng.lat.toFixed(6) + ',' + latlng.lng.toFixed(6);
-        }
+            var marker = null;
+            var latInput = document.getElementById(latInputId);
+            var lngInput = document.getElementById(lngInputId);
+            if (!latInput || !lngInput) { ctx.map = map; return; }
+            var initialLat = parseFloat(latInput.value);
+            var initialLng = parseFloat(lngInput.value);
+            if (initialLat && initialLng) {
+                marker = L.marker([initialLat, initialLng]).addTo(map);
+                map.setView([initialLat, initialLng], 15);
+            }
 
-        map.on('click', function(e) { placeMarker(e.latlng); });
+            function placeMarker(latlng) {
+                if (marker) map.removeLayer(marker);
+                marker = L.marker(latlng).addTo(map);
+                latInput.value = latlng.lat.toFixed(6);
+                lngInput.value = latlng.lng.toFixed(6);
+                var latDisp = document.getElementById('lat-display');
+                var lngDisp = document.getElementById('lng-display');
+                if (latDisp) latDisp.textContent = latlng.lat.toFixed(6);
+                if (lngDisp) lngDisp.textContent = latlng.lng.toFixed(6);
+                var gmaps = document.getElementById('gmaps-link');
+                if (gmaps) gmaps.href = 'https://www.google.com/maps?q=' + latlng.lat.toFixed(6) + ',' + latlng.lng.toFixed(6);
+            }
 
-        function switchLayer(name) {
-            if (name === currentLayer) return;
-            Object.keys(layers).forEach(function(k) {
-                if (k === name) { map.addLayer(layers[k]); }
-                else { map.removeLayer(layers[k]); }
-            });
-            currentLayer = name;
-            var btns = mapEl.querySelectorAll('.map-layer-btn');
-            btns.forEach(function(b) {
-                b.classList.toggle('bg-sky-600', b.dataset.layer === name);
-                b.classList.toggle('text-white', b.dataset.layer === name);
-                b.classList.toggle('bg-white', b.dataset.layer !== name);
-                b.classList.toggle('text-gray-700', b.dataset.layer !== name);
-                b.classList.toggle('shadow-sm', b.dataset.layer !== name);
-            });
-        }
+            map.on('click', function(e) { placeMarker(e.latlng); });
 
-        // Custom layer toggle buttons (inside map area)
-        var layerBar = document.createElement('div');
-        layerBar.className = 'flex gap-0.5 rounded-lg overflow-hidden shadow-md border border-gray-200';
-        layerBar.innerHTML =
-            '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-sky-600 text-white cursor-pointer leading-none" data-layer="street" onclick="switchMapLayer(\'' + mapId + '\',\'street\')">ຖະໜົນ</button>' +
-            '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-white text-gray-700 cursor-pointer leading-none" data-layer="satellite" onclick="switchMapLayer(\'' + mapId + '\',\'satellite\')">ດາວທຽມ</button>' +
-            '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-white text-gray-700 cursor-pointer leading-none" data-layer="hybrid" onclick="switchMapLayer(\'' + mapId + '\',\'hybrid\')">ປະສົມ</button>';
-        mapEl.style.position = 'relative';
-        mapEl.appendChild(layerBar);
-        layerBar.style.cssText = 'position:absolute;bottom:12px;left:12px;z-index:1001';
+            function switchLayer(name) {
+                if (name === currentLayer) return;
+                Object.keys(layers).forEach(function(k) {
+                    if (k === name) { map.addLayer(layers[k]); }
+                    else { map.removeLayer(layers[k]); }
+                });
+                currentLayer = name;
+                var btns = mapEl.querySelectorAll('.map-layer-btn');
+                btns.forEach(function(b) {
+                    b.classList.toggle('bg-sky-600', b.dataset.layer === name);
+                    b.classList.toggle('text-white', b.dataset.layer === name);
+                    b.classList.toggle('bg-white', b.dataset.layer !== name);
+                    b.classList.toggle('text-gray-700', b.dataset.layer !== name);
+                    b.classList.toggle('shadow-sm', b.dataset.layer !== name);
+                });
+            }
 
-        // Current location button (inside map area)
-        var locBtn = document.createElement('button');
-        locBtn.className = 'w-9 h-9 bg-white rounded-lg shadow-md border border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all';
-        locBtn.setAttribute('type', 'button');
-        locBtn.setAttribute('title', 'ຊອກຫາທີ່ຢູ່ຂອງຂ້ອຍ');
-        locBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>';
-        locBtn.addEventListener('click', function() { getCurrentLocation(mapId); });
-        mapEl.appendChild(locBtn);
-        locBtn.style.cssText = 'position:absolute;top:12px;right:12px;z-index:1001';
+            // Custom layer toggle buttons (inside map area)
+            var layerBar = document.createElement('div');
+            layerBar.className = 'flex gap-0.5 rounded-lg overflow-hidden shadow-md border border-gray-200';
+            layerBar.innerHTML =
+                '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-sky-600 text-white cursor-pointer leading-none" data-layer="street" onclick="switchMapLayer(\'' + mapId + '\',\'street\')">ຖະໜົນ</button>' +
+                '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-white text-gray-700 cursor-pointer leading-none" data-layer="satellite" onclick="switchMapLayer(\'' + mapId + '\',\'satellite\')">ດາວທຽມ</button>' +
+                '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-white text-gray-700 cursor-pointer leading-none" data-layer="hybrid" onclick="switchMapLayer(\'' + mapId + '\',\'hybrid\')">ປະສົມ</button>';
+            mapEl.style.position = 'relative';
+            mapEl.appendChild(layerBar);
+            layerBar.style.cssText = 'position:absolute;bottom:12px;left:12px;z-index:1001';
 
-        window['__map_' + mapId] = { map: map, placeMarker: placeMarker, _searchTimer: null, _searchDropdown: null };
-        setTimeout(function() { map.invalidateSize(); }, 300);
+            // Current location button (inside map area)
+            var locBtn = document.createElement('button');
+            locBtn.className = 'w-9 h-9 bg-white rounded-lg shadow-md border border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-all';
+            locBtn.setAttribute('type', 'button');
+            locBtn.setAttribute('title', 'ຊອກຫາທີ່ຢູ່ຂອງຂ້ອຍ');
+            locBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>';
+            locBtn.addEventListener('click', function() { getCurrentLocation(mapId); });
+            mapEl.appendChild(locBtn);
+            locBtn.style.cssText = 'position:absolute;top:12px;right:12px;z-index:1001';
+
+            ctx.map = map;
+            ctx.placeMarker = placeMarker;
+            setTimeout(function() { map.invalidateSize(); }, 300);
+        } catch(e) {}
     }
 
     function switchMapLayer(mapId, name) {
@@ -679,11 +723,15 @@
                             item.className = 'px-4 py-2.5 cursor-pointer text-sm hover:bg-primary/10 hover:text-primary transition-colors text-gray-700 border-b border-gray-50 last:border-b-0';
                             item.textContent = loc.display_name;
                             item.addEventListener('click', function() {
-                                ctx.placeMarker([loc.lat, loc.lon]);
-                                ctx.map.setView([loc.lat, loc.lon], 15);
+                                var lat = parseFloat(loc.lat);
+                                var lng = parseFloat(loc.lon);
+                                if (ctx.placeMarker && ctx.map) {
+                                    ctx.placeMarker({lat: lat, lng: lng});
+                                    ctx.map.setView([lat, lng], 15);
+                                }
                                 searchInput.value = loc.display_name;
                                 if (ctx._searchDropdown) { ctx._searchDropdown.remove(); ctx._searchDropdown = null; }
-                                autoFillAddress(loc);
+                                if (typeof autoFillAddress === 'function') autoFillAddress(loc);
                             });
                             dropdown.appendChild(item);
                         })(data[i]);
@@ -713,7 +761,7 @@
 
     function getCurrentLocation(mapId) {
         var ctx = window['__map_' + mapId];
-        if (!ctx) return;
+        if (!ctx || !ctx.map) return;
         if (!navigator.geolocation) {
             Swal.fire({ icon: 'warning', title: 'ບໍ່ສາມາດເຂົ້າເຖິງຕຳແໜ່ງ', text: 'ບຣາວເຊີຂອງທ່ານບໍ່ຮອງຮັບ' });
             return;

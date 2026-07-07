@@ -107,7 +107,7 @@
                         <div class="relative" @click.outside="villageOpen = false">
                             <label class="text-sm font-bold text-foreground/85 mb-1.5 block">ບ້ານ</label>
                             <div class="relative">
-                                <input type="text" x-model="villageSearch" @focus="villageOpen = true" @input="searchVillage($el.value)"
+                                <input type="text" x-model="villageSearch" @focus="villageOpen = true" @input="village = villageSearch = $el.value; searchVillage($el.value)"
                                        placeholder="ຄົ້ນຫາບ້ານ..." autocomplete="off"
                                        class="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm pr-10">
                                 <span class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs" x-show="villageLoading">

@@ -57,37 +57,30 @@
                     </div>
                 </div>
 
-                <?php if (!empty($order['shipping_latitude']) && !empty($order['shipping_longitude'])): ?>
                 <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-50">
                         <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-200">
                             <i class="fas fa-map-marked-alt text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-extrabold text-foreground">ຕຳແໜ່ງທີ່ຕັ້ງ</h2>
-                            <p class="text-xs text-muted-foreground">GPS ຂອງທີ່ຢູ່ຈັດສົ່ງ</p>
+                            <h2 class="text-base font-extrabold text-foreground">ຕຳແໜ່ງທີ່ຕັ້ງ GPS ຂອງທີ່ຢູ່ຈັດສົ່ງ</h2>
                         </div>
                     </div>
-                    <div id="map-order-show" class="w-full h-48 rounded-xl border border-border z-0"></div>
+
+                    <div id="map-order-show" class="w-full h-56 rounded-xl border border-border relative z-10"></div>
                     <div class="flex items-center justify-between mt-2">
                         <div class="flex gap-3">
-                            <span class="text-xs text-muted-foreground">ເສັ້ນຂວາງ: <?= $order['shipping_latitude'] ?></span>
-                            <span class="text-xs text-muted-foreground">ເສັ້ນແວງ: <?= $order['shipping_longitude'] ?></span>
+                            <span class="text-xs text-muted-foreground">ເສັ້ນຂວາງ: <span id="lat-display" class="font-bold text-foreground"><?= htmlspecialchars($order['shipping_latitude'] ?? '17.977') ?></span></span>
+                            <span class="text-xs text-muted-foreground">ເສັ້ນແວງ: <span id="lng-display" class="font-bold text-foreground"><?= htmlspecialchars($order['shipping_longitude'] ?? '102.639') ?></span></span>
                         </div>
-                        <a href="https://www.google.com/maps?q=<?= $order['shipping_latitude'] ?>,<?= $order['shipping_longitude'] ?>" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[11px] font-bold transition-all">
+                        <a id="gmaps-link" href="https://www.google.com/maps?q=<?= $order['shipping_latitude'] ?? '17.977' ?>,<?= $order['shipping_longitude'] ?? '102.639' ?>" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[11px] font-bold transition-all">
                             <i class="fab fa-google"></i> Google Maps
                         </a>
                     </div>
-                    <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        var isDark = document.documentElement.classList.contains('dark');
-                        var map = L.map('map-order-show', { zoomControl: true, scrollWheelZoom: false }).setView([<?= $order['shipping_latitude'] ?>, <?= $order['shipping_longitude'] ?>], 15);
-                        L.tileLayer(isDark ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' }).addTo(map);
-                        L.marker([<?= $order['shipping_latitude'] ?>, <?= $order['shipping_longitude'] ?>]).addTo(map);
-                    });
-                    </script>
+                    <p class="text-xs text-muted-foreground mt-1">ກົດເທິງແຜນທີ່ເພື່ອເລືອກຕຳແໜ່ງ</p>
+                    <input type="hidden" name="shipping_latitude" id="shipping_latitude" value="<?= htmlspecialchars($order['shipping_latitude'] ?? '17.977') ?>">
+                    <input type="hidden" name="shipping_longitude" id="shipping_longitude" value="<?= htmlspecialchars($order['shipping_longitude'] ?? '102.639') ?>">
                 </div>
-                <?php endif; ?>
             </div>
 
             <div class="space-y-6">

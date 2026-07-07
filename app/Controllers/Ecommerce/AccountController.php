@@ -134,17 +134,22 @@ class AccountController
         }
 
         $customerId = $_SESSION['customer']['id'];
-        $fullname = trim($_POST['fullname'] ?? '');
-        $phone = trim(($_POST['phone_prefix'] ?? '+856') . ' ' . ($_POST['phone'] ?? ''));
-        $email = trim($_POST['email'] ?? '');
-        $address = trim($_POST['address'] ?? '');
-        $province = trim($_POST['province'] ?? '');
-        $district = trim($_POST['district'] ?? '');
-        $village = trim($_POST['village'] ?? '');
-        $latitude = !empty($_POST['latitude']) ? $_POST['latitude'] : null;
-        $longitude = !empty($_POST['longitude']) ? $_POST['longitude'] : null;
-
         $db = Database::getInstance()->getConnection();
+
+        // Load existing customer data to preserve fields not sent by the current form
+        $stmt = $db->prepare("SELECT * FROM customers WHERE id = ?");
+        $stmt->execute([$customerId]);
+        $existing = $stmt->fetch();
+
+        $fullname = isset($_POST['fullname']) ? trim($_POST['fullname']) : ($existing['fullname'] ?? '');
+        $phone = isset($_POST['phone']) ? trim(($_POST['phone_prefix'] ?? '+856') . ' ' . ($_POST['phone'] ?? '')) : ($existing['phone'] ?? '');
+        $email = isset($_POST['email']) ? trim($_POST['email']) : ($existing['email'] ?? '');
+        $address = isset($_POST['address']) ? trim($_POST['address']) : ($existing['address'] ?? '');
+        $province = isset($_POST['province']) ? trim($_POST['province']) : ($existing['province'] ?? '');
+        $district = isset($_POST['district']) ? trim($_POST['district']) : ($existing['district'] ?? '');
+        $village = isset($_POST['village']) ? trim($_POST['village']) : ($existing['village'] ?? '');
+        $latitude = isset($_POST['latitude']) && $_POST['latitude'] !== '' ? $_POST['latitude'] : ($existing['latitude'] ?? null);
+        $longitude = isset($_POST['longitude']) && $_POST['longitude'] !== '' ? $_POST['longitude'] : ($existing['longitude'] ?? null);
 
         try {
             $stmt = $db->prepare("UPDATE customers SET fullname = ?, phone = ?, email = ?, address = ?, province = ?, district = ?, village = ?, latitude = ?, longitude = ? WHERE id = ?");
@@ -164,9 +169,15 @@ class AccountController
                 'longitude' => $longitude ?? '',
             ];
 
-            $this->redirect('/account', ['success' => 1, 'success_msg' => 'ອັບເດດຂໍ້ມູນສຳເລັດ']);
+            $tab = isset($_POST['province']) || isset($_POST['village']) ? '#address' : '#profile';
+            $url = url('/account') . '?success=1&success_msg=ອັບເດດຂໍ້ມູນສຳເລັດ' . $tab;
+            header('Location: ' . $url);
+            exit;
         } catch (\Exception $e) {
-            $this->redirect('/account', ['error' => 1, 'error_msg' => 'ເກີດຂໍ້ຜິດພາດ: ' . $e->getMessage()]);
+            $tab = isset($_POST['province']) || isset($_POST['village']) ? '#address' : '#profile';
+            $url = url('/account') . '?error=1&error_msg=ເກີດຂໍ້ຜິດພາດ: ' . urlencode($e->getMessage()) . $tab;
+            header('Location: ' . $url);
+            exit;
         }
     }
 }

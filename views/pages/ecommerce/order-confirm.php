@@ -168,8 +168,49 @@
         </div>
     </div>
 
+    <!-- WhatsApp Order Notification -->
+    <?php
+    $wa_number = get_store_whatsapp();
+    $wa_number_clean = preg_replace('/[^0-9]/', '', $wa_number);
+    if ($wa_number_clean):
+        $items_list = '';
+        foreach ($items as $idx => $item) {
+            $items_list .= ($idx + 1) . '. ' . htmlspecialchars($item['product_name']) . ' x' . (int)$item['quantity'] . ' = ' . number_format((float)$item['subtotal'], 0) . " ກີບ\n";
+        }
+        $wa_message = "ສະບາຍດີ, ຂ້ອຍຕ້ອງການສັ່ງຊື້ສິນຄ້າ\n\n";
+        $wa_message .= "ລິ້ງຄຳສັ່ງຊື້ (Admin):\n" . url('/admin/orders/' . $order['id']) . "\n\n";
+        $wa_message .= "ເລກທີຄຳສັ່ງ: #{$order['order_number']}\n";
+        $wa_message .= "ຊື່: {$order['customer_name']}\n";
+        $wa_message .= "ເບີໂທ: {$order['customer_phone']}\n";
+        if (!empty($order['customer_email'])) $wa_message .= "ອີເມວ: {$order['customer_email']}\n";
+        $wa_message .= "\n--- ລາຍການສິນຄ້າ ---\n{$items_list}\n";
+        $wa_message .= "ລວມທັງໝົດ: " . number_format((float)$order['grand_total'], 0) . " ກີບ\n";
+        $wa_message .= "ຄ່າຈັດສົ່ງ: " . number_format((float)$order['shipping_fee'], 0) . " ກີບ\n";
+        if ((float)$order['discount'] > 0) $wa_message .= "ສ່ວນຫຼຸດ: -" . number_format((float)$order['discount'], 0) . " ກີບ\n";
+        $wa_message .= "ວິທີຊຳລະ: " . ($order['payment_method'] === 'cod' ? 'ເງິນສົດປາຍທາງ' : 'QR Code') . "\n";
+        $wa_message .= "\n--- ທີ່ຢູ່ຈັດສົ່ງ ---\n{$order['shipping_address']}";
+        if (!empty($order['shipping_province'])) $wa_message .= ", {$order['shipping_province']}";
+        if (!empty($order['shipping_district'])) $wa_message .= ", {$order['shipping_district']}";
+        if (!empty($order['shipping_village'])) $wa_message .= ", {$order['shipping_village']}";
+        $wa_url = 'https://wa.me/' . $wa_number_clean . '?text=' . urlencode($wa_message);
+    ?>
+    <div class="text-center mt-6">
+        <a href="<?= $wa_url ?>" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-200">
+            <i class="fa-brands fa-whatsapp text-lg"></i> ສົ່ງຂໍ້ມູນຄຳສັ່ງຊື້ຜ່ານ WhatsApp
+        </a>
+    </div>
+    <?php endif; ?>
+
+    <?php if (!empty($wa_number_clean)): ?>
+    <script>
+    setTimeout(function() {
+        window.open('<?= $wa_url ?>', '_blank');
+    }, 1500);
+    </script>
+    <?php endif; ?>
+
     <!-- Actions -->
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
         <a href="<?= url('/products') ?>" class="inline-flex items-center gap-2 bg-sky-600 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-sky-700 transition-all shadow-lg shadow-sky-200">
             <i class="fas fa-shopping-bag"></i> ຊື້ສິນຄ້າເພີ່ມ
         </a>
