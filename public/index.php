@@ -44,10 +44,10 @@ $host = $_SERVER['HTTP_HOST'] ?? '';
 $isLocalhost = (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false);
 
 if ($isLocalhost) {
-    // Development: use existing .env with local MySQL
     $_ENV['APP_ENV'] = 'development';
-} elseif (strpos($host, 'infinityfree') !== false || file_exists(__DIR__ . '/../.env.infinityfree')) {
-    // InfinityFree: load .env.infinityfree overrides
+} elseif (!empty(getenv('SPACE_ID')) || ($_ENV['APP_ENV_HF'] ?? null) === 'true') {
+    $_ENV['APP_ENV'] = 'production';
+} elseif (strpos($host, 'infinityfree') !== false) {
     $_ENV['APP_ENV'] = 'infinityfree';
     $ifreeFile = __DIR__ . '/../.env.infinityfree';
     if (file_exists($ifreeFile)) {
@@ -67,7 +67,6 @@ if ($isLocalhost) {
         }
     }
 } else {
-    // Production (HF Spaces): use PROD_DB_* env vars (set by start.sh or Space Secrets)
     $_ENV['APP_ENV'] = 'production';
 }
 
