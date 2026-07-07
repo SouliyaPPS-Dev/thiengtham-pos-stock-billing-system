@@ -100,7 +100,7 @@ APP_NAME="POS & Stock"
 APP_ENV=production
 APP_ENV_HF=true
 APP_URL=${APP_URL}
-APP_DEBUG=false
+APP_DEBUG=${APP_DEBUG:-false}
 
 PROD_APP_URL=${APP_URL}
 
