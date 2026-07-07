@@ -1,70 +1,5 @@
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ status: '<?= $order['order_status'] ?? 'Pending' ?>', polling: true }"
-     x-init="
-         if (polling) {
-             setInterval(() => {
-                 fetch('<?= url('/order/' . $order['id'] . '/status') ?>', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
-                     .then(r => r.json())
-                     .then(data => {
-                         if (data.success) {
-                             status = data.order_status;
-                             let badge = document.getElementById('order-status-badge');
-                             let labels = { 'Pending': 'ລໍຖ້າ', 'Confirmed': 'ຢືນຢັນ', 'Processing': 'ກຳລັງດຳເນີນ', 'Shipped': 'ຈັດສົ່ງ', 'Delivered': 'ສົ່ງແລ້ວ', 'Cancelled': 'ຍົກເລີກ' };
-                             let colors = { 'Pending': 'bg-amber-100 text-amber-700', 'Confirmed': 'bg-blue-100 text-blue-700', 'Processing': 'bg-indigo-100 text-indigo-700', 'Shipped': 'bg-sky-100 text-sky-700', 'Delivered': 'bg-emerald-100 text-emerald-700', 'Cancelled': 'bg-red-100 text-red-700' };
-                             let dotColors = { 'Pending': 'bg-amber-500', 'Confirmed': 'bg-blue-500', 'Processing': 'bg-indigo-500', 'Shipped': 'bg-sky-500', 'Delivered': 'bg-emerald-500', 'Cancelled': 'bg-red-500' };
-                             if (badge) {
-                                 badge.innerHTML = '<span class=\"w-2 h-2 rounded-full ' + (dotColors[data.order_status] || 'bg-gray-400') + '\"></span> ' + (labels[data.order_status] || data.order_status);
-                                 badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ' + (colors[data.order_status] || 'bg-gray-100 text-gray-600');
-                             }
-                             // Update timeline
-                             let steps = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered'];
-                             let current = steps.indexOf(data.order_status);
-                             document.querySelectorAll('#tracking-timeline li').forEach((li, idx) => {
-                                 let circle = li.querySelector('.timeline-circle');
-                                 let conn1 = li.querySelector('.connector-left');
-                                 let conn2 = li.querySelector('.connector-right');
-                                 let label = li.querySelector('.timeline-label');
-                                 if (idx < current) {
-                                     circle?.classList.add('bg-sky-500', 'text-white', 'ring-sky-200');
-                                     circle?.classList.remove('bg-gray-300', 'text-gray-400', 'ring-gray-100', 'bg-red-400', 'ring-red-100');
-                                     circle.innerHTML = '<i class=\"fas fa-check text-[8px]\"></i>';
-                                     label?.classList.add('text-sky-600', 'font-black');
-                                     label?.classList.remove('text-gray-400', 'font-medium');
-                                     if (conn1) conn1.className = conn1.className.replace('bg-gray-200', 'bg-sky-400');
-                                     if (conn2) conn2.className = conn2.className.replace('bg-gray-200', 'bg-sky-400');
-                                 } else if (idx === current) {
-                                     circle?.classList.add('bg-sky-500', 'text-white', 'ring-sky-200');
-                                     circle?.classList.remove('bg-gray-300', 'text-gray-400', 'ring-gray-100', 'bg-red-400', 'ring-red-100');
-                                     circle.innerHTML = '<i class=\"fas fa-check text-[8px]\"></i>';
-                                     label?.classList.add('text-sky-600', 'font-black');
-                                     label?.classList.remove('text-gray-400', 'font-medium');
-                                 } else {
-                                     circle?.classList.add('bg-gray-300', 'text-white', 'ring-gray-100');
-                                     circle?.classList.remove('bg-sky-500', 'text-white', 'ring-sky-200');
-                                     circle.innerHTML = (idx + 1);
-                                     label?.classList.add('text-gray-400', 'font-medium');
-                                     label?.classList.remove('text-sky-600', 'font-black');
-                                 }
-                                 if (data.order_status === 'Cancelled') {
-                                     if (idx === 0) {
-                                         circle?.classList.add('bg-red-400', 'text-white', 'ring-red-100');
-                                         circle?.classList.remove('bg-sky-500', 'bg-gray-300', 'ring-sky-200', 'ring-gray-100');
-                                         circle.innerHTML = '<i class=\"fas fa-times text-[8px]\"></i>';
-                                         label?.classList.add('text-red-500', 'font-black');
-                                         label?.classList.remove('text-gray-400', 'font-medium', 'text-sky-600');
-                                     } else {
-                                         circle?.classList.add('bg-gray-300', 'text-white', 'ring-gray-100');
-                                         circle?.classList.remove('bg-sky-500', 'text-white', 'ring-sky-200');
-                                         circle.innerHTML = (idx + 1);
-                                         label?.classList.add('text-gray-400', 'font-medium');
-                                         label?.classList.remove('text-sky-600', 'font-black', 'text-red-500');
-                                     }
-                                 }
-                             });
-                         }
-                     }).catch(() => {});
-             }, 15000);
-         }
-     ">
+     x-init="if (polling) { setInterval(pollOrderStatus, 15000) }">
 
     <!-- Success Header -->
     <div class="text-center mb-8">
@@ -248,3 +183,67 @@
 
     <p class="text-center text-sm text-muted-foreground mt-6">ພວກເຮົາຈະຕິດຕໍ່ຫາທ່ານເພື່ອຢືນຢັນຄຳສັ່ງຊື້</p>
 </div>
+
+<script>
+function pollOrderStatus() {
+    fetch('<?= url('/order/' . $order['id'] . '/status') ?>', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                status = data.order_status;
+                let badge = document.getElementById('order-status-badge');
+                let labels = { 'Pending': 'ລໍຖ້າ', 'Confirmed': 'ຢືນຢັນ', 'Processing': 'ກຳລັງດຳເນີນ', 'Shipped': 'ຈັດສົ່ງ', 'Delivered': 'ສົ່ງແລ້ວ', 'Cancelled': 'ຍົກເລີກ' };
+                let colors = { 'Pending': 'bg-amber-100 text-amber-700', 'Confirmed': 'bg-blue-100 text-blue-700', 'Processing': 'bg-indigo-100 text-indigo-700', 'Shipped': 'bg-sky-100 text-sky-700', 'Delivered': 'bg-emerald-100 text-emerald-700', 'Cancelled': 'bg-red-100 text-red-700' };
+                let dotColors = { 'Pending': 'bg-amber-500', 'Confirmed': 'bg-blue-500', 'Processing': 'bg-indigo-500', 'Shipped': 'bg-sky-500', 'Delivered': 'bg-emerald-500', 'Cancelled': 'bg-red-500' };
+                if (badge) {
+                    badge.innerHTML = '<span class="w-2 h-2 rounded-full ' + (dotColors[data.order_status] || 'bg-gray-400') + '"></span> ' + (labels[data.order_status] || data.order_status);
+                    badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ' + (colors[data.order_status] || 'bg-gray-100 text-gray-600');
+                }
+                let steps = ['Pending', 'Confirmed', 'Processing', 'Shipped', 'Delivered'];
+                let current = steps.indexOf(data.order_status);
+                document.querySelectorAll('#tracking-timeline li').forEach((li, idx) => {
+                    let circle = li.querySelector('.timeline-circle');
+                    let conn1 = li.querySelector('.connector-left');
+                    let conn2 = li.querySelector('.connector-right');
+                    let label = li.querySelector('.timeline-label');
+                    if (idx < current) {
+                        circle?.classList.add('bg-sky-500', 'text-white', 'ring-sky-200');
+                        circle?.classList.remove('bg-gray-300', 'text-gray-400', 'ring-gray-100', 'bg-red-400', 'ring-red-100');
+                        circle.innerHTML = '<i class="fas fa-check text-[8px]"></i>';
+                        label?.classList.add('text-sky-600', 'font-black');
+                        label?.classList.remove('text-gray-400', 'font-medium');
+                        if (conn1) conn1.className = conn1.className.replace('bg-gray-200', 'bg-sky-400');
+                        if (conn2) conn2.className = conn2.className.replace('bg-gray-200', 'bg-sky-400');
+                    } else if (idx === current) {
+                        circle?.classList.add('bg-sky-500', 'text-white', 'ring-sky-200');
+                        circle?.classList.remove('bg-gray-300', 'text-gray-400', 'ring-gray-100', 'bg-red-400', 'ring-red-100');
+                        circle.innerHTML = '<i class="fas fa-check text-[8px]"></i>';
+                        label?.classList.add('text-sky-600', 'font-black');
+                        label?.classList.remove('text-gray-400', 'font-medium');
+                    } else {
+                        circle?.classList.add('bg-gray-300', 'text-white', 'ring-gray-100');
+                        circle?.classList.remove('bg-sky-500', 'text-white', 'ring-sky-200');
+                        circle.innerHTML = (idx + 1);
+                        label?.classList.add('text-gray-400', 'font-medium');
+                        label?.classList.remove('text-sky-600', 'font-black');
+                    }
+                    if (data.order_status === 'Cancelled') {
+                        if (idx === 0) {
+                            circle?.classList.add('bg-red-400', 'text-white', 'ring-red-100');
+                            circle?.classList.remove('bg-sky-500', 'bg-gray-300', 'ring-sky-200', 'ring-gray-100');
+                            circle.innerHTML = '<i class="fas fa-times text-[8px]"></i>';
+                            label?.classList.add('text-red-500', 'font-black');
+                            label?.classList.remove('text-gray-400', 'font-medium', 'text-sky-600');
+                        } else {
+                            circle?.classList.add('bg-gray-300', 'text-white', 'ring-gray-100');
+                            circle?.classList.remove('bg-sky-500', 'text-white', 'ring-sky-200');
+                            circle.innerHTML = (idx + 1);
+                            label?.classList.add('text-gray-400', 'font-medium');
+                            label?.classList.remove('text-sky-600', 'font-black', 'text-red-500');
+                        }
+                    }
+                });
+            }
+        }).catch(() => {});
+}
+</script>

@@ -113,7 +113,7 @@
                                 <i class="fas fa-location-dot"></i> ຕຳແໜ່ງປັດຈຸບັນ
                             </button>
                         </div>
-                        <div id="map-map-register" class="w-full h-56 rounded-xl border border-border z-0" x-init="initMapPicker('map-register', 'latitude', 'longitude')"></div>
+                        <div id="map-map-register" class="w-full h-56 rounded-xl border border-border relative z-0"></div>
                         <div class="flex gap-3 mt-2">
                             <input type="text" name="latitude" id="latitude" value="<?= htmlspecialchars($old['latitude'] ?? '') ?>" readonly placeholder="ເສັ້ນຂວາງ" class="flex-1 px-3 py-2 border border-border rounded-lg text-xs bg-muted text-muted-foreground">
                             <input type="text" name="longitude" id="longitude" value="<?= htmlspecialchars($old['longitude'] ?? '') ?>" readonly placeholder="ເສັ້ນແວງ" class="flex-1 px-3 py-2 border border-border rounded-lg text-xs bg-muted text-muted-foreground">

@@ -73,30 +73,40 @@ class CustomerController extends \App\Controllers\BaseController
             ]);
         }
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $data = [
-                'fullname' => $_POST['fullname'] ?? '',
-                'phone' => $_POST['phone'] ?? '',
-                'email' => $_POST['email'] ?? '',
-                'address' => $_POST['address'] ?? '',
-                'notes' => $_POST['notes'] ?? '',
-            ];
-
-            if (empty($data['fullname'])) {
-                $this->redirect("/admin/customers/{$id}/edit", [
-                    'error' => 1,
-                    'error_msg' => 'ກະລຸນາປ້ອນຊື່ລູກຄ້າ',
-                ]);
-            }
-
-            (new Customer())->update($id, $data);
-            $this->redirect('/admin/customers', ['updated' => 1]);
-        }
-
         return view('pages.admin.customers.edit', [
             'title' => 'ແກ້ໄຂລູກຄ້າ',
             'customer' => $customer,
         ]);
+    }
+
+    public function update($id)
+    {
+        $customer = (new Customer())->find($id);
+
+        if (!$customer) {
+            $this->redirect('/admin/customers', [
+                'error' => 1,
+                'error_msg' => 'ບໍ່ພົບລູກຄ້າ',
+            ]);
+        }
+
+        $data = [
+            'fullname' => $_POST['fullname'] ?? '',
+            'phone' => $_POST['phone'] ?? '',
+            'email' => $_POST['email'] ?? '',
+            'address' => $_POST['address'] ?? '',
+            'notes' => $_POST['notes'] ?? '',
+        ];
+
+        if (empty($data['fullname'])) {
+            $this->redirect("/admin/customers/{$id}/edit", [
+                'error' => 1,
+                'error_msg' => 'ກະລຸນາປ້ອນຊື່ລູກຄ້າ',
+            ]);
+        }
+
+        (new Customer())->update($id, $data);
+        $this->redirect('/admin/customers', ['updated' => 1]);
     }
 
     public function delete($id)
