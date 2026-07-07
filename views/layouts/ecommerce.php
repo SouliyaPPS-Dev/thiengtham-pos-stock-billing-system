@@ -54,6 +54,15 @@
 </head>
 <body x-data="{ mobileMenu: false, searchOpen: false }" class="bg-background min-h-screen flex flex-col">
 
+    <?php
+    $navCategories = [];
+    try {
+        $db = \App\Core\Database::getInstance()->getConnection();
+        $stmt = $db->query("SELECT * FROM categories WHERE status = 'Active' ORDER BY sort_order ASC, name ASC LIMIT 5");
+        $navCategories = $stmt->fetchAll();
+    } catch (\Exception $e) {}
+    ?>
+
     <!-- Top Header Bar -->
     <header class="bg-card/90 backdrop-blur-md border-b border-border/80 sticky top-0 z-50 transition-all duration-300 shadow-[0_2px_20px_-3px_rgba(0,0,0,0.03)]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -136,6 +145,30 @@
                     </a>
                     <?php endif; ?>
 
+                    <!-- Categories (Desktop) -->
+                    <div x-data="{ catOpen: false }" class="relative hidden sm:flex">
+                        <button @click="catOpen = !catOpen" class="h-10 px-3 rounded-xl hover:bg-muted transition-colors flex items-center gap-1.5 text-muted-foreground hover:text-foreground" title="ໝວດສິນຄ້າ">
+                            <i class="fas fa-tags"></i>
+                        </button>
+                        <div x-show="catOpen" @click.away="catOpen = false"
+                             class="absolute top-full right-0 mt-2 w-64 bg-card rounded-xl border border-border shadow-xl p-2.5 z-50"
+                             x-transition:enter="transition ease-out duration-100"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-cloak>
+                            <?php if (empty($navCategories)): ?>
+                            <div class="px-3 py-4 text-sm text-muted-foreground text-center">ຍັງບໍ່ມີໝວດສິນຄ້າ</div>
+                            <?php else: ?>
+                            <?php foreach ($navCategories as $cat): ?>
+                            <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/8 text-sm font-bold text-foreground/85 hover:text-primary transition-all">
+                                <span class="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-muted-foreground text-xs"><i class="fas fa-tag"></i></span>
+                                <?= htmlspecialchars($cat['name']) ?>
+                            </a>
+                            <?php endforeach; ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
                     <!-- Theme Toggle -->
                     <button @click="toggle()" class="h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors" :title="isDark ? 'ເປີດໂໝດກາງເວັນ' : 'ເປີດໂໝດກາງຄືນ'">
                         <i class="fas text-lg" :class="isDark ? 'fa-sun' : 'fa-moon'"></i>
@@ -176,39 +209,6 @@
                     <a href="<?= url('/products') ?>" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-primary hover:bg-primary/8 rounded-lg transition-all <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/products') === 0 ? 'text-primary bg-primary/10' : '' ?>">
                         <i class="fas fa-box mr-1.5"></i>ສິນຄ້າທັງໝົດ
                     </a>
-
-                    <?php
-                    $navCategories = [];
-                    try {
-                        $db = \App\Core\Database::getInstance()->getConnection();
-                        $stmt = $db->query("SELECT * FROM categories WHERE status = 'Active' ORDER BY sort_order ASC, name ASC LIMIT 5");
-                        $navCategories = $stmt->fetchAll();
-                    } catch (\Exception $e) {}
-                    ?>
-
-                    <div x-data="{ catOpen: false }" class="relative">
-                        <button @click="catOpen = !catOpen" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-primary hover:bg-primary/8 rounded-lg transition-all flex items-center gap-1.5">
-                            <i class="fas fa-tags mr-0.5"></i>ໝວດສິນຄ້າ
-                            <i class="fas fa-chevron-down text-[10px]" :class="catOpen ? 'rotate-180' : ''"></i>
-                        </button>
-                        <div x-show="catOpen" @click.away="catOpen = false"
-                             class="absolute top-full mt-1 w-56 bg-card rounded-xl border border-border shadow-xl p-2 z-50"
-                             x-transition:enter="transition ease-out duration-100"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             style="right: auto; left: 50%; transform: translateX(-50%);">
-                            <?php if (empty($navCategories)): ?>
-                            <div class="px-3 py-4 text-sm text-muted-foreground text-center">ຍັງບໍ່ມີໝວດສິນຄ້າ</div>
-                            <?php else: ?>
-                            <?php foreach ($navCategories as $cat): ?>
-                            <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/8 text-sm font-bold text-foreground/85 hover:text-primary transition-all">
-                                <span class="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-muted-foreground text-xs"><i class="fas fa-tag"></i></span>
-                                <?= htmlspecialchars($cat['name']) ?>
-                            </a>
-                            <?php endforeach; ?>
-                            <?php endif; ?>
-                        </div>
-                    </div>
                 </div>
             </div>
         </nav>
