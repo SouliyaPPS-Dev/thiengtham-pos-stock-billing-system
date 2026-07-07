@@ -49,24 +49,20 @@ for i in $(seq 1 30); do
 done
 
 if ! mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
-    echo "[start.sh] MySQL failed to start with recovery=1. Escalating recovery..."
+    echo "[start.sh] MySQL failed with InnoDB tablespace corruption. Resetting InnoDB..."
     kill $MYSQL_PID 2>/dev/null || true
     sleep 2
-    # Remove orphaned application .ibd files (not system tables) to clear "File exists" errors
-    rm -f "$MYSQL_DATA_DIR/$MYSQL_DATABASE"/*.ibd 2>/dev/null || true
-    echo "[start.sh] Retrying MySQL startup with higher recovery level..."
+    # Remove application .ibd files and InnoDB system tablespace so everything gets recreated
+    rm -rf "$MYSQL_DATA_DIR/$MYSQL_DATABASE" "$MYSQL_DATA_DIR/ib_logfile"* "$MYSQL_DATA_DIR/ibdata1" 2>/dev/null || true
     rm -f "$SCHEMA_VERSION_FILE" 2>/dev/null || true
+    echo "[start.sh] Retrying MySQL startup with clean InnoDB..."
     mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
            --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
-           --port=3306 \
-           --innodb-force-recovery=4 &
+           --port=3306 &
     MYSQL_PID=$!
     for i in $(seq 1 30); do
         if mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
-            echo "[start.sh] MySQL is ready after recovery."
-            # Drop and recreate the application database (ibd files were removed)
-            mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root \
-                -e "DROP DATABASE IF EXISTS \`${MYSQL_DATABASE}\`; CREATE DATABASE \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null || true
+            echo "[start.sh] MySQL is ready after InnoDB reset."
             break
         fi
         sleep 1
