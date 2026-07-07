@@ -537,12 +537,14 @@
     if (strlen($waClean) >= 9):
     ?>
     <a href="https://wa.me/<?= $waClean ?>?text=ສະບາຍດີ,%20ຂ້ອຍສົນໃຈສິນຄ້າ" target="_blank" rel="noopener noreferrer"
-       class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110 active:scale-95 anim-whatsapp-float"
+       style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;align-items:center;justify-content:center;width:60px;height:60px;border-radius:50%;background-color:#25D366;color:#fff;box-shadow:0 4px 20px rgba(37,211,102,0.4);transition:all 0.3s ease;text-decoration:none;"
+       onmouseover="this.style.transform='scale(1.1)';this.style.boxShadow='0 8px 30px rgba(37,211,102,0.6)'"
+       onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 20px rgba(37,211,102,0.4)'"
        title="ສົນທະນາຜ່ານ WhatsApp"
        aria-label="ສົນທະນາຜ່ານ WhatsApp">
-        <i class="fa-brands fa-whatsapp text-3xl"></i>
-        <span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 border-2 border-white flex items-center justify-center">
-            <i class="fas fa-comment-dots text-[8px] text-white"></i>
+        <i class="fa-brands fa-whatsapp" style="font-size:28px;"></i>
+        <span style="position:absolute;top:-4px;right:-4px;width:20px;height:20px;border-radius:50%;background-color:#ef4444;border:2px solid #fff;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-comment-dots" style="font-size:8px;color:#fff;"></i>
         </span>
     </a>
     <style>
@@ -550,13 +552,8 @@
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-6px); }
     }
-    .anim-whatsapp-float {
+    a[title="ສົນທະນາຜ່ານ WhatsApp"] {
         animation: whatsapp-float 2.5s ease-in-out infinite;
-        box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
-    }
-    .anim-whatsapp-float:hover {
-        animation: none;
-        box-shadow: 0 8px 30px rgba(37, 211, 102, 0.6);
     }
     </style>
     <?php endif; ?>
