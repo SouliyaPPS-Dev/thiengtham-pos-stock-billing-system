@@ -195,18 +195,10 @@
         $wa_url = 'https://wa.me/' . $wa_number_clean . '?text=' . urlencode($wa_message);
     ?>
     <div class="text-center mt-6">
-        <a href="<?= $wa_url ?>" target="_blank" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-200">
+        <a href="<?= url('/order/' . $order['id']) ?>" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold px-8 py-3.5 rounded-xl transition-all shadow-lg shadow-emerald-200">
             <i class="fa-brands fa-whatsapp text-lg"></i> ສົ່ງຂໍ້ມູນຄຳສັ່ງຊື້ຜ່ານ WhatsApp
         </a>
     </div>
-    <?php endif; ?>
-
-    <?php if (!empty($wa_number_clean)): ?>
-    <script>
-    setTimeout(function() {
-        window.open('<?= $wa_url ?>', '_blank');
-    }, 1500);
-    </script>
     <?php endif; ?>
 
     <!-- Actions -->
