@@ -31,9 +31,11 @@ chown -R mysql:mysql "$MYSQL_DATA_DIR" "$MYSQL_RUN_DIR"
 # ============================================================
 echo "[start.sh] Starting MySQL..."
 
+# Try normal start first; if it fails, attempt InnoDB recovery
 mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
        --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
-       --port=3306 &
+       --port=3306 \
+       --innodb-force-recovery=1 &
 
 MYSQL_PID=$!
 
@@ -45,6 +47,31 @@ for i in $(seq 1 30); do
     fi
     sleep 1
 done
+
+if ! mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
+    echo "[start.sh] MySQL failed to start with recovery=1. Escalating recovery..."
+    kill $MYSQL_PID 2>/dev/null || true
+    sleep 2
+    # Remove orphaned application .ibd files (not system tables) to clear "File exists" errors
+    rm -f "$MYSQL_DATA_DIR/$MYSQL_DATABASE"/*.ibd 2>/dev/null || true
+    echo "[start.sh] Retrying MySQL startup with higher recovery level..."
+    rm -f "$SCHEMA_VERSION_FILE" 2>/dev/null || true
+    mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
+           --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
+           --port=3306 \
+           --innodb-force-recovery=4 &
+    MYSQL_PID=$!
+    for i in $(seq 1 30); do
+        if mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
+            echo "[start.sh] MySQL is ready after recovery."
+            # Drop and recreate the application database (ibd files were removed)
+            mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root \
+                -e "DROP DATABASE IF EXISTS \`${MYSQL_DATABASE}\`; CREATE DATABASE \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null || true
+            break
+        fi
+        sleep 1
+    done
+fi
 
 if ! mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
     echo "[start.sh] ERROR: MySQL failed to start."
