@@ -24,10 +24,12 @@ chown -R mysql:mysql "$MYSQL_DATA_DIR" "$MYSQL_RUN_DIR"
 # 2. Start MySQL (MariaDB)
 # ============================================================
 echo "[start.sh] Starting MySQL..."
+
+# Clean up corrupted binlog cache dir from MariaDB 11.8 bug
+rm -rf "$MYSQL_DATA_DIR/#binlog_cache_files" 2>/dev/null || true
+
 mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
        --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
-       --skip-log-bin \
-       --skip-log-slave-updates \
        --port=3306 &
 
 MYSQL_PID=$!
