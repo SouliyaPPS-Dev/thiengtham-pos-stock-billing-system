@@ -54,7 +54,7 @@
 <body x-data="{ mobileMenu: false, searchOpen: false, cartOpen: false }" class="bg-background min-h-screen flex flex-col">
 
     <!-- Top Header Bar -->
-    <header class="bg-card shadow-sm border-b border-border sticky top-0 z-50">
+    <header class="bg-card/90 backdrop-blur-md border-b border-border/80 sticky top-0 z-50 transition-all duration-300 shadow-[0_2px_20px_-3px_rgba(0,0,0,0.03)]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16 lg:h-20">
 
@@ -63,17 +63,17 @@
                     <button @click="mobileMenu = !mobileMenu" class="lg:hidden h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
                         <i class="fas fa-bars text-lg"></i>
                     </button>
-                    <a href="<?= url('/') ?>" class="flex items-center gap-2.5 flex-shrink-0">
+                    <a href="<?= url('/') ?>" class="flex items-center gap-2.5 flex-shrink-0 group">
                         <?php $__logo = get_store_logo(); if ($__logo): ?>
-                        <div class="h-10 w-10 rounded-xl overflow-hidden flex-shrink-0 bg-card border border-border">
+                        <div class="h-10 w-10 rounded-xl overflow-hidden flex-shrink-0 bg-card border border-border group-hover:scale-105 group-hover:rotate-3 duration-300 transition-all shadow-sm">
                             <img src="<?= htmlspecialchars($__logo) ?>" class="h-full w-full object-cover">
                         </div>
                         <?php else: ?>
-                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white shadow-lg shadow-sky-200">
+                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:scale-105 group-hover:rotate-3 duration-300 transition-all">
                             <i class="fas fa-store text-sm"></i>
                         </div>
                         <?php endif; ?>
-                        <span class="font-black text-lg text-foreground hidden sm:block"><?= htmlspecialchars(get_store_name()) ?></span>
+                        <span class="font-black text-lg text-foreground hidden sm:block tracking-tight group-hover:text-primary transition-colors"><?= htmlspecialchars(get_store_name()) ?></span>
                     </a>
                 </div>
 
@@ -99,7 +99,7 @@
                     <a href="<?= isset($_SESSION['customer']) ? '#' : url('/login-customer') ?>"
                        @click="<?= isset($_SESSION['customer']) ? 'cartOpen = !cartOpen' : '' ?>"
                        class="hidden sm:flex items-center gap-2 h-10 px-3 rounded-xl hover:bg-muted transition-colors group relative">
-                        <div class="h-8 w-8 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600 group-hover:bg-sky-100 transition-colors">
+                        <div class="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary/20 transition-colors">
                             <i class="fas fa-user text-sm"></i>
                         </div>
                         <span class="text-sm font-bold text-foreground/85 hidden md:block">
@@ -132,7 +132,7 @@
                     <a href="<?= url('/cart') ?>" class="relative h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
                         <i class="fas fa-shopping-cart text-lg"></i>
                         <span id="cart-count-badge"
-                              class="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-sky-500 text-white text-[11px] font-black flex items-center justify-center shadow-sm shadow-sky-200 <?= ((int)($cartCount ?? 0) > 0) ? '' : 'hidden' ?>"><?= (int)($cartCount ?? 0) ?></span>
+                              class="absolute -top-1.5 -right-1.5 min-w-[22px] h-[22px] px-1.5 rounded-full bg-primary text-white text-[11px] font-black flex items-center justify-center shadow-md shadow-primary/30 <?= ((int)($cartCount ?? 0) > 0) ? '' : 'hidden' ?>"><?= (int)($cartCount ?? 0) ?></span>
                     </a>
 
                     <!-- Mobile Menu Toggle -->
@@ -157,10 +157,10 @@
         <nav class="hidden lg:block border-t border-border bg-card">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center gap-1 h-12">
-                    <a href="<?= url('/') ?>" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all <?= ($_SERVER['REQUEST_URI'] ?? '/') === '/' || ($_SERVER['REQUEST_URI'] ?? '/') === '/index.php' ? 'text-sky-600 bg-sky-50' : '' ?>">
+                    <a href="<?= url('/') ?>" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-primary hover:bg-primary/8 rounded-lg transition-all <?= ($_SERVER['REQUEST_URI'] ?? '/') === '/' || ($_SERVER['REQUEST_URI'] ?? '/') === '/index.php' ? 'text-primary bg-primary/10' : '' ?>">
                         <i class="fas fa-home mr-1.5"></i>ໜ້າຫຼັກ
                     </a>
-                    <a href="<?= url('/products') ?>" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/products') === 0 ? 'text-sky-600 bg-sky-50' : '' ?>">
+                    <a href="<?= url('/products') ?>" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-primary hover:bg-primary/8 rounded-lg transition-all <?= strpos($_SERVER['REQUEST_URI'] ?? '', '/products') === 0 ? 'text-primary bg-primary/10' : '' ?>">
                         <i class="fas fa-box mr-1.5"></i>ສິນຄ້າທັງໝົດ
                     </a>
 
@@ -174,7 +174,7 @@
                     ?>
 
                     <div x-data="{ catOpen: false }" class="relative">
-                        <button @click="catOpen = !catOpen" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all flex items-center gap-1.5">
+                        <button @click="catOpen = !catOpen" class="px-4 py-2 text-sm font-bold text-foreground/70 hover:text-primary hover:bg-primary/8 rounded-lg transition-all flex items-center gap-1.5">
                             <i class="fas fa-tags mr-0.5"></i>ໝວດສິນຄ້າ
                             <i class="fas fa-chevron-down text-[10px]" :class="catOpen ? 'rotate-180' : ''"></i>
                         </button>
@@ -187,7 +187,7 @@
                             <div class="px-3 py-4 text-sm text-muted-foreground text-center">ຍັງບໍ່ມີໝວດສິນຄ້າ</div>
                             <?php else: ?>
                             <?php foreach ($navCategories as $cat): ?>
-                            <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-sky-50 text-sm font-bold text-foreground/85 hover:text-sky-600 transition-all">
+                            <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/8 text-sm font-bold text-foreground/85 hover:text-primary transition-all">
                                 <span class="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xs"><i class="fas fa-tag"></i></span>
                                 <?= htmlspecialchars($cat['name']) ?>
                             </a>
@@ -202,17 +202,17 @@
         <!-- Mobile Menu -->
         <div x-show="mobileMenu" x-collapse class="lg:hidden border-t border-border bg-card">
             <div class="px-4 py-3 space-y-1">
-                <a href="<?= url('/') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-sky-50 hover:text-sky-600 transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600"><i class="fas fa-home"></i></span>
+                <a href="<?= url('/') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-primary/8 hover:text-primary transition-all">
+                    <span class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><i class="fas fa-home"></i></span>
                     ໜ້າຫຼັກ
                 </a>
-                <a href="<?= url('/products') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-sky-50 hover:text-sky-600 transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-fuchsia-50 flex items-center justify-center text-fuchsia-600"><i class="fas fa-box"></i></span>
+                <a href="<?= url('/products') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-primary/8 hover:text-primary transition-all">
+                    <span class="w-8 h-8 rounded-lg bg-fuchsia-50 dark:bg-fuchsia-950/30 flex items-center justify-center text-fuchsia-600"><i class="fas fa-box"></i></span>
                     ສິນຄ້າທັງໝົດ
                 </a>
                 <?php foreach ($navCategories as $cat): ?>
-                <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-sky-50 hover:text-sky-600 transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600"><i class="fas fa-tag"></i></span>
+                <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-primary/8 hover:text-primary transition-all">
+                    <span class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/30 flex items-center justify-center text-purple-600"><i class="fas fa-tag"></i></span>
                     <?= htmlspecialchars($cat['name']) ?>
                 </a>
                 <?php endforeach; ?>
@@ -221,17 +221,17 @@
                 <div class="px-3 py-2 text-sm text-muted-foreground">
                     <span class="font-bold text-foreground"><?= htmlspecialchars($_SESSION['customer']['fullname']) ?></span>
                 </div>
-                <a href="<?= url('/logout-customer') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500"><i class="fas fa-sign-out-alt"></i></span>
+                <a href="<?= url('/logout-customer') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all">
+                    <span class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-500"><i class="fas fa-sign-out-alt"></i></span>
                     ອອກຈາກລະບົບ
                 </a>
                 <?php else: ?>
-                <a href="<?= url('/login-customer') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-sky-600 hover:bg-sky-50 transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-sky-50 flex items-center justify-center text-sky-600"><i class="fas fa-user"></i></span>
+                <a href="<?= url('/login-customer') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-primary hover:bg-primary/8 transition-all">
+                    <span class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><i class="fas fa-user"></i></span>
                     ເຂົ້າສູ່ລະບົບ
                 </a>
-                <a href="<?= url('/register') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-emerald-600 hover:bg-emerald-50 transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600"><i class="fas fa-user-plus"></i></span>
+                <a href="<?= url('/register') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-all">
+                    <span class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-600"><i class="fas fa-user-plus"></i></span>
                     ສະໝັກສະມາຊິກ
                 </a>
                 <?php endif; ?>
@@ -244,8 +244,8 @@
     <?php if (!empty($banners)): ?>
     <div x-data="{ current: 0, slides: <?= count($banners) ?>, touchX: 0 }"
          x-init="let t = setInterval(() => { current = (current + 1) % slides }, 5000)"
-         class="relative overflow-hidden bg-gray-900 select-none">
-        <div class="relative aspect-[21/9] max-h-[500px]">
+         class="relative overflow-hidden bg-gray-900 select-none w-full">
+        <div class="relative h-[250px] sm:h-[380px] lg:h-[500px] w-full">
             <?php foreach ($banners as $i => $banner): ?>
             <div x-show="current === <?= $i ?>"
                  x-transition:enter="transition-all ease-out duration-700"
@@ -257,21 +257,23 @@
                  class="absolute inset-0"
                  @touchstart="touchX = $event.touches[0].clientX"
                  @touchend="if ($event.changedTouches[0].clientX - touchX < -50) current = (current + 1) % slides; if ($event.changedTouches[0].clientX - touchX > 50) current = (current - 1 + slides) % slides">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+                <div class="absolute inset-0 bg-black/40 z-10"></div>
                 <?php if (!empty($banner['image'])): ?>
-                <img src="<?= htmlspecialchars($banner['image']) ?>" alt="<?= htmlspecialchars($banner['title'] ?? '') ?>" class="w-full h-full object-cover">
+                <img src="<?= htmlspecialchars($banner['image']) ?>" alt="<?= htmlspecialchars($banner['title'] ?? '') ?>" class="w-full h-full object-cover object-center">
                 <?php endif; ?>
-                <div class="absolute inset-0 z-20 flex items-center">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-                        <div class="max-w-2xl">
-                            <h2 class="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-3 leading-tight drop-shadow-lg"><?= htmlspecialchars($banner['title'] ?? '') ?></h2>
+                <div class="absolute inset-0 z-20 flex items-center justify-center">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
+                        <div class="max-w-3xl mx-auto space-y-4 sm:space-y-6">
+                            <h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight drop-shadow-lg"><?= htmlspecialchars($banner['title'] ?? '') ?></h2>
                             <?php if (!empty($banner['subtitle'])): ?>
-                            <p class="text-sm sm:text-lg md:text-xl text-gray-200 mb-6 max-w-xl drop-shadow"><?= htmlspecialchars($banner['subtitle']) ?></p>
+                            <p class="text-sm sm:text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md leading-relaxed"><?= htmlspecialchars($banner['subtitle']) ?></p>
                             <?php endif; ?>
                             <?php if (!empty($banner['link'])): ?>
-                            <a href="<?= url($banner['link']) ?>" class="inline-flex items-center gap-2 bg-white text-sky-700 font-bold px-6 py-3 md:px-8 md:py-3.5 rounded-xl hover:bg-sky-50 transition-all shadow-xl text-sm md:text-base">
-                                ສັ່ງຊື້ເລີຍ <i class="fas fa-arrow-right"></i>
-                            </a>
+                            <div class="pt-2 sm:pt-4">
+                                <a href="<?= url($banner['link']) ?>" class="inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-gray-900 font-extrabold px-8 py-3.5 rounded-2xl shadow-xl shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 duration-200 text-sm md:text-base">
+                                    ສັ່ງຊື້ເລີຍ <i class="fas fa-shopping-bag"></i>
+                                </a>
+                            </div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -295,13 +297,84 @@
     </div>
     <?php else: ?>
     <!-- Default Hero -->
-    <div class="bg-gradient-to-r from-sky-600 to-sky-800">
-        <div class="max-w-7xl mx-auto px-6 py-16 md:py-24 md:px-12 lg:px-16 text-center">
-            <h1 class="text-3xl md:text-5xl font-black text-white mb-4 leading-tight">ຍິນດີຕ້ອນຮັບສູ່ຮ້ານຄ້າຂອງພວກເຮົາ</h1>
-            <p class="text-lg md:text-xl text-sky-100 mb-8 max-w-2xl mx-auto">ສິນຄ້າຄຸນນະພາບດີ ລາຄາຍຸດຕິທຳ ຈັດສົ່ງທົ່ວປະເທດ</p>
-            <a href="<?= url('/products') ?>" class="inline-flex items-center gap-2 bg-white text-sky-700 font-bold px-8 py-3.5 rounded-xl hover:bg-sky-50 transition-all shadow-lg">
-                ເລີ່ມຊື້ເລີຍ <i class="fas fa-arrow-right"></i>
-            </a>
+    <div class="relative overflow-hidden bg-gradient-to-br from-primary via-primary to-indigo-900 py-16 lg:py-24">
+        <!-- Floating abstract decorative particles -->
+        <div class="absolute top-10 left-10 w-24 h-24 rounded-full bg-white/5 blur-xl animate-pulse-soft"></div>
+        <div class="absolute bottom-10 right-10 w-32 h-32 rounded-full bg-white/5 blur-2xl animate-float"></div>
+        <div class="absolute top-1/2 left-1/3 w-16 h-16 rounded-full bg-white/5 blur-xl animate-float-delayed"></div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+                <!-- Left Content -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-xs font-bold tracking-wider animate-fade-in uppercase">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        ຮ້ານຄ້າອອນລາຍຍອດນິຍົມ
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-sm">
+                        ຍິນດີຕ້ອນຮັບສູ່ <br class="hidden sm:inline">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-300 to-amber-200">
+                            <?= htmlspecialchars(get_store_name()) ?>
+                        </span>
+                    </h1>
+                    <p class="text-base sm:text-lg text-white/95 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+                        ສິນຄ້າຄຸນນະພາບດີ ລາຄາຍຸດຕິທຳ ຈັດສົ່ງໄວທົ່ວປະເທດ. ຄົ້ນພົບປະສົບການການຊື້ເຄື່ອງທີ່ສະດວກສະບາຍ ແລະ ປອດໄພທີ່ສຸດ!
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
+                        <a href="<?= url('/products') ?>" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-gray-900 font-extrabold px-8 py-4 rounded-2xl shadow-xl shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 duration-200 text-base">
+                            ເລີ່ມຊື້ເລີຍ <i class="fas fa-shopping-bag text-sm"></i>
+                        </a>
+                        <a href="#featured-section" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/15 hover:bg-white/25 text-white border border-white/25 font-bold px-6 py-4 rounded-2xl transition-all text-sm backdrop-blur-sm">
+                            ສິນຄ້າແນະນຳ <i class="fas fa-chevron-down text-xs"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Graphic (Floating modern glassmorphic dashboard/cards) -->
+                <div class="lg:col-span-5 hidden lg:block relative">
+                    <div class="relative w-full aspect-square flex items-center justify-center">
+                        <!-- Background glow -->
+                        <div class="absolute w-72 h-72 rounded-full bg-amber-500/20 blur-3xl"></div>
+                        
+                        <!-- Floating Glass Card 1 (Main Product Mock) -->
+                        <div class="absolute w-72 bg-white/10 backdrop-blur-xl border border-white/25 rounded-3xl p-5 shadow-2xl shadow-black/20 animate-float">
+                            <div class="w-full aspect-[4/3] bg-gradient-to-br from-white/15 to-white/5 rounded-2xl overflow-hidden mb-4 border border-white/10 flex items-center justify-center relative group">
+                                <i class="fas fa-shopping-cart text-5xl text-white/40 group-hover:scale-110 duration-500 transition-all"></i>
+                                <span class="absolute top-3 left-3 bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-md shadow-emerald-500/30">ພ້ອມສົ່ງ</span>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="h-4 w-2/3 bg-white/20 rounded-md"></div>
+                                <div class="h-3 w-1/2 bg-white/10 rounded-md"></div>
+                                <div class="flex items-center justify-between pt-2">
+                                    <div class="h-6 w-24 bg-white/20 rounded-md"></div>
+                                    <div class="w-8 h-8 rounded-xl bg-amber-400 flex items-center justify-center text-gray-900 shadow-lg shadow-amber-400/30"><i class="fas fa-plus text-xs"></i></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Glass Card 2 (Sale Alert) -->
+                        <div class="absolute top-10 right-4 w-40 bg-white/10 backdrop-blur-xl border border-white/25 rounded-2xl p-4 shadow-xl animate-float-delayed">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-7 h-7 rounded-lg bg-rose-500/30 border border-rose-500/30 flex items-center justify-center text-rose-300 text-xs"><i class="fas fa-fire"></i></div>
+                                <span class="text-[10px] font-black text-rose-300">Hot Sale</span>
+                            </div>
+                            <div class="h-3 w-3/4 bg-white/20 rounded-md mb-2"></div>
+                            <span class="text-xs font-black text-white">-30% Discount</span>
+                        </div>
+
+                        <!-- Floating Glass Card 3 (Secure Pay) -->
+                        <div class="absolute bottom-6 left-4 w-44 bg-white/10 backdrop-blur-xl border border-white/25 rounded-2xl p-4 shadow-xl animate-float-slow">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-emerald-500/30 flex items-center justify-center text-emerald-300 text-sm"><i class="fas fa-shield-alt"></i></div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-white/60">ຄວາມປອດໄພ</p>
+                                    <p class="text-[10px] font-black text-white">ຮັບປະກັນ 100%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     <?php endif; ?>
