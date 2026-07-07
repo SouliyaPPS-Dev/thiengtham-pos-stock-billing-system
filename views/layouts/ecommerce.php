@@ -192,16 +192,17 @@
                             <i class="fas fa-chevron-down text-[10px]" :class="catOpen ? 'rotate-180' : ''"></i>
                         </button>
                         <div x-show="catOpen" @click.away="catOpen = false"
-                             class="absolute top-full left-0 mt-1 w-56 bg-card rounded-xl border border-border shadow-xl p-2 z-50"
+                             class="absolute top-full mt-1 w-56 bg-card rounded-xl border border-border shadow-xl p-2 z-50"
                              x-transition:enter="transition ease-out duration-100"
                              x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100">
+                             x-transition:enter-end="opacity-100 scale-100"
+                             style="right: auto; left: 50%; transform: translateX(-50%);">
                             <?php if (empty($navCategories)): ?>
                             <div class="px-3 py-4 text-sm text-muted-foreground text-center">ຍັງບໍ່ມີໝວດສິນຄ້າ</div>
                             <?php else: ?>
                             <?php foreach ($navCategories as $cat): ?>
                             <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-primary/8 text-sm font-bold text-foreground/85 hover:text-primary transition-all">
-                                <span class="w-7 h-7 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-xs"><i class="fas fa-tag"></i></span>
+                                <span class="w-7 h-7 rounded-lg bg-white flex items-center justify-center text-muted-foreground text-xs"><i class="fas fa-tag"></i></span>
                                 <?= htmlspecialchars($cat['name']) ?>
                             </a>
                             <?php endforeach; ?>
@@ -216,16 +217,16 @@
         <div x-show="mobileMenu" x-collapse class="lg:hidden border-t border-border bg-card">
             <div class="px-4 py-3 space-y-1">
                 <a href="<?= url('/') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-primary/8 hover:text-primary transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><i class="fas fa-home"></i></span>
+                    <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary"><i class="fas fa-home"></i></span>
                     ໜ້າຫຼັກ
                 </a>
                 <a href="<?= url('/products') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-primary/8 hover:text-primary transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-fuchsia-50 dark:bg-fuchsia-950/30 flex items-center justify-center text-fuchsia-600"><i class="fas fa-box"></i></span>
+                    <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-fuchsia-600"><i class="fas fa-box"></i></span>
                     ສິນຄ້າທັງໝົດ
                 </a>
                 <?php foreach ($navCategories as $cat): ?>
                 <a href="<?= url('/category/' . htmlspecialchars($cat['slug'])) ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-primary/8 hover:text-primary transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/30 flex items-center justify-center text-purple-600"><i class="fas fa-tag"></i></span>
+                    <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-purple-600"><i class="fas fa-tag"></i></span>
                     <?= htmlspecialchars($cat['name']) ?>
                 </a>
                 <?php endforeach; ?>
@@ -234,17 +235,21 @@
                 <div class="px-3 py-2 text-sm text-muted-foreground">
                     <span class="font-bold text-foreground"><?= htmlspecialchars($_SESSION['customer']['fullname']) ?></span>
                 </div>
+                <a href="<?= url('/account') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-primary/8 hover:text-primary transition-all">
+                    <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-sky-600"><i class="fas fa-user"></i></span>
+                    ບັນຊີຂອງຂ້ອຍ
+                </a>
                 <a href="<?= url('/logout-customer') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-red-50 dark:bg-red-950/30 flex items-center justify-center text-red-500"><i class="fas fa-sign-out-alt"></i></span>
+                    <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-red-500"><i class="fas fa-sign-out-alt"></i></span>
                     ອອກຈາກລະບົບ
                 </a>
                 <?php else: ?>
                 <a href="<?= url('/login-customer') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-primary hover:bg-primary/8 transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary"><i class="fas fa-user"></i></span>
+                    <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-primary"><i class="fas fa-user"></i></span>
                     ເຂົ້າສູ່ລະບົບ
                 </a>
                 <a href="<?= url('/register') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 transition-all">
-                    <span class="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-600"><i class="fas fa-user-plus"></i></span>
+                    <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-emerald-600"><i class="fas fa-user-plus"></i></span>
                     ສະໝັກສະມາຊິກ
                 </a>
                 <?php endif; ?>
