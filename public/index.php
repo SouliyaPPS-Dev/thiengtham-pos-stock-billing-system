@@ -36,6 +36,41 @@ if (file_exists($envFile)) {
     }
 }
 
+// ============================================================
+// Multi-environment detection
+// Supports: development (localhost), infinityfree, production (HF Spaces)
+// ============================================================
+$host = $_SERVER['HTTP_HOST'] ?? '';
+$isLocalhost = (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false);
+
+if ($isLocalhost) {
+    // Development: use existing .env with local MySQL
+    $_ENV['APP_ENV'] = 'development';
+} elseif (strpos($host, 'infinityfree') !== false || file_exists(__DIR__ . '/../.env.infinityfree')) {
+    // InfinityFree: load .env.infinityfree overrides
+    $_ENV['APP_ENV'] = 'infinityfree';
+    $ifreeFile = __DIR__ . '/../.env.infinityfree';
+    if (file_exists($ifreeFile)) {
+        $lines = file($ifreeFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (empty($line) || strpos($line, '#') === 0) continue;
+            if (strpos($line, '=') !== false) {
+                list($name, $value) = explode('=', $line, 2);
+                $name = trim($name);
+                $value = trim($value);
+                if (preg_match('/^"(.*)"$/', $value, $matches) || preg_match("/^'(.*)'$/", $value, $matches)) {
+                    $value = $matches[1];
+                }
+                $_ENV[$name] = $value;
+            }
+        }
+    }
+} else {
+    // Production (HF Spaces): use PROD_DB_* env vars (set by start.sh or Space Secrets)
+    $_ENV['APP_ENV'] = 'production';
+}
+
 $isDebug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
 if ($isDebug) {
     error_reporting(E_ALL);
@@ -44,10 +79,6 @@ if ($isDebug) {
     error_reporting(0);
     ini_set('display_errors', 0);
 }
-
-$host = $_SERVER['HTTP_HOST'] ?? '';
-$isLocalhost = (strpos($host, 'localhost') !== false || strpos($host, '127.0.0.1') !== false);
-$_ENV['APP_ENV'] = $isLocalhost ? 'development' : 'production';
 
 $env = $_ENV['APP_ENV'] ?? 'development';
 if ($env === 'production') {

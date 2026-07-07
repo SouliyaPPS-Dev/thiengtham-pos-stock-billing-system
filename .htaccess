@@ -28,7 +28,7 @@ RewriteRule ^(manifest\.json|sw\.js|offline\.html|robots\.txt|sitemap\.xml)$ pub
     Allow from all
 </IfModule>
 
-<FilesMatch "^\.env|database\.sql$">
+<FilesMatch "^\.env|\.env\.infinityfree|database\.sql$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>
