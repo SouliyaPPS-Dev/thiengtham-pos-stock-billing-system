@@ -6,6 +6,7 @@ MYSQL_DATABASE="${MYSQL_DATABASE:-if0_42353445_thiengtham}"
 MYSQL_DATA_DIR="/data/mysql"
 MYSQL_RUN_DIR="/var/run/mysqld"
 DB_SCHEMA="/var/www/html/database.sql"
+MYSQL_CHARSET="--default-character-set=utf8mb4"
 
 # ============================================================
 # 1. Initialize MySQL data directory if not already initialized
@@ -53,16 +54,17 @@ fi
 # ============================================================
 # 3. Set root password and create database
 # ============================================================
+MYSQL_CMD="mysql --socket=$MYSQL_RUN_DIR/mysqld.sock -u root"
 # First try: connect with password (for restart after first setup)
-if mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT 1" >/dev/null 2>&1; then
+if $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; then
     echo "[start.sh] Root password already set. Ensuring database exists..."
-    mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root -p"${MYSQL_ROOT_PASSWORD}" <<EOSQL
+    $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET <<EOSQL
     CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 EOSQL
 # Second try: connect without password (first run, unix_socket auth)
 else
     echo "[start.sh] Setting up root password and users..."
-    mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root <<EOSQL
+    $MYSQL_CMD $MYSQL_CHARSET <<EOSQL
     ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
@@ -76,18 +78,22 @@ fi
 echo "[start.sh] Database '${MYSQL_DATABASE}' ready."
 
 # ============================================================
-# 4. Import database schema if tables are empty
+# 4. Import database schema (with correct UTF-8 charset)
 # ============================================================
-TABLE_COUNT=$(mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root -p"${MYSQL_ROOT_PASSWORD}" -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '${MYSQL_DATABASE}'" 2>/dev/null || echo "0")
+SCHEMA_VERSION_FILE="/data/.schema_imported"
 
-if [ "$TABLE_COUNT" = "0" ] && [ -f "$DB_SCHEMA" ]; then
-    echo "[start.sh] Importing database schema from database.sql..."
-    mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root -p"${MYSQL_ROOT_PASSWORD}" "${MYSQL_DATABASE}" < "$DB_SCHEMA"
-    echo "[start.sh] Database schema imported successfully."
-elif [ ! -f "$DB_SCHEMA" ]; then
-    echo "[start.sh] WARNING: database.sql not found. Skipping schema import."
+if [ -f "$DB_SCHEMA" ]; then
+    # Force re-import if flag file is missing (e.g. first deploy or data corruption fix)
+    if [ ! -f "$SCHEMA_VERSION_FILE" ]; then
+        echo "[start.sh] Importing database schema from database.sql..."
+        $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" < "$DB_SCHEMA"
+        date > "$SCHEMA_VERSION_FILE"
+        echo "[start.sh] Database schema imported successfully."
+    else
+        echo "[start.sh] Database schema already imported. Skipping."
+    fi
 else
-    echo "[start.sh] Database already has tables. Skipping schema import."
+    echo "[start.sh] WARNING: database.sql not found. Skipping schema import."
 fi
 
 # ============================================================
