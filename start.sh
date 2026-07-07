@@ -10,6 +10,11 @@ DB_SCHEMA="/var/www/html/database.sql"
 # ============================================================
 # 1. Initialize MySQL data directory if not already initialized
 # ============================================================
+if [ -d "$MYSQL_DATA_DIR/#binlog_cache_files" ]; then
+    echo "[start.sh] Detected corrupted MariaDB binlog cache dir. Reinitializing data directory..."
+    mv "$MYSQL_DATA_DIR" "${MYSQL_DATA_DIR}_corrupted_$$"
+fi
+
 if [ ! -d "$MYSQL_DATA_DIR/mysql" ]; then
     echo "[start.sh] Initializing MySQL data directory in $MYSQL_DATA_DIR ..."
     mkdir -p "$MYSQL_DATA_DIR"
@@ -24,9 +29,6 @@ chown -R mysql:mysql "$MYSQL_DATA_DIR" "$MYSQL_RUN_DIR"
 # 2. Start MySQL (MariaDB)
 # ============================================================
 echo "[start.sh] Starting MySQL..."
-
-# Clean up corrupted binlog cache dir from MariaDB 11.8 bug
-rm -rf "$MYSQL_DATA_DIR/#binlog_cache_files" 2>/dev/null || true
 
 mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
        --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
