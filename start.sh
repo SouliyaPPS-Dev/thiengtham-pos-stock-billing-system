@@ -56,21 +56,21 @@ fi
 # First try: connect with password (for restart after first setup)
 if mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root -p"${MYSQL_ROOT_PASSWORD}" -e "SELECT 1" >/dev/null 2>&1; then
     echo "[start.sh] Root password already set. Ensuring database exists..."
-    mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root -p"${MYSQL_ROOT_PASSWORD}" <<-EOSQL
-        CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    EOSQL
+    mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root -p"${MYSQL_ROOT_PASSWORD}" <<EOSQL
+    CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+EOSQL
 # Second try: connect without password (first run, unix_socket auth)
 else
     echo "[start.sh] Setting up root password and users..."
-    mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root <<-EOSQL
-        ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-        CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-        GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
-        CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-        GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-        CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-        FLUSH PRIVILEGES;
-    EOSQL
+    mysql --socket="$MYSQL_RUN_DIR/mysqld.sock" -u root <<EOSQL
+    ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+    CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+    GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+    CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+    GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+    CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    FLUSH PRIVILEGES;
+EOSQL
 fi
 
 echo "[start.sh] Database '${MYSQL_DATABASE}' ready."
