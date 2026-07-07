@@ -2,28 +2,22 @@
 
 namespace App\Controllers\Admin;
 
+use App\Core\Database;
+use PDO;
+
 class DatabaseController extends \App\Controllers\BaseController
 {
+    private function db(): PDO
+    {
+        return Database::getInstance()->getConnection();
+    }
+
     public function export()
     {
-        $host = $_ENV['DB_HOST'] ?? 'localhost';
-        $user = $_ENV['DB_USERNAME'] ?? 'root';
-        $pass = $_ENV['DB_PASSWORD'] ?? '';
+        $db = $this->db();
         $name = $_ENV['DB_DATABASE'] ?? 'if0_42353445_thiengtham';
 
-        $mysqli = new \mysqli($host, $user, $pass, $name);
-        if ($mysqli->connect_error) {
-            die("Connection failed: " . $mysqli->connect_error);
-        }
-
-        $mysqli->set_charset("utf8mb4");
-        $mysqli->query("SET time_zone = '+07:00'");
-
-        $tables = [];
-        $result = $mysqli->query("SHOW TABLES");
-        while ($row = $result->fetch_row()) {
-            $tables[] = $row[0];
-        }
+        $tables = $db->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
 
         $sql = "-- Database Backup: " . date('Y-m-d H:i:s') . "\n";
         $sql .= "-- System: POS Stock Billing System\n";
@@ -31,34 +25,28 @@ class DatabaseController extends \App\Controllers\BaseController
         $sql .= "SET time_zone = \"+00:00\";\n\n";
 
         foreach ($tables as $table) {
-            $res_create = $mysqli->query("SHOW CREATE TABLE `$table`");
-            $row_create = $res_create->fetch_assoc();
+            $stmt = $db->query("SHOW CREATE TABLE `$table`");
+            $rowCreate = $stmt->fetch(PDO::FETCH_ASSOC);
 
             $sql .= "\n\nDROP TABLE IF EXISTS `$table`;\n";
-            $sql .= $row_create['Create Table'] . ";\n\n";
+            $sql .= $rowCreate['Create Table'] . ";\n\n";
 
-            $res_data = $mysqli->query("SELECT * FROM `$table`");
-            $numFields = $res_data->field_count;
+            $dataStmt = $db->query("SELECT * FROM `$table`");
+            $cols = $dataStmt->columnCount();
 
-            while ($row = $res_data->fetch_row()) {
-                $sql .= "INSERT INTO `$table` VALUES(";
-                for ($j = 0; $j < $numFields; $j++) {
-                    if (isset($row[$j])) {
-                        $val = $mysqli->real_escape_string($row[$j]);
-                        $sql .= '"' . $val . '"';
+            while ($row = $dataStmt->fetch(PDO::FETCH_NUM)) {
+                $vals = [];
+                for ($j = 0; $j < $cols; $j++) {
+                    if ($row[$j] === null) {
+                        $vals[] = 'NULL';
                     } else {
-                        $sql .= 'NULL';
-                    }
-                    if ($j < ($numFields - 1)) {
-                        $sql .= ',';
+                        $vals[] = $db->quote((string)$row[$j]);
                     }
                 }
-                $sql .= ");\n";
+                $sql .= "INSERT INTO `$table` VALUES(" . implode(',', $vals) . ");\n";
             }
             $sql .= "\n\n\n";
         }
-
-        $mysqli->close();
 
         header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="backup_' . $name . '_' . date('Y-m-d_H-i-s') . '.sql"');
@@ -72,36 +60,25 @@ class DatabaseController extends \App\Controllers\BaseController
             $file = $_FILES['backup_file'];
             if ($file['error'] === UPLOAD_ERR_OK) {
                 $sql = file_get_contents($file['tmp_name']);
+                $db = $this->db();
 
-                $host = $_ENV['DB_HOST'] ?? 'localhost';
-                $user = $_ENV['DB_USERNAME'] ?? 'root';
-                $pass = $_ENV['DB_PASSWORD'] ?? '';
-                $name = $_ENV['DB_DATABASE'] ?? 'if0_42353445_thiengtham';
+                try {
+                    $db->exec("SET time_zone = '+07:00'");
+                    $db->exec("SET FOREIGN_KEY_CHECKS = 0");
 
-                $mysqli = new \mysqli($host, $user, $pass, $name);
-                if ($mysqli->connect_error) {
-                    $_SESSION['error'] = "Connection failed: " . $mysqli->connect_error;
-                    header('Location: ' . url('/admin/settings'));
-                    exit;
-                }
-
-                $mysqli->set_charset("utf8mb4");
-                $mysqli->query("SET time_zone = '+07:00'");
-                $mysqli->query("SET FOREIGN_KEY_CHECKS = 0");
-
-                if ($mysqli->multi_query($sql)) {
-                    do {
-                        if ($result = $mysqli->store_result()) {
-                            $result->free();
+                    $statements = explode(';', $sql);
+                    foreach ($statements as $stmt) {
+                        $stmt = trim($stmt);
+                        if (!empty($stmt)) {
+                            $db->exec($stmt);
                         }
-                    } while ($mysqli->next_result());
+                    }
 
-                    $mysqli->query("SET FOREIGN_KEY_CHECKS = 1");
+                    $db->exec("SET FOREIGN_KEY_CHECKS = 1");
                     $_SESSION['success'] = "ກູ້ຄືນຂໍ້ມູນສຳເລັດແລ້ວ";
-                } else {
-                    $_SESSION['error'] = "Error importing database: " . $mysqli->error;
+                } catch (\Exception $e) {
+                    $_SESSION['error'] = "Error importing database: " . $e->getMessage();
                 }
-                $mysqli->close();
             } else {
                 $_SESSION['error'] = "ເກີດຂໍ້ຜິດພາດໃນການອັບໂຫລດໄຟລ໌";
             }
