@@ -518,8 +518,8 @@ $adminPrefix = '/admin';
             );
 
             var layers = { street: streetLayer, satellite: satelliteLayer, hybrid: hybridLayer };
-            var currentLayer = 'street';
-            streetLayer.addTo(map);
+            var currentLayer = 'satellite';
+            satelliteLayer.addTo(map);
             mapTileLayers[mapId] = layers;
 
             var marker = null;
@@ -568,13 +568,24 @@ $adminPrefix = '/admin';
 
             var layerBar = document.createElement('div');
             layerBar.className = 'flex gap-0.5 rounded-lg overflow-hidden shadow-md border border-gray-200';
-            layerBar.innerHTML =
-                '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-sky-600 text-white cursor-pointer leading-none" data-layer="street" onclick="switchMapLayer(\'' + mapId + '\',\'street\')">ຖະໜົນ</button>' +
-                '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-white text-gray-700 cursor-pointer leading-none" data-layer="satellite" onclick="switchMapLayer(\'' + mapId + '\',\'satellite\')">ດາວທຽມ</button>' +
-                '<button type="button" class="map-layer-btn px-2.5 py-1.5 text-[11px] font-bold bg-white text-gray-700 cursor-pointer leading-none" data-layer="hybrid" onclick="switchMapLayer(\'' + mapId + '\',\'hybrid\')">ປະສົມ</button>';
+            layerBar.style.cssText = 'position:absolute;bottom:12px;left:12px;z-index:1001';
+            var layerNames = ['street', 'satellite', 'hybrid'];
+            var layerLabels = {'street':'ຖະໜົນ','satellite':'ດາວທຽມ','hybrid':'ປະສົມ'};
+            layerNames.forEach(function(n) {
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'map-layer-btn px-2.5 py-1.5 text-[11px] font-bold cursor-pointer leading-none' +
+                    (n === currentLayer ? ' bg-sky-600 text-white' : ' bg-white text-gray-700');
+                btn.dataset.layer = n;
+                btn.textContent = layerLabels[n];
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    switchMapLayer(mapId, n);
+                });
+                layerBar.appendChild(btn);
+            });
             mapEl.style.position = 'relative';
             mapEl.appendChild(layerBar);
-            layerBar.style.cssText = 'position:absolute;bottom:12px;left:12px;z-index:1001';
 
 
             ctx.map = map;
