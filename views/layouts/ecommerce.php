@@ -602,8 +602,8 @@
                 { maxZoom: 19, attribution: '&copy; <a href="https://www.esri.com">Esri</a>' }
             );
             var hybridLayer = L.tileLayer(
-                'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',
-                { maxZoom: 19, attribution: '&copy; <a href="https://www.google.com/maps">Google</a>' }
+                'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
+                { maxZoom: 19, attribution: '&copy; <a href="https://www.esri.com">Esri</a>' }
             );
 
             var layers = { street: streetLayer, satellite: satelliteLayer, hybrid: hybridLayer };
@@ -652,6 +652,7 @@
                     b.classList.toggle('text-gray-700', b.dataset.layer !== name);
                     b.classList.toggle('shadow-sm', b.dataset.layer !== name);
                 });
+                setTimeout(function() { map.invalidateSize(); }, 100);
             }
 
             // Custom layer toggle buttons (inside map area)
@@ -683,7 +684,7 @@
 
     function switchMapLayer(mapId, name) {
         var ctx = window['__map_' + mapId];
-        if (!ctx) return;
+        if (!ctx || !ctx.map) return;
         var layers = mapTileLayers[mapId];
         if (!layers || !layers[name]) return;
         Object.keys(layers).forEach(function(k) {
@@ -691,14 +692,17 @@
             else ctx.map.removeLayer(layers[k]);
         });
         var el = document.getElementById('map-' + mapId);
-        var btns = el.querySelectorAll('.map-layer-btn');
-        btns.forEach(function(b) {
-            b.classList.toggle('bg-sky-600', b.dataset.layer === name);
-            b.classList.toggle('text-white', b.dataset.layer === name);
-            b.classList.toggle('bg-white', b.dataset.layer !== name);
-            b.classList.toggle('text-gray-700', b.dataset.layer !== name);
-            b.classList.toggle('shadow-sm', b.dataset.layer !== name);
-        });
+        if (el) {
+            var btns = el.querySelectorAll('.map-layer-btn');
+            btns.forEach(function(b) {
+                b.classList.toggle('bg-sky-600', b.dataset.layer === name);
+                b.classList.toggle('text-white', b.dataset.layer === name);
+                b.classList.toggle('bg-white', b.dataset.layer !== name);
+                b.classList.toggle('text-gray-700', b.dataset.layer !== name);
+                b.classList.toggle('shadow-sm', b.dataset.layer !== name);
+            });
+        }
+        setTimeout(function() { ctx.map.invalidateSize(); }, 100);
     }
 
     function searchLocation(query, mapId) {
