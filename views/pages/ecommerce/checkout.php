@@ -279,6 +279,7 @@
                     this.village = '';
                     this.villageSearch = '';
                     this.villageResults = [];
+                    this.updateMapFromAddress();
                 },
 
                 selectDistrict: function(d) {
@@ -288,6 +289,7 @@
                     this.village = '';
                     this.villageSearch = '';
                     this.villageResults = [];
+                    this.updateMapFromAddress();
                 },
 
                 searchVillage: function(q) {
@@ -327,6 +329,32 @@
                     this.village = v;
                     this.villageSearch = v;
                     this.villageOpen = false;
+                    this.updateMapFromAddress();
+                },
+
+                updateMapFromAddress: function() {
+                    var p = this.province;
+                    var d = this.district;
+                    var v = this.village;
+                    if (!p) return;
+                    var q = v ? v + ', ' : '';
+                    q += d ? d + ', ' : '';
+                    q += p + ', ລາວ';
+                    var ctx = window['__map_checkout'];
+                    if (!ctx || !ctx.map) return;
+                    fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(q) + '&limit=1&countrycodes=LA')
+                        .then(function(r) { return r.json(); })
+                        .then(function(data) {
+                            if (data.length > 0) {
+                                var lat = parseFloat(data[0].lat);
+                                var lng = parseFloat(data[0].lon);
+                                if (ctx.placeMarker) {
+                                    ctx.placeMarker({lat: lat, lng: lng});
+                                    ctx.map.setView([lat, lng], 15);
+                                }
+                            }
+                        })
+                        .catch(function() {});
                 }
             };
         }
