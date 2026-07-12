@@ -1,5 +1,12 @@
+<?php
+$__allowedLangs = ['lo', 'en', 'th', 'zh'];
+$__lang = $_SESSION['lang'] ?? ($_COOKIE['lang'] ?? 'lo');
+if (!in_array($__lang, $__allowedLangs, true)) {
+    $__lang = 'lo';
+}
+?>
 <!DOCTYPE html>
-<html lang="lo" x-data="theme">
+<html lang="<?= htmlspecialchars($__lang) ?>" x-data="theme">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -119,7 +126,7 @@
                             </div>
                             <a href="<?= url('/account') ?>" class="flex items-center gap-3.5 px-4 py-3.5 text-foreground/85 hover:bg-gray-50 rounded-lg text-sm font-bold transition-all">
                                 <i class="fas fa-user w-4 text-center"></i>
-                                <span>ບັນຊີຂອງຂ້ອຍ</span>
+                                <span>ບັນຊີຂອຍຂ້ອຍ</span>
                             </a>
                             <a href="<?= url('/logout-customer') ?>" class="flex items-center gap-3.5 px-4 py-3.5 text-red-500 hover:bg-red-50 rounded-lg text-sm font-bold transition-all">
                                 <i class="fas fa-sign-out-alt w-4 text-center"></i>
@@ -141,6 +148,9 @@
                         <i class="fas text-lg" :class="isDark ? 'fa-sun' : 'fa-moon'"></i>
                     </button>
 
+                    <!-- Language Switcher (Lao / English / Thai / Chinese) -->
+                    <?php component('language_switcher'); ?>
+
                     <!-- Cart -->
                     <a href="<?= url('/cart') ?>" class="relative h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors">
                         <i class="fas fa-shopping-cart text-lg"></i>
@@ -158,7 +168,7 @@
             <!-- Mobile Search -->
             <div x-show="searchOpen" x-collapse class="lg:hidden pb-3">
                 <form action="<?= url('/products') ?>" method="GET" class="relative">
-                    <input type="text" name="search" placeholder="ຄົ້ນຫາສິນຄ້າ..." class="w-full pl-11 pr-4 py-3 bg-muted border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
+                        <input type="text" name="search" placeholder="ຄົ້ນຫາສິນຄ້າ..." class="w-full pl-11 pr-4 py-3 bg-muted border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted-foreground">
                         <i class="fas fa-search"></i>
                     </span>
@@ -237,7 +247,7 @@
                 </div>
                 <a href="<?= url('/account') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-foreground/85 hover:bg-primary/8 hover:text-primary transition-all">
                     <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-sky-600"><i class="fas fa-user"></i></span>
-                    ບັນຊີຂອງຂ້ອຍ
+                    ບັນຊີຂອຍຂ້ອຍ
                 </a>
                 <a href="<?= url('/logout-customer') ?>" class="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-bold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all">
                     <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-red-500"><i class="fas fa-sign-out-alt"></i></span>
@@ -905,5 +915,11 @@
     </style>
     <?php endif; ?>
     <?php endif; ?>
+
+    <!-- Background Google Translate engine (no visible UI) -->
+    <?php component('translator'); ?>
+
+    <!-- AI Chatbot (storefront) -->
+    <?php component('chatbot'); ?>
 </body>
 </html>

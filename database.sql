@@ -475,13 +475,18 @@ CREATE TABLE quotations (
     supplier_id INT DEFAULT NULL,
     supplier_name VARCHAR(200) DEFAULT NULL,
     supplier_contact VARCHAR(200) DEFAULT NULL,
+    customer_id INT DEFAULT NULL,
+    customer_name VARCHAR(200) DEFAULT NULL,
+    customer_contact VARCHAR(200) DEFAULT NULL,
     ref_no VARCHAR(100) DEFAULT NULL,
     date DATE DEFAULT NULL,
+    expiry_date DATE DEFAULT NULL,
     subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
     discount DECIMAL(12,2) NOT NULL DEFAULT 0,
     tax_percent DECIMAL(5,2) DEFAULT 10.00,
     tax_amount DECIMAL(12,2) DEFAULT 0,
     grand_total DECIMAL(12,2) NOT NULL DEFAULT 0,
+    converted_to_sale_id INT DEFAULT NULL,
     notes TEXT,
     terms TEXT,
     status ENUM('Draft', 'Sent', 'Approved', 'Rejected') NOT NULL DEFAULT 'Draft',
@@ -489,8 +494,10 @@ CREATE TABLE quotations (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-    INDEX idx_quotation_number (quotation_number)
+    INDEX idx_quotation_number (quotation_number),
+    INDEX idx_converted (converted_to_sale_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE quotation_items (
@@ -504,6 +511,20 @@ CREATE TABLE quotation_items (
     amount DECIMAL(12,2) NOT NULL DEFAULT 0,
     FOREIGN KEY (quotation_id) REFERENCES quotations(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE quotation_history (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    quotation_id INT NOT NULL,
+    action VARCHAR(50) NOT NULL,
+    old_status VARCHAR(50) DEFAULT NULL,
+    new_status VARCHAR(50) DEFAULT NULL,
+    notes TEXT,
+    performed_by INT DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (quotation_id) REFERENCES quotations(id) ON DELETE CASCADE,
+    FOREIGN KEY (performed_by) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_quotation_history (quotation_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Insert sample quotation (from live database)

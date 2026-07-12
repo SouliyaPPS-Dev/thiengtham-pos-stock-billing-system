@@ -6,10 +6,16 @@
                 <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">ໃບສະເໜີລາຄາ</h1>
                 <p class="text-sm text-muted-foreground mt-0.5">ຈັດການໃບສະເໜີລາຄາຕາມແບບຟອມ Excel</p>
             </div>
-            <a href="<?= url('/admin/quotations/create') ?>" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
-                <i class="fas fa-plus"></i>
-                <span>ສ້າງໃບສະເໜີລາຄາ</span>
-            </a>
+            <div class="flex items-center gap-2">
+                <a href="<?= url('/admin/quotations/export/csv?search=' . urlencode($search)) ?>" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-600 rounded-xl font-bold text-sm hover:bg-emerald-100 transition-all">
+                    <i class="fas fa-file-csv"></i>
+                    <span>Export CSV</span>
+                </a>
+                <a href="<?= url('/admin/quotations/create') ?>" class="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
+                    <i class="fas fa-plus"></i>
+                    <span>ສ້າງໃບສະເໜີລາຄາ</span>
+                </a>
+            </div>
         </div>
 
         <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
@@ -29,6 +35,7 @@
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ເລກທີໃບ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ຜູ້ສະໜອງ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ລູກຄ້າ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ເລກອ້າງອີງ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ວັນທີ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-right">ຍອດລວມ</th>
@@ -60,6 +67,7 @@
                                 </a>
                             </td>
                             <td class="py-3 px-2 font-medium text-foreground"><?= htmlspecialchars($q['supplier_name'] ?: '-') ?></td>
+                            <td class="py-3 px-2 font-medium text-foreground"><?= htmlspecialchars($q['customer_name'] ?? $q['customer_name_resolved'] ?? '-') ?></td>
                             <td class="py-3 px-2 text-foreground/70"><?= htmlspecialchars($q['ref_no'] ?: '-') ?></td>
                             <td class="py-3 px-2 text-foreground/70"><?= $q['date'] ? date('d/m/Y', strtotime($q['date'])) : '-' ?></td>
                             <td class="py-3 px-2 font-bold text-foreground text-right"><?= number_format($q['grand_total'], 0) ?> ກີບ</td>
@@ -80,6 +88,10 @@
                                     <a href="<?= url('/admin/quotations/' . $q['id']) ?>" class="icon-btn icon-btn-info" title="ເບິ່ງ"><i class="fas fa-eye text-xs"></i></a>
                                     <a href="<?= url('/admin/quotations/' . $q['id'] . '/print') ?>" target="_blank" class="icon-btn icon-btn-print" title="ພິມ"><i class="fas fa-print text-xs"></i></a>
                                     <a href="<?= url('/admin/quotations/' . $q['id'] . '/edit') ?>" class="icon-btn icon-btn-edit" title="ແກ້ໄຂ"><i class="fas fa-pen text-xs"></i></a>
+                                    <a href="<?= url('/admin/quotations/' . $q['id'] . '/duplicate') ?>" onclick="return confirm('ສຳເນົາໃບສະເໜີລາຄານີ້?')" class="icon-btn icon-btn-edit" title="ສຳເນົາ"><i class="fas fa-copy text-xs"></i></a>
+                                    <?php if ($st === 'Approved' && empty($q['converted_to_sale_id'])): ?>
+                                    <a href="<?= url('/admin/quotations/' . $q['id'] . '/convert') ?>" onclick="return confirm('ປ່ຽນເປັນບິນຂາຍ?')" class="icon-btn icon-btn-print" title="ປ່ຽນເປັນບິນ" style="background:#ecfdf5;color:#059669"><i class="fas fa-exchange-alt text-xs"></i></a>
+                                    <?php endif; ?>
                                     <a href="<?= url('/admin/quotations/' . $q['id'] . '/delete') ?>" onclick="confirmDelete(event, this.href)" class="icon-btn icon-btn-delete" title="ລຶບ"><i class="fas fa-trash text-xs"></i></a>
                                 </div>
                             </td>

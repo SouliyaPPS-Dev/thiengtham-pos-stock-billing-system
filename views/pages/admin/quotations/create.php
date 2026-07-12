@@ -58,15 +58,53 @@
                     </div>
 
                     <div class="bg-card rounded-2xl border border-border shadow-sm p-6">
+                        <h2 class="text-base font-extrabold text-foreground mb-4">ຂໍ້ມູນລູກຄ້າ</h2>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ເລືອກລູກຄ້າ</label>
+                                <select x-model="customerId" @change="selectCustomer()" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    <option value="">-- ເລືອກ --</option>
+                                    <?php foreach ($customers as $c): ?>
+                                    <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['fullname']) ?> (<?= htmlspecialchars($c['phone'] ?? '') ?>)</option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <input type="hidden" name="customer_id" x-model="customerId">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ຊື່ລູກຄ້າ</label>
+                                <input type="text" name="customer_name" x-model="customerName" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ຜູ້ຕິດຕໍ່ລູກຄ້າ</label>
+                                <input type="text" name="customer_contact" x-model="customerContact" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-card rounded-2xl border border-border shadow-sm p-6">
                         <h2 class="text-base font-extrabold text-foreground mb-4">ຂໍ້ມູນເພີ່ມເຕີມ</h2>
                         <div class="space-y-3">
+                            <div>
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ແບບຟອມຄົບຮອບ (Company Template)</label>
+                                <select name="company_template" x-model="companyTemplate" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                    <?php foreach ($templates as $key => $t): ?>
+                                    <option value="<?= $key ?>"><?= htmlspecialchars($t['label']) ?> - <?= htmlspecialchars($t['company']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                             <div>
                                 <label class="text-xs font-bold text-muted-foreground mb-1 block">ເລກອ້າງອີງ (Ref No.)</label>
                                 <input type="text" name="ref_no" x-model="refNo" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" placeholder="z.B. PR-2026-...">
                             </div>
-                            <div>
-                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ວັນທີ</label>
-                                <input type="date" name="date" x-model="date" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-xs font-bold text-muted-foreground mb-1 block">ວັນທີ</label>
+                                    <input type="date" name="date" x-model="date" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-bold text-muted-foreground mb-1 block">ວັນໝົດອາຍຸ (Expiry)</label>
+                                    <input type="date" name="expiry_date" x-model="expiryDate" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                </div>
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-muted-foreground mb-1 block">ເງື່ອນໄຂ / Terms</label>
@@ -447,8 +485,13 @@ function quotationForm() {
         supplierId: '<?= $isEdit ? ($quotation['supplier_id'] ?? '') : '' ?>',
         supplierName: '<?= $isEdit ? htmlspecialchars($quotation['supplier_name'] ?? '', ENT_QUOTES) : '' ?>',
         supplierContact: '<?= $isEdit ? htmlspecialchars($quotation['supplier_contact'] ?? '', ENT_QUOTES) : '' ?>',
+        customerId: '<?= $isEdit ? ($quotation['customer_id'] ?? '') : '' ?>',
+        customerName: '<?= $isEdit ? htmlspecialchars($quotation['customer_name'] ?? '', ENT_QUOTES) : '' ?>',
+        customerContact: '<?= $isEdit ? htmlspecialchars($quotation['customer_contact'] ?? '', ENT_QUOTES) : '' ?>',
+        companyTemplate: '<?= $isEdit ? ($quotation['company_template'] ?? 'luang-prabarg') : 'luang-prabarg' ?>',
         refNo: '<?= $isEdit ? htmlspecialchars($quotation['ref_no'] ?? '', ENT_QUOTES) : '' ?>',
         date: '<?= $isEdit ? ($quotation['date'] ?? date('Y-m-d')) : date('Y-m-d') ?>',
+        expiryDate: '<?= $isEdit ? ($quotation['expiry_date'] ?? '') : '' ?>',
         terms: '<?= $isEdit ? htmlspecialchars($quotation['terms'] ?? '', ENT_QUOTES) : '' ?>',
         status: '<?= $isEdit ? ($quotation['status'] ?? 'Draft') : 'Draft' ?>',
         notes: '<?= $isEdit ? htmlspecialchars($quotation['notes'] ?? '', ENT_QUOTES) : '' ?>',
@@ -489,6 +532,14 @@ function quotationForm() {
                 if (supplier.tax_percent || supplier.tax_percent === 0) {
                     this.taxPercent = parseFloat(supplier.tax_percent);
                 }
+            }
+        },
+
+        selectCustomer() {
+            const customer = <?= json_encode($customers ?? []) ?>.find(c => c.id == this.customerId);
+            if (customer) {
+                this.customerName = customer.fullname;
+                this.customerContact = (customer.phone || '') + (customer.email ? ' | ' + customer.email : '');
             }
         },
 

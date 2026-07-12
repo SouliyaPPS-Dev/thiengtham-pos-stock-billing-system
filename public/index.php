@@ -18,6 +18,18 @@ spl_autoload_register(function ($class) {
 
 require_once __DIR__ . '/../app/Helpers/view.php';
 
+// ============================================================
+// Language detection (Lao / English / Thai / Chinese)
+// ?lang=xx sets the preferred language in session + cookie.
+// ============================================================
+if (isset($_GET['lang'])) {
+    $__lang = strtolower(trim($_GET['lang']));
+    if (in_array($__lang, ['lo', 'en', 'th', 'zh'], true)) {
+        $_SESSION['lang'] = $__lang;
+        setcookie('lang', $__lang, time() + (60 * 60 * 24 * 365), '/');
+    }
+}
+
 $envFile = __DIR__ . '/../.env';
 if (file_exists($envFile)) {
     $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);

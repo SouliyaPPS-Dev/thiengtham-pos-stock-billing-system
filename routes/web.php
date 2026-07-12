@@ -127,6 +127,10 @@ return [
     '/admin/quotations/{id}/update'     => ['Admin\QuotationController', 'update'],
     '/admin/quotations/{id}/delete'     => ['Admin\QuotationController', 'delete'],
     '/admin/quotations/{id}/print'      => ['Admin\QuotationController', 'printView'],
+    '/admin/quotations/{id}/duplicate'  => ['Admin\QuotationController', 'duplicate'],
+    '/admin/quotations/{id}/convert'    => ['Admin\QuotationController', 'convertToSale'],
+    '/admin/quotations/{id}/status'     => ['Admin\QuotationController', 'updateStatus'],
+    '/admin/quotations/export/csv'      => ['Admin\QuotationController', 'exportCsv'],
 
     // Settings
     '/admin/settings'                    => ['Admin\SettingsController', 'index'],
@@ -144,4 +148,7 @@ return [
 
     // Public invoice view (no auth)
     '/print-invoice/{id}' => ['Admin\InvoiceController', 'printPublic'],
+
+    // Chatbot API (public, no auth)
+    '/api/chat' => ['ChatbotController', 'chat'],
 ];

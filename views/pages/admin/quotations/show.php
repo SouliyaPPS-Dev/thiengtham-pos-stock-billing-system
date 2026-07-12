@@ -12,12 +12,20 @@
                 </div>
             </div>
             <div class="flex items-center gap-2">
+                <a href="<?= url('/admin/quotations/' . $quotation['id'] . '/duplicate') ?>" onclick="return confirm('ສຳເນົາໃບສະເໜີລາຄານີ້?')" class="inline-flex items-center gap-2 px-4 py-2.5 bg-violet-100 text-violet-700 rounded-xl font-bold text-sm hover:bg-violet-200 transition-all shadow-lg shadow-violet-200">
+                    <i class="fas fa-copy"></i> ສຳເນົາ
+                </a>
                 <a href="<?= url('/admin/quotations/' . $quotation['id'] . '/print') ?>" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-100 text-emerald-700 rounded-xl font-bold text-sm hover:bg-emerald-200 transition-all shadow-lg shadow-emerald-200">
                     <i class="fas fa-print"></i> ພິມ
                 </a>
                 <a href="<?= url('/admin/quotations/' . $quotation['id'] . '/edit') ?>" class="inline-flex items-center gap-2 px-4 py-2.5 bg-amber-100 text-amber-700 rounded-xl font-bold text-sm hover:bg-amber-200 transition-all shadow-lg shadow-amber-200">
                     <i class="fas fa-pen"></i> ແກ້ໄຂ
                 </a>
+                <?php if (($quotation['status'] ?? 'Draft') === 'Approved' && empty($quotation['converted_to_sale_id'])): ?>
+                <a href="<?= url('/admin/quotations/' . $quotation['id'] . '/convert') ?>" onclick="return confirm('ປ່ຽນເປັນບິນຂາຍ?')" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-500 text-white rounded-xl font-bold text-sm hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-300">
+                    <i class="fas fa-exchange-alt"></i> ປ່ຽນເປັນບິນຂາຍ
+                </a>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -117,6 +125,12 @@
                             <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">ເລກອ້າງອີງ</p>
                             <p class="text-sm text-foreground"><?= htmlspecialchars($quotation['ref_no'] ?: '-') ?></p>
                         </div>
+                        <?php if (!empty($quotation['expiry_date'])): ?>
+                        <div>
+                            <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">ວັນໝົດອາຍຸ</p>
+                            <p class="text-sm text-foreground"><?= date('d/m/Y', strtotime($quotation['expiry_date'])) ?></p>
+                        </div>
+                        <?php endif; ?>
                         <div>
                             <p class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">ສະຖານະ</p>
                             <?php $st = $quotation['status'] ?? 'Draft'; ?>
@@ -148,6 +162,26 @@
                     <?php endif; ?>
                 </div>
 
+                <?php if (!empty($quotation['customer_name']) || !empty($quotation['customer_name_resolved'])): ?>
+                <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
+                    <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                            <i class="fas fa-user text-sm"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-extrabold text-foreground">ຂໍ້ມູນລູກຄ້າ</h2>
+                        </div>
+                    </div>
+                    <p class="text-sm font-bold text-foreground"><?= htmlspecialchars($quotation['customer_name'] ?? $quotation['customer_name_resolved'] ?: '-') ?></p>
+                    <?php if (!empty($quotation['customer_contact'])): ?>
+                    <p class="text-sm text-muted-foreground mt-1"><?= htmlspecialchars($quotation['customer_contact']) ?></p>
+                    <?php endif; ?>
+                    <?php if (!empty($quotation['customer_phone'])): ?>
+                    <p class="text-sm text-muted-foreground mt-1"><?= htmlspecialchars($quotation['customer_phone']) ?></p>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+
                 <?php if (!empty($quotation['terms'])): ?>
                 <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-4 pb-4 border-b border-gray-50">
@@ -173,5 +207,50 @@
                 <p class="text-xs text-muted-foreground text-center">ສ້າງເມື່ອ: <?= date('d/m/Y H:i', strtotime($quotation['created_at'])) ?></p>
             </div>
         </div>
+
+        <?php if (!empty($quotation['history'])): ?>
+        <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white shadow-lg shadow-gray-200">
+                    <i class="fas fa-history text-sm"></i>
+                </div>
+                <div>
+                    <h2 class="text-base font-extrabold text-foreground">ປະຫວັດການດຳເນີນງານ</h2>
+                    <p class="text-xs text-muted-foreground">ບັນທຶກການປ່ຽນແປງທັງໝົດ</p>
+                </div>
+            </div>
+            <div class="space-y-3">
+                <?php foreach ($quotation['history'] as $h): ?>
+                <div class="flex items-start gap-3 p-3 rounded-xl bg-gray-50/50 border border-gray-100">
+                    <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                        <?php if ($h['action'] === 'created'): ?>
+                        <i class="fas fa-plus text-[10px] text-emerald-600"></i>
+                        <?php elseif ($h['action'] === 'status_changed'): ?>
+                        <i class="fas fa-exchange-alt text-[10px] text-blue-600"></i>
+                        <?php elseif ($h['action'] === 'converted_to_sale'): ?>
+                        <i class="fas fa-file-invoice text-[10px] text-violet-600"></i>
+                        <?php else: ?>
+                        <i class="fas fa-pen text-[10px] text-gray-600"></i>
+                        <?php endif; ?>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-foreground"><?= htmlspecialchars($h['notes'] ?: $h['action']) ?></p>
+                        <?php if (!empty($h['old_status']) && !empty($h['new_status']) && $h['old_status'] !== $h['new_status']): ?>
+                        <p class="text-xs text-muted-foreground mt-0.5">
+                            <span class="font-medium"><?= $h['old_status'] ?></span> → <span class="font-medium"><?= $h['new_status'] ?></span>
+                        </p>
+                        <?php endif; ?>
+                        <p class="text-[10px] text-muted-foreground mt-0.5">
+                            <?= date('d/m/Y H:i', strtotime($h['created_at'])) ?>
+                            <?php if (!empty($h['performed_by_name'])): ?>
+                            · <?= htmlspecialchars($h['performed_by_name']) ?>
+                            <?php endif; ?>
+                        </p>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 </div>

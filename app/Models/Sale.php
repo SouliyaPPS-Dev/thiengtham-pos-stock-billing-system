@@ -145,11 +145,11 @@ class Sale
                                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
             $stmt->execute([
                 $invoiceNo,
-                $data['customer_id'] ?? null,
+                (!empty($data['customer_id']) ? $data['customer_id'] : null),
                 $data['customer_name'] ?? '',
                 $data['customer_phone'] ?? '',
                 $data['customer_address'] ?? '',
-                $data['supplier_id'] ?? null,
+                (!empty($data['supplier_id']) ? $data['supplier_id'] : null),
                 $data['supplier_name'] ?? '',
                 $data['subtotal'] ?? 0,
                 $data['discount'] ?? 0,
