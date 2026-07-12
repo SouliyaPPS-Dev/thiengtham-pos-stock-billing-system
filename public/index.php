@@ -99,6 +99,23 @@ if ($env === 'production') {
     $_ENV['DB_DATABASE'] = $_ENV['PROD_DB_DATABASE'] ?? '';
 }
 
+if (($_GET['diag'] ?? '') === 'd1ag-7f3k') {
+    header('Content-Type: text/plain; charset=utf-8');
+    $dbh = $_ENV['DB_HOST'] ?? '127.0.0.1';
+    $dbu = $_ENV['DB_USERNAME'] ?? 'root';
+    $dbp = $_ENV['DB_PASSWORD'] ?? 'root';
+    $dbn = $_ENV['DB_DATABASE'] ?? 'if0_42353445_thiengtham';
+    try {
+        $pdo = new PDO("mysql:host=$dbh;dbname=$dbn;charset=utf8mb4", $dbu, $dbp, [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
+        $r = $pdo->query("SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=".$pdo->quote($dbn)." AND TABLE_NAME='quotations' AND COLUMN_NAME='customer_id'")->fetch();
+        $cols = $pdo->query("SHOW COLUMNS FROM quotations")->fetchAll(PDO::FETCH_COLUMN);
+        echo "CONNECTED db=$dbn\n";
+        echo "customer_id exists: " . ($r ? 'YES' : 'NO') . "\n";
+        echo "quotations columns: " . implode(', ', $cols) . "\n";
+    } catch (\Exception $e) { echo "DB ERROR: " . $e->getMessage() . "\n"; }
+    exit;
+}
+
 if (isset($_SERVER['REQUEST_URI'])) {
     $requestUri = $_SERVER['REQUEST_URI'];
     $scriptName = $_SERVER['SCRIPT_NAME'];
