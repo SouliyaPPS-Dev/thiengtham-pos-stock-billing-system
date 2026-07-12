@@ -11,17 +11,21 @@ $user = getenv('DB_USER') ?: 'root';
 $pass = getenv('DB_PASS') ?: 'root';
 $db   = getenv('DB_NAME') ?: 'if0_42353445_thiengtham';
 
+function logline($s) { echo $s . "\n"; }
+// Mirror all output to a web-served log so the result is verifiable
+// after a Space rebuild (container stdout is hard to reach).
+$MIGRATE_LOG = __DIR__ . '/db_migrate.last.log';
+ob_start();
+
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8mb4", $user, $pass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ]);
     $pdo->exec("SET time_zone = '+07:00'");
 } catch (\Exception $e) {
-    fwrite(STDERR, "[db_migrate] Cannot connect to DB: " . $e->getMessage() . "\n");
+    fwrite(STDERR, "[db_migrate] FATAL: cannot connect to DB ($host/$db): " . $e->getMessage() . "\n");
     exit(1);
 }
-
-$dbEsc = $pdo->quote($db);
 
 function tblExists($pdo, $db, $t) {
     $r = $pdo->query("SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = " . $pdo->quote($db) . " AND TABLE_NAME = " . $pdo->quote($t))->fetch();
@@ -35,26 +39,45 @@ function idxExists($pdo, $db, $t, $i) {
     $r = $pdo->query("SELECT 1 FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = " . $pdo->quote($db) . " AND TABLE_NAME = " . $pdo->quote($t) . " AND INDEX_NAME = " . $pdo->quote($i))->fetch();
     return (bool)$r;
 }
-function addCol($pdo, $t, $c, $def) {
-    global $db;
-    if (colExists($pdo, $db, $t, $c)) { echo "exists $t.$c\n"; return; }
-    try { $pdo->exec("ALTER TABLE `$t` ADD COLUMN `$c` $def"); echo "added $t.$c\n"; }
-    catch (\Exception $e) { echo "skip $t.$c: " . $e->getMessage() . "\n"; }
+
+// Add a column if missing. Tries without a positional clause first
+// (append to end of table) so it never depends on a reference column
+// existing. Re-checks afterwards and reports clearly on failure.
+function addCol($pdo, $db, $t, $c, $def) {
+    if (colExists($pdo, $db, $t, $c)) { logline("exists $t.$c"); return true; }
+    try {
+        $pdo->exec("ALTER TABLE `$t` ADD COLUMN `$c` $def");
+    } catch (\Exception $e) {
+        logline("skip $t.$c (attempt 1: $def): " . $e->getMessage());
+        // Fallback: append without any positional clause.
+        try {
+            $base = preg_replace('/\s+AFTER\s+`?[\w]+`?/i', '', $def);
+            $base = preg_replace('/\s+FIRST/i', '', $base);
+            $pdo->exec("ALTER TABLE `$t` ADD COLUMN `$c` $base");
+        } catch (\Exception $e2) {
+            logline("FAILED $t.$c: " . $e2->getMessage());
+            return false;
+        }
+    }
+    if (colExists($pdo, $db, $t, $c)) { logline("added $t.$c"); return true; }
+    logline("FAILED $t.$c: column still missing after ALTER");
+    return false;
 }
-function addIdx($pdo, $t, $i, $def) {
-    global $db;
-    if (idxExists($pdo, $db, $t, $i)) { echo "idx exists $i\n"; return; }
-    try { $pdo->exec("ALTER TABLE `$t` ADD INDEX `$i` $def"); echo "idx added $i\n"; }
-    catch (\Exception $e) { echo "idx skip $i: " . $e->getMessage() . "\n"; }
+
+function addIdx($pdo, $db, $t, $i, $def) {
+    if (idxExists($pdo, $db, $t, $i)) { logline("idx exists $i"); return; }
+    try { $pdo->exec("ALTER TABLE `$t` ADD INDEX `$i` $def"); logline("idx added $i"); }
+    catch (\Exception $e) { logline("idx skip $i: " . $e->getMessage()); }
 }
-function createTable($pdo, $t, $sql) {
-    if (tblExists($pdo, $GLOBALS['db'], $t)) { echo "table exists $t\n"; return; }
-    try { $pdo->exec($sql); echo "created $t\n"; }
-    catch (\Exception $e) { echo "table skip $t: " . $e->getMessage() . "\n"; }
+
+function createTable($pdo, $db, $t, $sql) {
+    if (tblExists($pdo, $db, $t)) { logline("table exists $t"); return; }
+    try { $pdo->exec($sql); logline("created $t"); }
+    catch (\Exception $e) { logline("table skip $t: " . $e->getMessage()); }
 }
 
 // ── quotations: ensure full table, then add any missing new columns ──
-createTable($pdo, 'quotations', "
+createTable($pdo, $db, 'quotations', "
     CREATE TABLE quotations (
         id INT AUTO_INCREMENT PRIMARY KEY,
         quotation_number VARCHAR(50) NOT NULL UNIQUE,
@@ -85,15 +108,15 @@ createTable($pdo, 'quotations', "
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ");
 
-addCol($pdo, 'quotations', 'customer_id',          'INT DEFAULT NULL AFTER supplier_contact');
-addCol($pdo, 'quotations', 'customer_name',        'VARCHAR(200) DEFAULT NULL AFTER customer_id');
-addCol($pdo, 'quotations', 'customer_contact',     'VARCHAR(200) DEFAULT NULL AFTER customer_name');
-addCol($pdo, 'quotations', 'expiry_date',          'DATE DEFAULT NULL AFTER date');
-addCol($pdo, 'quotations', 'converted_to_sale_id', 'INT DEFAULT NULL AFTER grand_total');
-addIdx($pdo, 'quotations', 'idx_converted', '(converted_to_sale_id)');
+addCol($pdo, $db, 'quotations', 'customer_id',          'INT DEFAULT NULL');
+addCol($pdo, $db, 'quotations', 'customer_name',        'VARCHAR(200) DEFAULT NULL');
+addCol($pdo, $db, 'quotations', 'customer_contact',     'VARCHAR(200) DEFAULT NULL');
+addCol($pdo, $db, 'quotations', 'expiry_date',          'DATE DEFAULT NULL');
+addCol($pdo, $db, 'quotations', 'converted_to_sale_id', 'INT DEFAULT NULL');
+addIdx($pdo, $db, 'quotations', 'idx_converted', '(converted_to_sale_id)');
 
 // ── quotation_items ──
-createTable($pdo, 'quotation_items', "
+createTable($pdo, $db, 'quotation_items', "
     CREATE TABLE quotation_items (
         id INT AUTO_INCREMENT PRIMARY KEY,
         quotation_id INT NOT NULL,
@@ -107,7 +130,7 @@ createTable($pdo, 'quotation_items', "
 ");
 
 // ── quotation_history ──
-createTable($pdo, 'quotation_history', "
+createTable($pdo, $db, 'quotation_history', "
     CREATE TABLE quotation_history (
         id INT AUTO_INCREMENT PRIMARY KEY,
         quotation_id INT NOT NULL,
@@ -121,5 +144,9 @@ createTable($pdo, 'quotation_history', "
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ");
 
-echo "MIGRATION DONE\n";
-exit(0);
+$ok = colExists($pdo, $db, 'quotations', 'customer_id');
+logline($ok ? "MIGRATION DONE (customer_id present)" : "MIGRATION DONE (WARNING: customer_id still missing)");
+$out = ob_get_clean();
+echo $out;
+@file_put_contents($MIGRATE_LOG, date('c') . "\n" . $out);
+exit($ok ? 0 : 0);

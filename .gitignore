@@ -8,3 +8,4 @@ dist/
 build/
 /public/uploads/
 Thumbs.db
+db_migrate.last.log
