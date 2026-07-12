@@ -120,6 +120,23 @@ else
 fi
 
 # ============================================================
+# 4b. Apply incremental migrations (idempotent) so the bucket DB
+#     stays in sync with code across redeploys. database.sql is
+#     only imported once; this safely adds any missing columns/tables.
+# ============================================================
+MIGRATION_DIR="/var/www/html/database/migrations"
+if [ -d "$MIGRATION_DIR" ]; then
+    shopt -s nullglob
+    for m in "$MIGRATION_DIR"/*.sql; do
+        echo "[start.sh] Applying migration: $m"
+        $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" < "$m" \
+            && echo "[start.sh]   -> done: $(basename "$m")" \
+            || echo "[start.sh]   -> warnings (non-fatal): $(basename "$m")"
+    done
+    shopt -u nullglob
+fi
+
+# ============================================================
 # 5. Generate .env file for PHP
 # ============================================================
 APP_URL="${PROD_APP_URL:-}"

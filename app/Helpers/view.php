@@ -163,7 +163,8 @@ function get_store_phone() {
 
 function get_store_whatsapp() {
     $wa = get_store_setting('store_whatsapp', '');
-    return $wa ?: get_store_phone();
+    $wa = $wa ?: get_store_phone();
+    return $wa ?: '+8562078287509';
 }
 
 function get_logo_url($logoPath) {
