@@ -181,6 +181,7 @@ $adminPrefix = '/admin';
                         <span class="w-8 h-8 rounded-xl bg-teal-100 flex items-center justify-center text-teal-600 text-xs"><i class="fas fa-file-invoice"></i></span>
                         <span>ໃບສະເໜີລາຄາ</span>
                     </a>
+                    <div class="border-t border-border my-2 mx-3"></div>
                     <a href="<?= url($adminPrefix . '/pos') ?>" class="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-sm font-bold <?= get_menu_active_class('/admin/pos') ?>">
                         <span class="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs"><i class="fas fa-cash-register"></i></span>
                         <span>POS ຂາຍສິນຄ້າ</span>
@@ -284,6 +285,7 @@ $adminPrefix = '/admin';
                             <a href="<?= url($adminPrefix . '/quotations') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/quotations') ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground/80' ?>">
                                 <span class="w-5 h-5 rounded-md bg-teal-100 flex items-center justify-center text-teal-600 text-[9px]"><i class="fas fa-file-invoice"></i></span>ໃບສະເໜີ
                             </a>
+                            <div class="w-px h-5 bg-border mx-0.5 flex-shrink-0"></div>
                             <a href="<?= url($adminPrefix . '/pos') ?>" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap <?= is_menu_active('/admin/pos') ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground/80' ?>">
                                 <span class="w-5 h-5 rounded-md bg-emerald-100 flex items-center justify-center text-emerald-600 text-[9px]"><i class="fas fa-cash-register"></i></span>POS
                             </a>
@@ -376,6 +378,7 @@ $adminPrefix = '/admin';
                     <a href="<?= url($adminPrefix . '/quotations') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/quotations') ? 'bg-primary/10 text-primary shadow-sm' : 'text-foreground/70 hover:bg-muted' ?>">
                         <span class="w-9 h-9 rounded-xl bg-teal-100 flex items-center justify-center text-teal-600 text-sm"><i class="fas fa-file-invoice"></i></span> ໃບສະເໜີລາຄາ
                     </a>
+                    <div class="border-t border-border my-2 mx-3"></div>
                     <a href="<?= url($adminPrefix . '/pos') ?>" class="flex items-center gap-3 px-4 py-3.5 rounded-xl text-base font-bold transition-all <?= is_menu_active('/admin/pos') ? 'bg-primary/10 text-primary shadow-sm' : 'text-foreground/70 hover:bg-muted' ?>">
                         <span class="w-9 h-9 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-600 text-sm"><i class="fas fa-cash-register"></i></span> POS ຂາຍສິນຄ້າ
                     </a>
