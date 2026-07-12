@@ -107,11 +107,27 @@ if (($_GET['diag'] ?? '') === 'd1ag-7f3k') {
     $dbn = $_ENV['DB_DATABASE'] ?? 'if0_42353445_thiengtham';
     try {
         $pdo = new PDO("mysql:host=$dbh;dbname=$dbn;charset=utf8mb4", $dbu, $dbp, [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
-        $r = $pdo->query("SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=".$pdo->quote($dbn)." AND TABLE_NAME='quotations' AND COLUMN_NAME='customer_id'")->fetch();
-        $cols = $pdo->query("SHOW COLUMNS FROM quotations")->fetchAll(PDO::FETCH_COLUMN);
         echo "CONNECTED db=$dbn\n";
-        echo "customer_id exists: " . ($r ? 'YES' : 'NO') . "\n";
-        echo "quotations columns: " . implode(', ', $cols) . "\n";
+        $cols = $pdo->query("SHOW COLUMNS FROM quotations")->fetchAll(PDO::FETCH_COLUMN);
+        echo "before: " . implode(', ', $cols) . "\n";
+        foreach ([
+            'customer_id'=>'INT DEFAULT NULL',
+            'customer_name'=>'VARCHAR(200) DEFAULT NULL',
+            'customer_contact'=>'VARCHAR(200) DEFAULT NULL',
+            'expiry_date'=>'DATE DEFAULT NULL',
+            'converted_to_sale_id'=>'INT DEFAULT NULL',
+        ] as $c=>$def) {
+            $has = $pdo->query("SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=".$pdo->quote($dbn)." AND TABLE_NAME='quotations' AND COLUMN_NAME=".$pdo->quote($c))->fetch();
+            if ($has) { echo "$c: exists\n"; continue; }
+            try {
+                $pdo->exec("ALTER TABLE quotations ADD COLUMN `$c` $def");
+                echo "$c: ADDED\n";
+            } catch (\Exception $e) {
+                echo "$c: FAIL -> " . $e->getMessage() . "\n";
+            }
+        }
+        $cols = $pdo->query("SHOW COLUMNS FROM quotations")->fetchAll(PDO::FETCH_COLUMN);
+        echo "after: " . implode(', ', $cols) . "\n";
     } catch (\Exception $e) { echo "DB ERROR: " . $e->getMessage() . "\n"; }
     exit;
 }
