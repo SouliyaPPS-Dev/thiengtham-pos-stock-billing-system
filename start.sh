@@ -120,21 +120,17 @@ else
 fi
 
 # ============================================================
-# 4b. Apply incremental migrations (idempotent) so the bucket DB
-#     stays in sync with code across redeploys. database.sql is
-#     only imported once; this safely adds any missing columns/tables.
+# 4b. Idempotent bucket-DB schema sync (robust PHP runner).
+#     database.sql is imported only once; this guarantees any
+#     missing columns/tables (e.g. quotations.customer_id,
+#     quotation_history) are added on EVERY startup. PDO-based,
+#     guarded + try/catch, so it never fails the container start.
 # ============================================================
-MIGRATION_DIR="/var/www/html/database/migrations"
-if [ -d "$MIGRATION_DIR" ]; then
-    shopt -s nullglob
-    for m in "$MIGRATION_DIR"/*.sql; do
-        echo "[start.sh] Applying migration: $m"
-        $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" < "$m" \
-            && echo "[start.sh]   -> done: $(basename "$m")" \
-            || echo "[start.sh]   -> warnings (non-fatal): $(basename "$m")"
-    done
-    shopt -u nullglob
-fi
+echo "[start.sh] Syncing bucket DB schema (idempotent)..."
+DB_HOST=127.0.0.1 DB_USER=root DB_PASS="$MYSQL_ROOT_PASSWORD" DB_NAME="$MYSQL_DATABASE" \
+    php /var/www/html/db_migrate.php \
+    && echo "[start.sh] Bucket DB schema synced." \
+    || echo "[start.sh] Bucket DB schema sync had non-fatal warnings."
 
 # ============================================================
 # 5. Generate .env file for PHP
