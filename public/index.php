@@ -108,6 +108,21 @@ if (($_GET['diag'] ?? '') === 'd1ag-7f3k') {
     try {
         $pdo = new PDO("mysql:host=$dbh;dbname=$dbn;charset=utf8mb4", $dbu, $dbp, [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
         echo "CONNECTED db=$dbn\n";
+        $datadir = $pdo->query("SELECT @@datadir AS d")->fetch()['d'];
+        $stray = rtrim($datadir, '/') . '/' . $dbn . '/quotations';
+        echo "datadir=$datadir stray_path=$stray\n";
+        if (is_dir($stray)) {
+            echo "STRAY DIR FOUND\n";
+            if (@rmdir($stray)) { echo "rmdir OK (empty)\n"; }
+            else {
+                echo "rmdir failed (not empty?): " . (function_exists('error_get_last') ? json_encode(error_get_last()) : '') . "\n";
+                // try removing contents then dir
+                array_map('unlink', glob($stray . '/*'));
+                @rmdir($stray) && echo "rmdir OK after cleanup\n" || echo "rmdir still failed\n";
+            }
+        } else {
+            echo "no stray dir\n";
+        }
         $cols = $pdo->query("SHOW COLUMNS FROM quotations")->fetchAll(PDO::FETCH_COLUMN);
         echo "before: " . implode(', ', $cols) . "\n";
         foreach ([
