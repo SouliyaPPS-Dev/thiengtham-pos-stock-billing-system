@@ -83,7 +83,7 @@
                             </tr>
                         </template>
                     </tbody>
-                    <tfoot x-show="selectedExpenses.length > 0">
+                    <tfoot x-show="selectedExpenses.length > 0" style="display: none">
                         <tr>
                             <td colspan="7" class="px-2 py-0">
                                 <div class="border border-red-200 bg-red-50/80 rounded-xl px-5 py-3 flex items-center justify-between transition-all">
@@ -103,7 +103,7 @@
             </div>
 
             <!-- Mobile Bulk Action Bar -->
-            <div x-show="selectedExpenses.length > 0" class="fixed bottom-0 left-0 right-0 bg-card border-t shadow-2xl px-4 py-3 z-50 md:hidden">
+            <div x-show="selectedExpenses.length > 0" style="display: none" class="fixed bottom-0 left-0 right-0 bg-card border-t shadow-2xl px-4 py-3 z-50 md:hidden">
                 <div class="flex items-center justify-between">
                     <span class="text-sm font-bold text-foreground/70">
                         ເລືອກ <span x-text="selectedExpenses.length" class="text-primary font-black"></span> ລາຍການ
