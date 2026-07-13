@@ -25,10 +25,14 @@
                 </button>
             </form>
 
-            <div class="overflow-x-auto">
+            <?php $bidCustomerIds = array_map('strval', array_column($bidCustomers, 'id')); ?>
+            <div x-data="bidCustomersBulkDelete()" class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="border-b border-border">
+                            <th class="py-3 px-2 text-center" style="width:40px">
+                                <input type="checkbox" @click="toggleAll" :checked="allSelected" class="rounded border-gray-300 text-primary focus:ring-primary cursor-pointer">
+                            </th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ຊື່ລູກຄ້າທີ່ສະເໜີລາຄາ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ຜູ້ຕິດຕໍ່</th>
@@ -41,7 +45,7 @@
                     <tbody>
                         <?php if (empty($bidCustomers)): ?>
                         <tr>
-                            <td colspan="7" class="py-3 px-2">
+                            <td colspan="8" class="py-3 px-2">
                                 <div class="flex flex-col items-center justify-center py-12 text-center">
                                     <div class="h-16 w-16 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300 mb-4">
                                         <i class="fas fa-truck text-2xl"></i>
@@ -55,6 +59,9 @@
                         <?php $i = 0; ?>
                         <?php foreach ($bidCustomers as $s): $i++; ?>
                         <tr class="border-b border-gray-50 last:border-0">
+                            <td class="py-3 px-2 text-center">
+                                <input type="checkbox" :value="<?= $s['id'] ?>" x-model="selected" class="rounded border-gray-300 text-primary focus:ring-primary cursor-pointer">
+                            </td>
                             <td class="py-3 px-2 text-muted-foreground text-sm text-center"><?= $i ?></td>
                             <td class="py-3 px-2 font-medium text-foreground"><?= htmlspecialchars($s['name']) ?></td>
                             <td class="py-3 px-2 text-foreground/70"><?= htmlspecialchars($s['contact_person'] ?? '-') ?></td>
@@ -82,12 +89,89 @@
                         <?php endif; ?>
                     </tbody>
                 </table>
+                <?php if (!empty($bidCustomers)): ?>
+                <tfoot x-show="selected.length > 0">
+                    <tr>
+                        <td colspan="8" class="px-2 py-0">
+                            <div class="border border-red-200 bg-red-50/80 rounded-xl px-5 py-3 flex items-center justify-between transition-all">
+                                <span class="text-sm font-bold text-red-700">
+                                    <i class="fas fa-check-circle mr-1.5"></i>
+                                    ເລືອກ <span x-text="selected.length" class="text-red-600 text-base"></span> ລາຍການ
+                                </span>
+                                <button @click="confirmBulkDelete" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all shadow-sm" style="background:#dc2626">
+                                    <i class="fas fa-trash-alt"></i>
+                                    ລຶບທັງໝົດ
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+                <?php endif; ?>
+            </div>
+
+            <!-- Mobile Bulk Action Bar -->
+            <div x-show="selected.length > 0" class="fixed bottom-0 left-0 right-0 bg-card border-t shadow-2xl px-4 py-3 z-50 md:hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-bold text-foreground/70">
+                        ເລືອກ <span x-text="selected.length" class="text-primary font-black"></span> ລາຍການ
+                    </span>
+                    <button @click="confirmBulkDelete" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-black text-white transition-all shadow-lg" style="background:#dc2626">
+                        <i class="fas fa-trash-alt"></i>
+                        ລຶບທັງໝົດ
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
+function bidCustomersBulkDelete() {
+    return {
+        selected: [],
+        allIds: <?= json_encode($bidCustomerIds) ?>,
+        get allSelected() {
+            return this.allIds.length > 0 && this.selected.length === this.allIds.length;
+        },
+        toggleAll() {
+            if (this.allSelected) {
+                this.selected = [];
+            } else {
+                this.selected = [...this.allIds];
+            }
+        },
+        confirmBulkDelete() {
+            if (this.selected.length === 0) return;
+            Swal.fire({
+                title: 'ທ່ານແນ່ໃຈບໍ່?',
+                text: 'ທ່ານຕ້ອງການລົບ ' + this.selected.length + ' ລາຍການນີ້ແທ້ບໍ່? ການກະທຳນີ້ບໍ່ສາມາດກັບຄືນໄດ້.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'ແມ່ນ, ລົບ',
+                cancelButtonText: 'ຍົກເລີກ',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '<?= url('/admin/bid-customers/bulk-delete') ?>';
+                    this.selected.forEach(id => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ids[]';
+                        input.value = id;
+                        form.appendChild(input);
+                    });
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+    };
+}
+
 function confirmDelete(event, url) {
     event.preventDefault();
     Swal.fire({

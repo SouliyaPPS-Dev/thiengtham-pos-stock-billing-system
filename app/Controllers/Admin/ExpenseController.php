@@ -161,4 +161,41 @@ class ExpenseController extends \App\Controllers\BaseController
 
         $this->redirect('/admin/expenses', ['deleted' => 1]);
     }
+
+    public function bulkDelete()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/expenses');
+        }
+
+        $ids = $_POST['ids'] ?? [];
+        if (empty($ids) || !is_array($ids)) {
+            $this->redirect('/admin/expenses', [
+                'error' => 1,
+                'error_msg' => 'ກະລຸນາເລືອກລາຍການທີ່ຕ້ອງການລົບ',
+            ]);
+        }
+
+        $ids = array_map('intval', $ids);
+        $db = $this->db();
+
+        try {
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $db->prepare("DELETE FROM expenses WHERE id IN ($placeholders)");
+            $stmt->execute($ids);
+            $db->commit();
+
+            $this->redirect('/admin/expenses', [
+                'success' => 1,
+                'success_msg' => 'ລົບ ' . count($ids) . ' ລາຍການສຳເລັດ',
+            ]);
+        } catch (\Exception $e) {
+            $db->rollBack();
+            $this->redirect('/admin/expenses', [
+                'error' => 1,
+                'error_msg' => 'ເກີດຂໍ້ຜິດພາດ: ' . $e->getMessage(),
+            ]);
+        }
+    }
 }

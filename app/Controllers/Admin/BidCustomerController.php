@@ -145,4 +145,41 @@ class BidCustomerController extends \App\Controllers\BaseController
         (new BidCustomer())->delete($id);
         $this->redirect('/admin/bid-customers', ['deleted' => 1]);
     }
+
+    public function bulkDelete()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('/admin/bid-customers');
+        }
+
+        $ids = $_POST['ids'] ?? [];
+        if (empty($ids) || !is_array($ids)) {
+            $this->redirect('/admin/bid-customers', [
+                'error' => 1,
+                'error_msg' => 'ກະລຸນາເລືອກລາຍການທີ່ຕ້ອງການລົບ',
+            ]);
+        }
+
+        $ids = array_map('intval', $ids);
+        $db = \App\Core\Database::getInstance()->getConnection();
+
+        try {
+            $db->beginTransaction();
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $db->prepare("DELETE FROM bid_customers WHERE id IN ($placeholders)");
+            $stmt->execute($ids);
+            $db->commit();
+
+            $this->redirect('/admin/bid-customers', [
+                'success' => 1,
+                'success_msg' => 'ລົບ ' . count($ids) . ' ລາຍການສຳເລັດ',
+            ]);
+        } catch (\Exception $e) {
+            $db->rollBack();
+            $this->redirect('/admin/bid-customers', [
+                'error' => 1,
+                'error_msg' => 'ເກີດຂໍ້ຜິດພາດ: ' . $e->getMessage(),
+            ]);
+        }
+    }
 }

@@ -288,11 +288,16 @@ CREATE TABLE IF NOT EXISTS promotions (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Insert sample promotions
-INSERT INTO promotions (title, image, link, sort_order, status) VALUES
-    ('ໂປຣໂມຊັ້ນ 1', 'https://picsum.photos/id/96/400/300', '/products', 1, 'Active'),
-    ('ໂປຣໂມຊັ້ນ 2', 'https://picsum.photos/id/95/400/300', '/products', 2, 'Active'),
-    ('ໂປຣໂມຊັ້ນ 3', 'https://picsum.photos/id/94/400/300', '/products', 3, 'Active');
+-- Insert sample promotions (skip if already exists)
+INSERT INTO promotions (title, image, link, sort_order, status)
+SELECT 'ໂປຣໂມຊັ້ນ 1', 'https://picsum.photos/id/96/400/300', '/products', 1, 'Active'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM promotions WHERE title = 'ໂປຣໂມຊັ້ນ 1');
+INSERT INTO promotions (title, image, link, sort_order, status)
+SELECT 'ໂປຣໂມຊັ້ນ 2', 'https://picsum.photos/id/95/400/300', '/products', 2, 'Active'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM promotions WHERE title = 'ໂປຣໂມຊັ້ນ 2');
+INSERT INTO promotions (title, image, link, sort_order, status)
+SELECT 'ໂປຣໂມຊັ້ນ 3', 'https://picsum.photos/id/94/400/300', '/products', 3, 'Active'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM promotions WHERE title = 'ໂປຣໂມຊັ້ນ 3');
 
 -- Insert default settings
 INSERT INTO settings (setting_key, setting_value) VALUES
@@ -325,27 +330,41 @@ INSERT INTO users (username, password, full_name, role, status) VALUES
     ('staff', '$2y$10$jqUyvZnfaFvtc/F/cgTWG.ziCX4F/yjYmIy61xGd1fT9xpHCjEbei', 'Staff User', 'staff', 'Active')
 ON DUPLICATE KEY UPDATE username = username;
 
--- Insert sample categories
-INSERT INTO categories (name, slug, description) VALUES
-    ('ທົ່ວໄປ', 'general', 'ສິນຄ້າທົ່ວໄປ'),
-    ('ເຄື່ອງດື່ມ', 'drinks', 'ເຄື່ອງດື່ມຕ່າງໆ'),
-    ('ອາຫານ', 'food', 'ອາຫານ ແລະ ຂອງກິນ')
-ON DUPLICATE KEY UPDATE name = name;
+-- Insert sample categories (skip if already exists)
+INSERT INTO categories (name, slug, description)
+SELECT 'ທົ່ວໄປ', 'general', 'ສິນຄ້າທົ່ວໄປ'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'ທົ່ວໄປ');
+INSERT INTO categories (name, slug, description)
+SELECT 'ເຄື່ອງດື່ມ', 'drinks', 'ເຄື່ອງດື່ມຕ່າງໆ'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'ເຄື່ອງດື່ມ');
+INSERT INTO categories (name, slug, description)
+SELECT 'ອາຫານ', 'food', 'ອາຫານ ແລະ ຂອງກິນ'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM categories WHERE name = 'ອາຫານ');
 
--- Insert sample payment methods
-INSERT INTO payment_methods (name, details) VALUES
-    ('ເງິນສົດ', 'Cash'),
-    ('QR Code', 'QR Code Payment')
-ON DUPLICATE KEY UPDATE name = name;
+-- Insert sample payment methods (skip if already exists)
+INSERT INTO payment_methods (name, details)
+SELECT 'ເງິນສົດ', 'Cash'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM payment_methods WHERE name = 'ເງິນສົດ');
+INSERT INTO payment_methods (name, details)
+SELECT 'QR Code', 'QR Code Payment'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM payment_methods WHERE name = 'QR Code');
 
--- Insert sample expense categories
-INSERT INTO expense_categories (name, description) VALUES
-    ('ຄ່າເຊົ່າສະຖານທີ່', 'Rent'),
-    ('ຄ່ານ້ຳ-ຄ່າໄຟ', 'Utilities'),
-    ('ຄ່າພະນັກງານ', 'Salary'),
-    ('ຄ່າຂົນສົ່ງ', 'Shipping'),
-    ('ອື່ນໆ', 'Other')
-ON DUPLICATE KEY UPDATE name = name;
+-- Insert sample expense categories (skip if already exists)
+INSERT INTO expense_categories (name, description)
+SELECT 'ຄ່າເຊົ່າສະຖານທີ່', 'Rent'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM expense_categories WHERE name = 'ຄ່າເຊົ່າສະຖານທີ່');
+INSERT INTO expense_categories (name, description)
+SELECT 'ຄ່ານ້ຳ-ຄ່າໄຟ', 'Utilities'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM expense_categories WHERE name = 'ຄ່ານ້ຳ-ຄ່າໄຟ');
+INSERT INTO expense_categories (name, description)
+SELECT 'ຄ່າພະນັກງານ', 'Salary'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM expense_categories WHERE name = 'ຄ່າພະນັກງານ');
+INSERT INTO expense_categories (name, description)
+SELECT 'ຄ່າຂົນສົ່ງ', 'Shipping'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM expense_categories WHERE name = 'ຄ່າຂົນສົ່ງ');
+INSERT INTO expense_categories (name, description)
+SELECT 'ອື່ນໆ', 'Other'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM expense_categories WHERE name = 'ອື່ນໆ');
 
 -- Insert sample products
 INSERT INTO products (name, slug, sku, category_id, cost_price, selling_price, stock, min_stock, unit, description, image, status, featured) VALUES
@@ -377,11 +396,16 @@ INSERT IGNORE INTO customer_addresses (customer_id, label, recipient_name, phone
     (1, 'ຫ້ອງການ', 'ສຸລິຍາ ວົງສະຫວັດ', '020 55667788', 'ຕຶກລາວໄອທີ ຊັ້ນ 3 ຫ້ອງ 302', 'ນະຄອນຫຼວງວຽງຈັນ', 'ໄຊເສດຖາ', 'ສະພັນທະ', 0),
     (2, 'ບ້ານ', 'ອະນຸສາ ແກ້ວມະນີ', '020 99887766', 'ບ້ານສະພັນທະ ໃກ້ໂຮງຮຽນ', 'ນະຄອນຫຼວງວຽງຈັນ', 'ໄຊເສດຖາ', 'ສະພັນທະ', 1);
 
--- Insert sample bid_customers
-INSERT IGNORE INTO bid_customers (name, contact_person, phone, email, address, notes, status, created_at) VALUES
-    (' CH.KARNCHANG(LAO)COMPANY LIMITED', 'ທ້າວ ສົມຊາຍ', '020 12345678', 'info@laowater.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສົ່ງທຸກວັນຈັນ ແລະ ວັນພະຫັດ', 'Active', '2026-01-15 08:00:00'),
-    ('XAYABURI POWER COMPANY LIMITED', 'ນາງ ມາລິກາ', '020 23456789', 'order@thailaoshop.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສິນຄ້າອຸປະໂພກ ແລະ ບໍລິໂພກ', 'Active', '2026-02-01 09:00:00'),
-    ('NAM NGUM 2 POWER COMPANY LIMITED', 'ທ້າວ ບຸນມີ', '020 34567890', 'vte.dist@example.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສົ່ງຟຣີເມື່ອສັ່ງ 500,000 ກີບຂຶ້ນໄປ', 'Active', '2026-02-15 10:00:00');
+-- Insert sample bid_customers (skip if already exists)
+INSERT INTO bid_customers (name, contact_person, phone, email, address, notes, status, created_at)
+SELECT ' CH.KARNCHANG(LAO)COMPANY LIMITED', 'ທ້າວ ສົມຊາຍ', '020 12345678', 'info@laowater.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສົ່ງທຸກວັນຈັນ ແລະ ວັນພະຫັດ', 'Active', '2026-01-15 08:00:00'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM bid_customers WHERE name = ' CH.KARNCHANG(LAO)COMPANY LIMITED');
+INSERT INTO bid_customers (name, contact_person, phone, email, address, notes, status, created_at)
+SELECT 'XAYABURI POWER COMPANY LIMITED', 'ນາງ ມາລິກາ', '020 23456789', 'order@thailaoshop.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສິນຄ້າອຸປະໂພກ ແລະ ບໍລິໂພກ', 'Active', '2026-02-01 09:00:00'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM bid_customers WHERE name = 'XAYABURI POWER COMPANY LIMITED');
+INSERT INTO bid_customers (name, contact_person, phone, email, address, notes, status, created_at)
+SELECT 'NAM NGUM 2 POWER COMPANY LIMITED', 'ທ້າວ ບຸນມີ', '020 34567890', 'vte.dist@example.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສົ່ງຟຣີເມື່ອສັ່ງ 500,000 ກີບຂຶ້ນໄປ', 'Active', '2026-02-15 10:00:00'
+FROM DUAL WHERE NOT EXISTS (SELECT 1 FROM bid_customers WHERE name = 'NAM NGUM 2 POWER COMPANY LIMITED');
 
 -- Insert sample product images (e-commerce gallery)
 INSERT IGNORE INTO product_images (product_id, image, sort_order) VALUES
