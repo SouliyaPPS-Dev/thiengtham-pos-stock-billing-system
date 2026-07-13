@@ -101,8 +101,9 @@ fi
 MYSQL_CMD="mysql --socket=$MYSQL_RUN_DIR/mysqld.sock -u root"
 
 # Helper: ensure root can connect via TCP (127.0.0.1 and %)
+# Must use password auth since root@localhost already has password set
 ensure_tcp_users() {
-    $MYSQL_CMD $MYSQL_CHARSET <<EOSQLTCP
+    $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET <<EOSQLTCP
     CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
