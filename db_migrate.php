@@ -81,19 +81,38 @@ function createTable($pdo, $db, $t, $sql) {
 // directory. A leftover directory named like a table (e.g. `quotations/`)
 // shadows the real table and makes every ALTER/CREATE fail with
 // errno 21 "Is a directory". Drop such stray dirs so migration can proceed.
+function delTree($dir) {
+    $items = @scandir($dir);
+    if ($items === false) return false;
+    foreach (array_diff($items, ['.', '..']) as $item) {
+        $p = $dir . '/' . $item;
+        if (is_dir($p)) delTree($p);
+        else @unlink($p);
+    }
+    return @rmdir($dir);
+}
+
+// ── remove stray per-table directories in the data dir ──
+// InnoDB stores tables as files (table.frm / table.ibd), never as a
+// directory. A leftover directory named exactly like a table (e.g.
+// `quotations/`, sometimes with nested junk inside) shadows the real
+// table and makes every ALTER/CREATE fail with errno 21 "Is a directory".
+// Drop such stray dirs (only those whose name matches a real table) so
+// the migration can proceed. Runs as root at container start.
 function cleanStrayDirs($pdo, $db) {
     try {
         $datadir = $pdo->query("SELECT @@datadir AS d")->fetchColumn();
         if (!$datadir) return;
         $dbDir = rtrim($datadir, '/') . '/' . $db;
         if (!is_dir($dbDir)) return;
+        $tbls = $pdo->query("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA=" . $pdo->quote($db))->fetchAll(PDO::FETCH_COLUMN);
+        $tblSet = array_flip($tbls);
         $entries = @scandir($dbDir);
         if ($entries === false) return;
         foreach (array_diff($entries, ['.', '..', 'db.opt']) as $entry) {
             $full = $dbDir . '/' . $entry;
-            if (is_dir($full)) {
-                array_map('unlink', glob($full . '/*'));
-                if (@rmdir($full)) { logline("removed stray data-dir: $entry"); }
+            if (is_dir($full) && isset($tblSet[$entry])) {
+                if (delTree($full)) { logline("removed stray data-dir: $entry"); }
                 else { logline("note: could not remove stray data-dir: $entry"); }
             }
         }
