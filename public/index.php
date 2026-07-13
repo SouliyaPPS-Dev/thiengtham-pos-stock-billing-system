@@ -118,7 +118,7 @@ if (($_GET['diag'] ?? '') === 'd1ag-7f3k') {
                 echo "rmdir failed (not empty?): " . (function_exists('error_get_last') ? json_encode(error_get_last()) : '') . "\n";
                 // try removing contents then dir
                 array_map('unlink', glob($stray . '/*'));
-                @rmdir($stray) && echo "rmdir OK after cleanup\n" || echo "rmdir still failed\n";
+                if (@rmdir($stray)) { echo "rmdir OK after cleanup\n"; } else { echo "rmdir still failed\n"; }
             }
         } else {
             echo "no stray dir\n";

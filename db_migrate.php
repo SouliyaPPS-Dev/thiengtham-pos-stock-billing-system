@@ -76,6 +76,33 @@ function createTable($pdo, $db, $t, $sql) {
     catch (\Exception $e) { logline("table skip $t: " . $e->getMessage()); }
 }
 
+// ── remove stray per-table directories in the data dir ──
+// InnoDB stores tables as files (table.frm / table.ibd), never as a
+// directory. A leftover directory named like a table (e.g. `quotations/`)
+// shadows the real table and makes every ALTER/CREATE fail with
+// errno 21 "Is a directory". Drop such stray dirs so migration can proceed.
+function cleanStrayDirs($pdo, $db) {
+    try {
+        $datadir = $pdo->query("SELECT @@datadir AS d")->fetchColumn();
+        if (!$datadir) return;
+        $dbDir = rtrim($datadir, '/') . '/' . $db;
+        if (!is_dir($dbDir)) return;
+        $entries = @scandir($dbDir);
+        if ($entries === false) return;
+        foreach (array_diff($entries, ['.', '..', 'db.opt']) as $entry) {
+            $full = $dbDir . '/' . $entry;
+            if (is_dir($full)) {
+                array_map('unlink', glob($full . '/*'));
+                if (@rmdir($full)) { logline("removed stray data-dir: $entry"); }
+                else { logline("note: could not remove stray data-dir: $entry"); }
+            }
+        }
+    } catch (\Exception $e) {
+        logline("stray-dir cleanup note: " . $e->getMessage());
+    }
+}
+cleanStrayDirs($pdo, $db);
+
 // ── quotations: ensure full table, then add any missing new columns ──
 createTable($pdo, $db, 'quotations', "
     CREATE TABLE quotations (
