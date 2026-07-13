@@ -28,10 +28,8 @@ fi
 chown -R mysql:mysql "$MYSQL_DATA_DIR" "$MYSQL_RUN_DIR"
 
 # ============================================================
-# 2. Start MySQL normally (unix_socket auth for root@localhost)
+# 2. Helper: start/stop MySQL
 # ============================================================
-echo "[start.sh] Starting MySQL..."
-
 start_mysql() {
     local EXTRA_ARGS="$1"
     mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_SOCK" \
@@ -39,7 +37,7 @@ start_mysql() {
     MYSQL_PID=$!
     for i in $(seq 1 30); do
         if mysqladmin ping --socket="$MYSQL_SOCK" --silent 2>/dev/null; then
-            echo "[start.sh] MySQL is ready."
+            echo "[start.sh] MySQL is ready (args: ${EXTRA_ARGS:-none})."
             return 0
         fi
         sleep 1
@@ -48,54 +46,70 @@ start_mysql() {
     return 1
 }
 
+stop_mysql() {
+    echo "[start.sh] Stopping MySQL..."
+    kill $(cat "$MYSQL_RUN_DIR/mysqld.pid" 2>/dev/null) 2>/dev/null || true
+    for i in $(seq 1 15); do
+        if ! mysqladmin ping --socket="$MYSQL_SOCK" --silent 2>/dev/null; then
+            break
+        fi
+        sleep 1
+    done
+    sleep 1
+}
+
+# ============================================================
+# 3. Phase 1: Start with --skip-grant-tables
+#
+#    The persistent volume may have root@localhost set to
+#    mysql_native_password from previous failed attempts.
+#    This makes `mysql -u root` (no password) fail, falling
+#    back to anonymous user. skip-grant-tables bypasses all
+#    auth so we can always connect as root without password.
+# ============================================================
+echo "[start.sh] Phase 1: Starting MySQL with --skip-grant-tables for auth repair..."
+
 kill $(cat "$MYSQL_RUN_DIR/mysqld.pid" 2>/dev/null) 2>/dev/null || true
 sleep 2
 
-if ! start_mysql ""; then
-    echo "[start.sh] Normal start failed. Trying InnoDB recovery..."
-    kill $MYSQL_PID 2>/dev/null || true; sleep 2
+if ! start_mysql "--skip-grant-tables"; then
+    echo "[start.sh] skip-grant-tables start failed. Trying InnoDB recovery..."
+    stop_mysql
     rm -rf "$MYSQL_DATA_DIR/$MYSQL_DATABASE" 2>/dev/null || true
     rm -f "$MYSQL_DATA_DIR"/ibdata1 "$MYSQL_DATA_DIR"/ib_logfile* "$MYSQL_DATA_DIR"/undo00* 2>/dev/null || true
-    if ! start_mysql ""; then
+    if ! start_mysql "--skip-grant-tables"; then
         echo "[start.sh] InnoDB recovery failed. Full wipe..."
-        kill $MYSQL_PID 2>/dev/null || true; sleep 2
+        stop_mysql
         rm -rf "$MYSQL_DATA_DIR" 2>/dev/null || true
         mkdir -p "$MYSQL_DATA_DIR"
         chown -R mysql:mysql "$MYSQL_DATA_DIR"
         mysql_install_db --user=mysql --datadir="$MYSQL_DATA_DIR" >/dev/null 2>&1
-        start_mysql "" || { echo "[start.sh] FATAL: Cannot start MySQL."; exit 1; }
+        start_mysql "--skip-grant-tables" || { echo "[start.sh] FATAL: Cannot start MySQL."; exit 1; }
     fi
 fi
 
 # ============================================================
-# 3. Fix TCP auth: ONE session via unix_socket
+# 4. Phase 2: Fix auth — repair table, nuclear DELETE, re-INSERT
 #
-#    Connect as root via unix_socket (OS root → no password).
-#    Compute password hash IN SQL using SHA1(SHA1('password')).
-#    Use UPDATE mysql.global_priv to set plugin + hash directly.
-#    Use INSERT for root@127.0.0.1 and root@%.
-#    FLUSH PRIVILEGES at end of session.
-#
-#    After FLUSH, current session stays alive (existing connections
-#    are not terminated). New connections use the updated auth.
+#    All in ONE session. FLUSH PRIVILEGES at end re-enables
+#    the grant system with our corrected data.
 # ============================================================
-echo "[start.sh] Fixing TCP auth (unix_socket session, hash computed by MariaDB)..."
+echo "[start.sh] Phase 2: Fixing TCP auth (skip-grant-tables session)..."
 
 mysql --socket="$MYSQL_SOCK" -u root $MYSQL_CHARSET <<EOSQL
--- Repair corrupt global_priv index first
+-- Repair any corrupt indexes on global_priv
 REPAIR TABLE mysql.global_priv;
 
 -- Compute mysql_native_password hash
--- CRITICAL: MariaDB SHA1() returns a hex string already, do NOT wrap in HEX()
--- Correct: CONCAT('*', UPPER(SHA1(SHA1('password'))))  → 41 chars: * + 40 hex
--- Wrong:   CONCAT('*', UPPER(HEX(SHA1(SHA1('password')))))  → 81 chars: * + 80 hex (double-encoded!)
+-- MariaDB SHA1() returns hex string → CONCAT('*', UPPER(SHA1(SHA1(...)))) = 41 chars
+-- NEVER wrap in HEX() — that double-encodes to 81 chars
 SET @hash = CONCAT('*', UPPER(SHA1(SHA1('${MYSQL_ROOT_PASSWORD}'))));
 SELECT @hash AS computed_hash, CHAR_LENGTH(@hash) AS hash_len;
 
--- Step 1: NUCLEAR DELETE all root entries (clears stale/duplicate rows)
+-- NUCLEAR: delete ALL root entries (clears duplicates, wrong hashes, stale plugin configs)
 DELETE FROM mysql.global_priv WHERE User = 'root';
 
--- Step 2: INSERT root@localhost with mysql_native_password plugin
+-- Insert root@localhost (mysql_native_password)
 INSERT INTO mysql.global_priv (User, Host, priv)
 VALUES ('root', 'localhost', CONCAT(
     '{"plugin":"mysql_native_password","authentication_string":"', @hash, '",',
@@ -110,7 +124,7 @@ VALUES ('root', 'localhost', CONCAT(
     '"create_tablespace_priv":"Y"}'
 ));
 
--- Step 3: INSERT root@127.0.0.1 for TCP connections
+-- Insert root@127.0.0.1 (for TCP connections from localhost)
 INSERT INTO mysql.global_priv (User, Host, priv)
 VALUES ('root', '127.0.0.1', CONCAT(
     '{"plugin":"mysql_native_password","authentication_string":"', @hash, '",',
@@ -125,7 +139,7 @@ VALUES ('root', '127.0.0.1', CONCAT(
     '"create_tablespace_priv":"Y"}'
 ));
 
--- Step 4: INSERT root@% for wildcard connections
+-- Insert root@% (wildcard — allows any host)
 INSERT INTO mysql.global_priv (User, Host, priv)
 VALUES ('root', '%', CONCAT(
     '{"plugin":"mysql_native_password","authentication_string":"', @hash, '",',
@@ -140,10 +154,10 @@ VALUES ('root', '%', CONCAT(
     '"create_tablespace_priv":"Y"}'
 ));
 
--- Reload grants
+-- Re-enable the grant system (existing session stays alive)
 FLUSH PRIVILEGES;
 
--- Verify: show all root users and their plugins
+-- Verify
 SELECT User, Host, JSON_UNQUOTE(JSON_EXTRACT(priv, '$.plugin')) AS plugin,
        CHAR_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(priv, '$.authentication_string'))) AS auth_len
 FROM mysql.global_priv WHERE User = 'root';
@@ -152,29 +166,40 @@ FROM mysql.global_priv WHERE User = 'root';
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 EOSQL
 
-echo "[start.sh] Auth fix complete."
+echo "[start.sh] Auth fix SQL complete."
 
 # ============================================================
-# 4. Verify TCP connection works
+# 5. Phase 3: Stop and restart MySQL normally (no skip-grant-tables)
 # ============================================================
-echo "[start.sh] Verifying TCP connection..."
+stop_mysql
 
-if mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 1" >/dev/null 2>&1; then
-    echo "[start.sh] TCP auth: OK"
-else
-    echo "[start.sh] ERROR: TCP auth FAILED"
+echo "[start.sh] Phase 3: Restarting MySQL normally..."
+if ! start_mysql ""; then
+    echo "[start.sh] FATAL: MySQL failed to restart normally."
+    exit 1
 fi
 
-if mysql --socket="$MYSQL_SOCK" -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 1" >/dev/null 2>&1; then
+# ============================================================
+# 6. Verify TCP and Socket auth
+# ============================================================
+echo "[start.sh] Verifying authentication..."
+
+if mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 'TCP_OK' AS status" 2>/dev/null; then
+    echo "[start.sh] TCP auth: OK"
+else
+    echo "[start.sh] WARNING: TCP auth check failed (may still work from PHP)"
+fi
+
+if mysql --socket="$MYSQL_SOCK" -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 'SOCKET_OK' AS status" 2>/dev/null; then
     echo "[start.sh] Socket auth: OK"
 else
-    echo "[start.sh] ERROR: Socket auth FAILED"
+    echo "[start.sh] WARNING: Socket auth check failed"
 fi
 
 echo "[start.sh] Database '${MYSQL_DATABASE}' ready."
 
 # ============================================================
-# 5. Remove stray directories in the MySQL data dir
+# 7. Remove stray directories in the MySQL data dir
 # ============================================================
 DB_DATADIR="$MYSQL_DATA_DIR/$MYSQL_DATABASE"
 if [ -d "$DB_DATADIR" ]; then
@@ -208,7 +233,7 @@ if [ -d "$DB_DATADIR" ]; then
 fi
 
 # ============================================================
-# 6. Import database schema (idempotent)
+# 8. Import database schema (idempotent)
 # ============================================================
 DB_SCHEMA_REPO="/var/www/html/database.sql"
 DB_SCHEMA_BUCKET="/data/database.sql"
@@ -254,7 +279,7 @@ if [ -d "$DB_DATADIR" ]; then
 fi
 
 # ============================================================
-# 7. Run db_migrate.php for schema drift detection
+# 9. Run db_migrate.php for schema drift detection
 # ============================================================
 echo "[start.sh] Syncing bucket DB schema (idempotent)..."
 DB_HOST=127.0.0.1 DB_USER=root DB_PASS="$MYSQL_ROOT_PASSWORD" DB_NAME="$MYSQL_DATABASE" \
@@ -268,7 +293,7 @@ if [ -d "$DB_DATADIR" ]; then
 fi
 
 # ============================================================
-# 8. Setup file storage: /data/uploads/ on HuggingFace bucket
+# 10. Setup file storage: /data/uploads/ on HuggingFace bucket
 # ============================================================
 mkdir -p /data/uploads/pos-stock/products
 mkdir -p /data/uploads/pos-stock/bill
@@ -276,7 +301,7 @@ chown -R www-data:www-data /data/uploads
 echo "[start.sh] File storage directory /data/uploads/ ready."
 
 # ============================================================
-# 9. Configure Apache: port + Alias for /data/uploads
+# 11. Configure Apache: port + Alias for /data/uploads
 # ============================================================
 sed -i "s/80/${PORT:-7860}/g" /etc/apache2/sites-available/000-default.conf
 sed -i "s/80/${PORT:-7860}/g" /etc/apache2/ports.conf
@@ -293,7 +318,7 @@ a2enconf uploads-alias >/dev/null 2>&1
 echo "[start.sh] Apache configured on port ${PORT:-7860} with /uploads alias."
 
 # ============================================================
-# 10. Generate .env file for PHP
+# 12. Generate .env file for PHP
 # ============================================================
 APP_URL="${PROD_APP_URL:-}"
 
@@ -326,7 +351,7 @@ EOF
 echo "[start.sh] .env file generated."
 
 # ============================================================
-# 11. Start Apache (foreground)
+# 13. Start Apache (foreground)
 # ============================================================
 echo "[start.sh] Starting Apache..."
 apache2-foreground
