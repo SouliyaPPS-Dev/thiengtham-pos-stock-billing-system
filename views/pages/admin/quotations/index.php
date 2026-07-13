@@ -125,7 +125,6 @@
                     </tr>
                 </tfoot>
                 <?php endif; ?>
-            </div>
 
             <!-- Mobile Bulk Action Bar -->
             <div x-show="selected.length > 0" class="fixed bottom-0 left-0 right-0 bg-card border-t shadow-2xl px-4 py-3 z-50 md:hidden">
@@ -138,6 +137,7 @@
                         ລຶບທັງໝົດ
                     </button>
                 </div>
+            </div>
             </div>
 
             <?php if ($totalPages > 1): ?>
