@@ -82,17 +82,32 @@ fi
 echo "[start.sh] Fixing TCP auth (unix_socket session, hash computed by MariaDB)..."
 
 mysql --socket="$MYSQL_SOCK" -u root $MYSQL_CHARSET <<EOSQL
--- Compute mysql_native_password hash: *UPPER(HEX(SHA1(SHA1('password'))))
-SET @hash = CONCAT('*', UPPER(HEX(SHA1(SHA1('${MYSQL_ROOT_PASSWORD}')))));
-SELECT @hash AS computed_hash;
+-- Compute mysql_native_password hash
+-- CRITICAL: MariaDB SHA1() returns a hex string already, do NOT wrap in HEX()
+-- Correct: CONCAT('*', UPPER(SHA1(SHA1('password'))))  → 41 chars: * + 40 hex
+-- Wrong:   CONCAT('*', UPPER(HEX(SHA1(SHA1('password')))))  → 81 chars: * + 80 hex (double-encoded!)
+SET @hash = CONCAT('*', UPPER(SHA1(SHA1('${MYSQL_ROOT_PASSWORD}'))));
+SELECT @hash AS computed_hash, CHAR_LENGTH(@hash) AS hash_len;
 
--- Fix root@localhost: switch plugin from unix_socket to mysql_native_password
-UPDATE mysql.global_priv
-SET priv = JSON_SET(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', @hash)
-WHERE User = 'root' AND Host = 'localhost';
+-- Step 1: NUCLEAR DELETE all root entries (clears stale/duplicate rows)
+DELETE FROM mysql.global_priv WHERE User = 'root';
 
--- Fix root@127.0.0.1: DELETE + INSERT with correct plugin and hash
-DELETE FROM mysql.global_priv WHERE User = 'root' AND Host = '127.0.0.1';
+-- Step 2: INSERT root@localhost with mysql_native_password plugin
+INSERT INTO mysql.global_priv (User, Host, priv)
+VALUES ('root', 'localhost', CONCAT(
+    '{"plugin":"mysql_native_password","authentication_string":"', @hash, '",',
+    '"select_priv":"Y","insert_priv":"Y","update_priv":"Y","delete_priv":"Y",',
+    '"create_priv":"Y","drop_priv":"Y","reload_priv":"Y","process_priv":"Y",',
+    '"file_priv":"Y","grant_priv":"Y","references_priv":"Y","index_priv":"Y",',
+    '"alter_priv":"Y","show_db_priv":"Y","super_priv":"Y",',
+    '"create_tmp_table_priv":"Y","lock_tables_priv":"Y","execute_priv":"Y",',
+    '"repl_slave_priv":"Y","repl_client_priv":"Y","create_view_priv":"Y",',
+    '"show_view_priv":"Y","create_routine_priv":"Y","alter_routine_priv":"Y",',
+    '"create_user_priv":"Y","event_priv":"Y","trigger_priv":"Y",',
+    '"create_tablespace_priv":"Y"}'
+));
+
+-- Step 3: INSERT root@127.0.0.1 for TCP connections
 INSERT INTO mysql.global_priv (User, Host, priv)
 VALUES ('root', '127.0.0.1', CONCAT(
     '{"plugin":"mysql_native_password","authentication_string":"', @hash, '",',
@@ -107,8 +122,7 @@ VALUES ('root', '127.0.0.1', CONCAT(
     '"create_tablespace_priv":"Y"}'
 ));
 
--- Fix root@%: DELETE + INSERT with correct plugin and hash
-DELETE FROM mysql.global_priv WHERE User = 'root' AND Host = '%';
+-- Step 4: INSERT root@% for wildcard connections
 INSERT INTO mysql.global_priv (User, Host, priv)
 VALUES ('root', '%', CONCAT(
     '{"plugin":"mysql_native_password","authentication_string":"', @hash, '",',
@@ -123,16 +137,16 @@ VALUES ('root', '%', CONCAT(
     '"create_tablespace_priv":"Y"}'
 ));
 
+-- Reload grants
+FLUSH PRIVILEGES;
+
 -- Verify: show all root users and their plugins
 SELECT User, Host, JSON_UNQUOTE(JSON_EXTRACT(priv, '$.plugin')) AS plugin,
-       JSON_UNQUOTE(JSON_EXTRACT(priv, '$.authentication_string')) AS auth_str
+       CHAR_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(priv, '$.authentication_string'))) AS auth_len
 FROM mysql.global_priv WHERE User = 'root';
 
 -- Create the application database
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- Reload grant tables (existing connections stay alive)
-FLUSH PRIVILEGES;
 EOSQL
 
 echo "[start.sh] Auth fix complete."
