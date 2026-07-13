@@ -20,9 +20,7 @@ compute_native_hash() {
 }
 
 MYSQL_NATIVE_HASH=$(compute_native_hash "$MYSQL_ROOT_PASSWORD")
-
-# Build the full priv JSON string for root TCP users (computed in bash, not SQL)
-ROOT_PRIV_JSON="{\"plugin\":\"mysql_native_password\",\"authentication_string\":\"${MYSQL_NATIVE_HASH}\",\"select_priv\":\"Y\",\"insert_priv\":\"Y\",\"update_priv\":\"Y\",\"delete_priv\":\"Y\",\"create_priv\":\"Y\",\"drop_priv\":\"Y\",\"reload_priv\":\"Y\",\"process_priv\":\"Y\",\"file_priv\":\"Y\",\"grant_priv\":\"Y\",\"references_priv\":\"Y\",\"index_priv\":\"Y\",\"alter_priv\":\"Y\",\"show_db_priv\":\"Y\",\"super_priv\":\"Y\",\"create_tmp_table_priv\":\"Y\",\"lock_tables_priv\":\"Y\",\"execute_priv\":\"Y\",\"repl_slave_priv\":\"Y\",\"repl_client_priv\":\"Y\",\"create_view_priv\":\"Y\",\"show_view_priv\":\"Y\",\"create_routine_priv\":\"Y\",\"alter_routine_priv\":\"Y\",\"create_user_priv\":\"Y\",\"event_priv\":\"Y\",\"trigger_priv\":\"Y\",\"create_tablespace_priv\":\"Y\"}"
+echo "[start.sh] Password hash: ${MYSQL_NATIVE_HASH}"
 
 # ============================================================
 # 1. Initialize MySQL data directory if not already initialized
@@ -43,9 +41,9 @@ fi
 chown -R mysql:mysql "$MYSQL_DATA_DIR" "$MYSQL_RUN_DIR"
 
 # ============================================================
-# 2. Start MySQL with --skip-grant-tables for auth fix
+# 2. Start MySQL normally (unix_socket auth for root@localhost)
 # ============================================================
-echo "[start.sh] Starting MySQL (skip-grant-tables for auth fix)..."
+echo "[start.sh] Starting MySQL..."
 
 start_mysql() {
     local EXTRA_ARGS="$1"
@@ -66,99 +64,110 @@ start_mysql() {
 kill $(cat "$MYSQL_RUN_DIR/mysqld.pid" 2>/dev/null) 2>/dev/null || true
 sleep 2
 
-start_mysql "--skip-grant-tables" || { echo "[start.sh] FATAL: Cannot start MySQL for auth fix."; exit 1; }
+if ! start_mysql ""; then
+    echo "[start.sh] Normal start failed. Trying InnoDB recovery..."
+    kill $MYSQL_PID 2>/dev/null || true; sleep 2
+    rm -rf "$MYSQL_DATA_DIR/$MYSQL_DATABASE" 2>/dev/null || true
+    rm -f "$MYSQL_DATA_DIR"/ibdata1 "$MYSQL_DATA_DIR"/ib_logfile* "$MYSQL_DATA_DIR"/undo00* 2>/dev/null || true
+    if ! start_mysql ""; then
+        echo "[start.sh] InnoDB recovery failed. Full wipe..."
+        kill $MYSQL_PID 2>/dev/null || true; sleep 2
+        rm -rf "$MYSQL_DATA_DIR" 2>/dev/null || true
+        mkdir -p "$MYSQL_DATA_DIR"
+        chown -R mysql:mysql "$MYSQL_DATA_DIR"
+        mysql_install_db --user=mysql --datadir="$MYSQL_DATA_DIR" >/dev/null 2>&1
+        start_mysql "" || { echo "[start.sh] FATAL: Cannot start MySQL."; exit 1; }
+    fi
+fi
 
 # ============================================================
-# 3. Fix auth: switch ALL root users to mysql_native_password
-#    Use UPDATE mysql.global_priv to set plugin + hash directly.
-#    Avoid SET PASSWORD (MariaDB 11.8 requires hex hash, not plaintext).
-#    Avoid ALTER USER IDENTIFIED BY (uses default unix_socket plugin).
-#    Avoid CONCAT in INSERT (may fail in skip-grant-tables mode).
+# 3. Fix TCP auth: create root@127.0.0.1 with mysql_native_password
+#
+#    MariaDB 10.4+ defaults to unix_socket for root@localhost.
+#    PHP connects via TCP to 127.0.0.1, so it looks up root@127.0.0.1.
+#    We use unix_socket auth (connects as root OS user, no password)
+#    to create root@127.0.0.1 with mysql_native_password plugin.
 # ============================================================
+# Connect via socket using unix_socket auth (no password needed)
 MYSQL_CMD="mysql --socket=$MYSQL_SOCK -u root"
 
-echo "[start.sh] Fixing auth: setting mysql_native_password for all root users..."
-echo "[start.sh] Password hash: ${MYSQL_NATIVE_HASH}"
+echo "[start.sh] Setting up TCP auth for root@127.0.0.1..."
 
-# Step 3a: Fix root@localhost (UPDATE existing row)
-echo "[start.sh] Updating root@localhost..."
+# Step 3a: Switch root@localhost to mysql_native_password + hash
+echo "[start.sh] Switching root@localhost to mysql_native_password..."
 $MYSQL_CMD $MYSQL_CHARSET -e "
 UPDATE mysql.global_priv
-SET priv = json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', '${MYSQL_NATIVE_HASH}')
+SET priv = json_set(
+    priv,
+    '$.plugin', 'mysql_native_password',
+    '$.authentication_string', '${MYSQL_NATIVE_HASH}'
+)
 WHERE User = 'root' AND Host = 'localhost';
+FLUSH PRIVILEGES;
 " && echo "[start.sh] root@localhost updated." || echo "[start.sh] WARNING: root@localhost update failed."
 
-# Step 3b: Ensure root@127.0.0.1 exists and has correct auth
-echo "[start.sh] Setting up root@127.0.0.1..."
+# Step 3b: Create root@127.0.0.1 with mysql_native_password
+echo "[start.sh] Creating root@127.0.0.1..."
 $MYSQL_CMD $MYSQL_CHARSET -e "
-DELETE FROM mysql.global_priv WHERE User = 'root' AND Host = '127.0.0.1';
-" 2>/dev/null || true
+CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED VIA mysql_native_password USING '${MYSQL_NATIVE_HASH}';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+" && echo "[start.sh] root@127.0.0.1 created." || echo "[start.sh] WARNING: root@127.0.0.1 creation failed."
 
+# Step 3c: Create root@% with mysql_native_password
+echo "[start.sh] Creating root@%..."
 $MYSQL_CMD $MYSQL_CHARSET -e "
-INSERT INTO mysql.global_priv (User, Host, priv) VALUES ('root', '127.0.0.1', '${ROOT_PRIV_JSON}');
-" && echo "[start.sh] root@127.0.0.1 created." || echo "[start.sh] WARNING: root@127.0.0.1 insert failed."
+CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED VIA mysql_native_password USING '${MYSQL_NATIVE_HASH}';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+" && echo "[start.sh] root@% created." || echo "[start.sh] WARNING: root@% creation failed."
 
-# Step 3c: Ensure root@% exists and has correct auth
-echo "[start.sh] Setting up root@%..."
+# Step 3d: Verify
+echo "[start.sh] Verifying users..."
 $MYSQL_CMD $MYSQL_CHARSET -e "
-DELETE FROM mysql.global_priv WHERE User = 'root' AND Host = '%';
-" 2>/dev/null || true
-
-$MYSQL_CMD $MYSQL_CHARSET -e "
-INSERT INTO mysql.global_priv (User, Host, priv) VALUES ('root', '%', '${ROOT_PRIV_JSON}');
-" && echo "[start.sh] root@% created." || echo "[start.sh] WARNING: root@% insert failed."
-
-# Step 3d: Verify what we have in global_priv
-echo "[start.sh] Verifying global_priv entries..."
-$MYSQL_CMD $MYSQL_CHARSET -e "
-SELECT User, Host, JSON_EXTRACT(priv, '$.plugin') AS plugin
-FROM mysql.global_priv
-WHERE User = 'root';
-" 2>/dev/null || echo "[start.sh] Could not verify global_priv."
+SELECT User, Host, plugin FROM mysql.global_priv WHERE User='root';
+" 2>/dev/null || echo "[start.sh] Could not verify."
 
 # Step 3e: Create the application database
 $MYSQL_CMD $MYSQL_CHARSET -e "
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-" && echo "[start.sh] Database '${MYSQL_DATABASE}' ensured." || echo "[start.sh] WARNING: Database creation failed."
+" && echo "[start.sh] Database '${MYSQL_DATABASE}' ensured."
 
-# Step 3f: Final FLUSH to reload grant tables before restart
 $MYSQL_CMD $MYSQL_CHARSET -e "FLUSH PRIVILEGES;" 2>/dev/null || true
 
-echo "[start.sh] Auth fix complete. Restarting MySQL normally..."
-
 # ============================================================
-# 4. Restart MySQL normally (with auth enabled)
+# 4. Verify TCP connection works
 # ============================================================
-kill $MYSQL_PID 2>/dev/null || true; sleep 2
-start_mysql "" || { echo "[start.sh] FATAL: Cannot restart MySQL after auth fix."; exit 1; }
+echo "[start.sh] Verifying TCP connection..."
 
-# ============================================================
-# 5. Verify connection works (socket + TCP)
-# ============================================================
-echo "[start.sh] Verifying connections..."
-
-if $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; then
-    echo "[start.sh] Socket auth: OK"
-else
-    echo "[start.sh] ERROR: Socket auth FAILED"
-fi
-
+# After root@localhost switched to mysql_native_password, socket also needs password
 if mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 1" >/dev/null 2>&1; then
     echo "[start.sh] TCP auth: OK"
 else
     echo "[start.sh] ERROR: TCP auth FAILED"
-    echo "[start.sh] Dumping root users for debugging..."
+    echo "[start.sh] Attempting fallback: start with --skip-grant-tables to fix..."
+    kill $MYSQL_PID 2>/dev/null || true; sleep 2
+
+    start_mysql "--skip-grant-tables" || { echo "[start.sh] FATAL: Cannot start MySQL for fallback fix."; exit 1; }
+
     $MYSQL_CMD $MYSQL_CHARSET -e "
-    SELECT User, Host, plugin FROM mysql.global_priv WHERE User='root'
-    UNION ALL
-    SELECT User, Host, plugin FROM mysql.user WHERE User='root';
+    FLUSH PRIVILEGES;
+    UPDATE mysql.global_priv SET priv=json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', '${MYSQL_NATIVE_HASH}') WHERE User='root';
+    FLUSH PRIVILEGES;
     " 2>/dev/null || true
+
+    kill $MYSQL_PID 2>/dev/null || true; sleep 2
+    start_mysql "" || { echo "[start.sh] FATAL: Cannot restart MySQL."; exit 1; }
+
+    if mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 1" >/dev/null 2>&1; then
+        echo "[start.sh] TCP auth: OK (after fallback)"
+    else
+        echo "[start.sh] ERROR: TCP auth STILL FAILED after fallback"
+    fi
 fi
 
 echo "[start.sh] Database '${MYSQL_DATABASE}' ready."
 
 # ============================================================
-# 6. Remove stray directories in the MySQL data dir
+# 5. Remove stray directories in the MySQL data dir
 # ============================================================
 DB_DATADIR="$MYSQL_DATA_DIR/$MYSQL_DATABASE"
 if [ -d "$DB_DATADIR" ]; then
@@ -192,7 +201,7 @@ if [ -d "$DB_DATADIR" ]; then
 fi
 
 # ============================================================
-# 7. Import database schema (idempotent)
+# 6. Import database schema (idempotent)
 # ============================================================
 DB_SCHEMA_REPO="/var/www/html/database.sql"
 DB_SCHEMA_BUCKET="/data/database.sql"
@@ -238,7 +247,7 @@ if [ -d "$DB_DATADIR" ]; then
 fi
 
 # ============================================================
-# 8. Run db_migrate.php for schema drift detection
+# 7. Run db_migrate.php for schema drift detection
 # ============================================================
 echo "[start.sh] Syncing bucket DB schema (idempotent)..."
 DB_HOST=127.0.0.1 DB_USER=root DB_PASS="$MYSQL_ROOT_PASSWORD" DB_NAME="$MYSQL_DATABASE" \
@@ -252,7 +261,32 @@ if [ -d "$DB_DATADIR" ]; then
 fi
 
 # ============================================================
-# 11. Generate .env file for PHP
+# 8. Setup file storage: /data/uploads/ on HuggingFace bucket
+# ============================================================
+mkdir -p /data/uploads/pos-stock/products
+mkdir -p /data/uploads/pos-stock/bill
+chown -R www-data:www-data /data/uploads
+echo "[start.sh] File storage directory /data/uploads/ ready."
+
+# ============================================================
+# 9. Configure Apache: port + Alias for /data/uploads
+# ============================================================
+sed -i "s/80/${PORT:-7860}/g" /etc/apache2/sites-available/000-default.conf
+sed -i "s/80/${PORT:-7860}/g" /etc/apache2/ports.conf
+
+cat > /etc/apache2/conf-available/uploads-alias.conf <<'ALIAS'
+Alias /uploads /data/uploads
+<Directory /data/uploads>
+    Options +FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+ALIAS
+a2enconf uploads-alias >/dev/null 2>&1
+echo "[start.sh] Apache configured on port ${PORT:-7860} with /uploads alias."
+
+# ============================================================
+# 10. Generate .env file for PHP
 # ============================================================
 APP_URL="${PROD_APP_URL:-}"
 
@@ -285,33 +319,7 @@ EOF
 echo "[start.sh] .env file generated."
 
 # ============================================================
-# 9. Setup file storage: /data/uploads/ on HuggingFace bucket
-# ============================================================
-mkdir -p /data/uploads/pos-stock/products
-mkdir -p /data/uploads/pos-stock/bill
-chown -R www-data:www-data /data/uploads
-echo "[start.sh] File storage directory /data/uploads/ ready."
-
-# ============================================================
-# 10. Configure Apache: port + Alias for /data/uploads
-# ============================================================
-sed -i "s/80/${PORT:-7860}/g" /etc/apache2/sites-available/000-default.conf
-sed -i "s/80/${PORT:-7860}/g" /etc/apache2/ports.conf
-
-# Add Alias to serve uploaded files from the persistent bucket
-cat > /etc/apache2/conf-available/uploads-alias.conf <<'ALIAS'
-Alias /uploads /data/uploads
-<Directory /data/uploads>
-    Options +FollowSymLinks
-    AllowOverride None
-    Require all granted
-</Directory>
-ALIAS
-a2enconf uploads-alias >/dev/null 2>&1
-echo "[start.sh] Apache configured on port ${PORT:-7860} with /uploads alias."
-
-# ============================================================
-# 12. Start Apache (foreground)
+# 11. Start Apache (foreground)
 # ============================================================
 echo "[start.sh] Starting Apache..."
 apache2-foreground
