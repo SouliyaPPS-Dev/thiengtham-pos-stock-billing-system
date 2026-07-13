@@ -82,6 +82,9 @@ fi
 echo "[start.sh] Fixing TCP auth (unix_socket session, hash computed by MariaDB)..."
 
 mysql --socket="$MYSQL_SOCK" -u root $MYSQL_CHARSET <<EOSQL
+-- Repair corrupt global_priv index first
+REPAIR TABLE mysql.global_priv;
+
 -- Compute mysql_native_password hash
 -- CRITICAL: MariaDB SHA1() returns a hex string already, do NOT wrap in HEX()
 -- Correct: CONCAT('*', UPPER(SHA1(SHA1('password'))))  → 41 chars: * + 40 hex
