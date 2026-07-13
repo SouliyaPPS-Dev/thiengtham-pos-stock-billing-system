@@ -7,12 +7,13 @@ MYSQL_DATA_DIR="/data/mysql"
 MYSQL_RUN_DIR="/var/run/mysqld"
 DB_SCHEMA="/var/www/html/database.sql"
 MYSQL_CHARSET="--default-character-set=utf8mb4"
+MYSQL_SOCK="$MYSQL_RUN_DIR/mysqld.sock"
 
 # ============================================================
 # 1. Initialize MySQL data directory if not already initialized
 # ============================================================
 if [ -d "$MYSQL_DATA_DIR/#binlog_cache_files" ]; then
-    echo "[start.sh] Detected corrupted MariaDB binlog cache dir. Reinitializing data directory..."
+    echo "[start.sh] Detected corrupted MariaDB binlog cache dir. Wiping data directory..."
     rm -rf "$MYSQL_DATA_DIR" 2>/dev/null || true
 fi
 
@@ -27,227 +28,125 @@ fi
 chown -R mysql:mysql "$MYSQL_DATA_DIR" "$MYSQL_RUN_DIR"
 
 # ============================================================
-# 2. Start MySQL (MariaDB)
+# 2. Start MySQL with --skip-grant-tables
+#    This bypasses ALL auth issues during startup.
+#    We fix everything below, then restart normally.
 # ============================================================
-echo "[start.sh] Starting MySQL..."
+echo "[start.sh] Starting MySQL (skip-grant-tables for auth fix)..."
 
-mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
-       --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
-       --port=3306 &
+start_mysql() {
+    local EXTRA_ARGS="$1"
+    mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_SOCK" \
+           --pid-file="$MYSQL_RUN_DIR/mysqld.pid" --port=3306 $EXTRA_ARGS &
+    MYSQL_PID=$!
+    for i in $(seq 1 30); do
+        if mysqladmin ping --socket="$MYSQL_SOCK" --silent 2>/dev/null; then
+            echo "[start.sh] MySQL is ready."
+            return 0
+        fi
+        sleep 1
+    done
+    echo "[start.sh] ERROR: MySQL failed to start."
+    return 1
+}
 
-MYSQL_PID=$!
+# If MySQL is already running from a previous attempt, kill it
+kill $(cat "$MYSQL_RUN_DIR/mysqld.pid" 2>/dev/null) 2>/dev/null || true
+sleep 2
 
-# Wait for MySQL to be ready
-for i in $(seq 1 30); do
-    if mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
-        echo "[start.sh] MySQL is ready."
-        break
-    fi
-    sleep 1
-done
-
-if ! mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
-    echo "[start.sh] MySQL failed with InnoDB tablespace corruption. Resetting InnoDB..."
-    kill $MYSQL_PID 2>/dev/null || true
-    sleep 2
-    # Remove ALL InnoDB files to force clean rebuild
+# Try normal start first
+if ! start_mysql ""; then
+    echo "[start.sh] Normal start failed. Trying InnoDB recovery..."
+    kill $MYSQL_PID 2>/dev/null || true; sleep 2
     rm -rf "$MYSQL_DATA_DIR/$MYSQL_DATABASE" 2>/dev/null || true
     rm -f "$MYSQL_DATA_DIR"/ibdata1 "$MYSQL_DATA_DIR"/ib_logfile* "$MYSQL_DATA_DIR"/undo00* 2>/dev/null || true
-    rm -f "$SCHEMA_VERSION_FILE" 2>/dev/null || true
-    echo "[start.sh] Retrying MySQL startup with clean InnoDB..."
-    mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
-           --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
-           --port=3306 &
-    MYSQL_PID=$!
-    for i in $(seq 1 30); do
-        if mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
-            echo "[start.sh] MySQL is ready after InnoDB reset."
-            break
-        fi
-        sleep 1
-    done
-fi
-
-if ! mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
-    echo "[start.sh] ERROR: MySQL failed to start. Attempting full data directory wipe..."
-    kill $MYSQL_PID 2>/dev/null || true
-    sleep 2
-    # Complete wipe — remove everything and reinitialize from scratch
-    rm -rf "$MYSQL_DATA_DIR" 2>/dev/null || true
-    mkdir -p "$MYSQL_DATA_DIR"
-    chown -R mysql:mysql "$MYSQL_DATA_DIR"
-    mysql_install_db --user=mysql --datadir="$MYSQL_DATA_DIR" >/dev/null 2>&1
-    echo "[start.sh] Data directory reinitialized. Starting MySQL fresh..."
-    mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
-           --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
-           --port=3306 &
-    MYSQL_PID=$!
-    for i in $(seq 1 30); do
-        if mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
-            echo "[start.sh] MySQL is ready after full wipe."
-            break
-        fi
-        sleep 1
-    done
+    if ! start_mysql ""; then
+        echo "[start.sh] InnoDB recovery failed. Full wipe..."
+        kill $MYSQL_PID 2>/dev/null || true; sleep 2
+        rm -rf "$MYSQL_DATA_DIR" 2>/dev/null || true
+        mkdir -p "$MYSQL_DATA_DIR"
+        chown -R mysql:mysql "$MYSQL_DATA_DIR"
+        mysql_install_db --user=mysql --datadir="$MYSQL_DATA_DIR" >/dev/null 2>&1
+        start_mysql "" || { echo "[start.sh] FATAL: Cannot start MySQL."; exit 1; }
+    fi
 fi
 
 # ============================================================
-# 3. Set root password and create database
-#    MariaDB 10.4+ defaults to unix_socket auth for root@localhost.
-#    PHP connects via TCP (127.0.0.1), so we MUST switch to
-#    mysql_native_password. PASSWORD() is removed in MariaDB 10.11+,
-#    so we use UPDATE mysql.global_priv + ALTER USER IDENTIFIED BY.
+# 3. Fix auth: switch ALL root users to mysql_native_password
+#    MariaDB 10.4+ defaults to unix_socket which blocks TCP.
+#    We use UPDATE mysql.global_priv (direct JSON column update)
+#    because ALTER USER ... IDENTIFIED BY uses the server's
+#    default_authentication_plugin (unix_socket), which doesn't work.
 # ============================================================
-MYSQL_CMD="mysql --socket=$MYSQL_RUN_DIR/mysqld.sock -u root"
+MYSQL_CMD="mysql --socket=$MYSQL_SOCK -u root"
 
-# Helper: ensure root can connect via TCP (127.0.0.1 and %)
-# Must use password auth since root@localhost already has password set
-ensure_tcp_users() {
-    $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET <<EOSQLTCP
-    CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-    ALTER USER 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-    GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
-    CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-    ALTER USER 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-    GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-    FLUSH PRIVILEGES;
-EOSQLTCP
-}
+echo "[start.sh] Fixing auth: switching all root users to mysql_native_password..."
 
-# Helper: switch root auth from unix_socket to mysql_native_password
-fix_root_auth() {
-    $MYSQL_CMD $MYSQL_CHARSET <<EOSQL
-    FLUSH PRIVILEGES;
-    UPDATE mysql.global_priv SET priv=json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', '') WHERE User='root' AND Host='localhost';
-    FLUSH PRIVILEGES;
-    ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-    CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-    GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
-    CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
-    GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-    CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    FLUSH PRIVILEGES;
+# Try connecting first (works in both skip-grant-tables and normal modes)
+# Use skip-grant-tables for guaranteed access
+kill $MYSQL_PID 2>/dev/null || true; sleep 2
+start_mysql "--skip-grant-tables" || { echo "[start.sh] FATAL: Cannot start MySQL for auth fix."; exit 1; }
+
+$MYSQL_CMD $MYSQL_CHARSET <<EOSQL
+FLUSH PRIVILEGES;
+
+-- Force ALL root users to mysql_native_password plugin
+UPDATE mysql.global_priv SET priv=json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', '') WHERE User='root';
+
+-- Set password for all root hosts
+SET PASSWORD FOR 'root'@'localhost' = '${MYSQL_ROOT_PASSWORD}';
+SET PASSWORD FOR 'root'@'127.0.0.1' = '${MYSQL_ROOT_PASSWORD}';
+SET PASSWORD FOR 'root'@'%' = '${MYSQL_ROOT_PASSWORD}';
+
+-- Ensure root@127.0.0.1 exists with full privileges
+CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED VIA mysql_native_password;
+SET PASSWORD FOR 'root'@'127.0.0.1' = '${MYSQL_ROOT_PASSWORD}';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+
+-- Ensure root@% exists with full privileges
+CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED VIA mysql_native_password;
+SET PASSWORD FOR 'root'@'%' = '${MYSQL_ROOT_PASSWORD}';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+
+-- Create the application database
+CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+FLUSH PRIVILEGES;
 EOSQL
-}
 
-# Path A: password works (normal restart after first setup)
-if $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; then
-    echo "[start.sh] Root password auth OK (socket). Ensuring TCP users and database exist..."
-    ensure_tcp_users || true
-    $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET $MYSQL_DATABASE -e "SELECT 1" >/dev/null 2>&1 \
-        || $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET <<EOSQLA
-    CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-EOSQLA
-
-# Path B: socket works, no password set yet (first run, unix_socket auth)
-elif $MYSQL_CMD -e "SELECT 1" >/dev/null 2>&1; then
-    echo "[start.sh] First run: switching root from unix_socket to mysql_native_password..."
-    if fix_root_auth; then
-        echo "[start.sh] Auth switched successfully."
-    else
-        echo "[start.sh] ALTER failed, trying skip-grant-tables..."
-        kill $MYSQL_PID 2>/dev/null || true; sleep 2
-        mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
-               --pid-file="$MYSQL_RUN_DIR/mysqld.pid" --port=3306 --skip-grant-tables &
-        MYSQL_PID=$!
-        for i in $(seq 1 30); do
-            mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null && break
-            sleep 1
-        done
-        fix_root_auth || true
-        echo "[start.sh] Restarting MySQL normally..."
-        kill $MYSQL_PID 2>/dev/null || true; sleep 2
-        mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
-               --pid-file="$MYSQL_RUN_DIR/mysqld.pid" --port=3306 &
-        MYSQL_PID=$!
-        for i in $(seq 1 30); do
-            mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null && break
-            sleep 1
-        done
-    fi
-
-# Path C: stuck state — password set but wrong plugin (old deploy)
-else
-    echo "[start.sh] Cannot connect as root. Using --skip-grant-tables to fix..."
-    kill $MYSQL_PID 2>/dev/null || true; sleep 2
-    mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
-           --pid-file="$MYSQL_RUN_DIR/mysqld.pid" --port=3306 --skip-grant-tables &
-    MYSQL_PID=$!
-    for i in $(seq 1 30); do
-        mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null && break
-        sleep 1
-    done
-    fix_root_auth || true
-    echo "[start.sh] Restarting MySQL normally..."
-    kill $MYSQL_PID 2>/dev/null || true; sleep 2
-    mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
-           --pid-file="$MYSQL_RUN_DIR/mysqld.pid" --port=3306 &
-    MYSQL_PID=$!
-    for i in $(seq 1 30); do
-        mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null && break
-        sleep 1
-    done
-fi
-
-# Verify socket AND TCP connections work
-if $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; then
-    # Also verify TCP works (what PHP uses)
-    if mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 1" >/dev/null 2>&1; then
-        echo "[start.sh] Database '${MYSQL_DATABASE}' ready (socket + TCP verified)."
-    else
-        echo "[start.sh] Socket OK but TCP failed. Re-creating TCP users..."
-        ensure_tcp_users || true
-        if mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 1" >/dev/null 2>&1; then
-            echo "[start.sh] Database '${MYSQL_DATABASE}' ready (TCP users fixed)."
-        else
-            echo "[start.sh] WARNING: TCP still failing after user fix."
-        fi
-    fi
-else
-    echo "[start.sh] WARNING: Auth verification failed. Attempting emergency full wipe..."
-    kill $MYSQL_PID 2>/dev/null || true; sleep 2
-    rm -rf "$MYSQL_DATA_DIR" 2>/dev/null || true
-    mkdir -p "$MYSQL_DATA_DIR"
-    chown -R mysql:mysql "$MYSQL_DATA_DIR"
-    mysql_install_db --user=mysql --datadir="$MYSQL_DATA_DIR" >/dev/null 2>&1
-    echo "[start.sh] Starting MySQL fresh after emergency wipe..."
-    mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
-           --pid-file="$MYSQL_RUN_DIR/mysqld.pid" --port=3306 &
-    MYSQL_PID=$!
-    for i in $(seq 1 30); do
-        mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null && break
-        sleep 1
-    done
-    # Fresh install — connect without password, then set it
-    if $MYSQL_CMD -e "SELECT 1" >/dev/null 2>&1; then
-        fix_root_auth || true
-        ensure_tcp_users || true
-        echo "[start.sh] Database '${MYSQL_DATABASE}' ready after emergency wipe + auth setup."
-    else
-        echo "[start.sh] FATAL: MySQL auth is broken. Check MariaDB logs."
-    fi
-fi
+echo "[start.sh] Auth fixed. Restarting MySQL normally..."
 
 # ============================================================
-# 4a. Remove ALL stray directories in the MySQL data dir.
-#     InnoDB stores tables as files (table.frm / table.ibd),
-#     NEVER as directories. Stray directories cause errno 21
-#     "Is a directory" on every ALTER/CREATE TABLE.
-#
-#     Two categories of stray dirs:
-#     1. Table-name dirs (e.g. `quotations/`) - shadow the real table
-#     2. MariaDB temp dirs (`#sql-*`) - orphaned from failed ALTER TABLE
-#
-#     We run this as root BEFORE schema import so both can succeed.
-#     Also run a second pass AFTER import to clean any created by import.
+# 4. Restart MySQL normally (with auth enabled)
+# ============================================================
+kill $MYSQL_PID 2>/dev/null || true; sleep 2
+start_mysql "" || { echo "[start.sh] FATAL: Cannot restart MySQL after auth fix."; exit 1; }
+
+# ============================================================
+# 5. Verify connection works (socket + TCP)
+# ============================================================
+if $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; then
+    echo "[start.sh] Socket auth verified."
+else
+    echo "[start.sh] ERROR: Socket auth failed after fix!"
+fi
+
+if mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 1" >/dev/null 2>&1; then
+    echo "[start.sh] TCP auth verified."
+else
+    echo "[start.sh] ERROR: TCP auth failed after fix!"
+fi
+
+echo "[start.sh] Database '${MYSQL_DATABASE}' ready."
+
+# ============================================================
+# 6. Remove stray directories in the MySQL data dir
 # ============================================================
 DB_DATADIR="$MYSQL_DATA_DIR/$MYSQL_DATABASE"
 if [ -d "$DB_DATADIR" ]; then
-    # Pass 1: Remove #sql-* temp dirs (orphaned ALTER TABLE fragments)
     find "$DB_DATADIR" -maxdepth 1 -type d -name '#sql-*' -exec rm -rf {} + 2>/dev/null && \
         echo "[start.sh] Cleaned #sql-* temp directories" || true
 
-    # Pass 2: Remove table-name dirs that have sibling .frm/.ibd files
     for entry in "$DB_DATADIR"/*/; do
         [ -d "$entry" ] || continue
         name="$(basename "$entry")"
@@ -255,37 +154,33 @@ if [ -d "$DB_DATADIR" ]; then
             mysql|performance_schema|information_schema|sys) continue ;;
         esac
         if [ -f "$DB_DATADIR/$name.frm" ] || [ -f "$DB_DATADIR/$name.ibd" ]; then
-            echo "[start.sh] Removing stray table directory (has sibling .frm/.ibd): $name"
+            echo "[start.sh] Removing stray table directory: $name"
             rm -rf "$entry"
         fi
     done
 
-    # Pass 3: Remove orphan dirs (no matching table in DB)
     for entry in "$DB_DATADIR"/*/; do
         [ -d "$entry" ] || continue
         name="$(basename "$entry")"
         case "$name" in
             mysql|performance_schema|information_schema|sys) continue ;;
         esac
-        if ! $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" -e "SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$MYSQL_DATABASE' AND TABLE_NAME='$name' LIMIT 1" >/dev/null 2>&1; then
-            echo "[start.sh] Removing orphan data-dir (no such table): $name"
+        if ! $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" \
+            -e "SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$MYSQL_DATABASE' AND TABLE_NAME='$name' LIMIT 1" >/dev/null 2>&1; then
+            echo "[start.sh] Removing orphan data-dir: $name"
             rm -rf "$entry"
         fi
     done
 fi
 
 # ============================================================
-# 4b. Import database schema (with correct UTF-8 charset)
-#    Always re-import because database.sql is now fully idempotent
-#    (CREATE DATABASE IF NOT EXISTS, CREATE TABLE IF NOT EXISTS,
-#    INSERT IGNORE). This guarantees any missing columns added by
-#    new schema versions are present even on existing bucket data.
-#    Priority: bucket mount (/data/database.sql) > repo (/var/www/html/database.sql)
+# 7. Import database schema (idempotent)
+#    Priority: /data/database.sql (persistent) > /var/www/html/database.sql (repo)
 # ============================================================
 DB_SCHEMA_REPO="/var/www/html/database.sql"
 DB_SCHEMA_BUCKET="/data/database.sql"
 
-# Always keep /data/database.sql in sync with repo version
+# Keep /data/database.sql in sync with repo version
 if [ -f "$DB_SCHEMA_REPO" ]; then
     if [ ! -f "$DB_SCHEMA_BUCKET" ] || ! diff -q "$DB_SCHEMA_REPO" "$DB_SCHEMA_BUCKET" >/dev/null 2>&1; then
         cp "$DB_SCHEMA_REPO" "$DB_SCHEMA_BUCKET"
@@ -295,10 +190,8 @@ fi
 
 if [ -f "$DB_SCHEMA_BUCKET" ]; then
     DB_SCHEMA="$DB_SCHEMA_BUCKET"
-    echo "[start.sh] Using database.sql from bucket: $DB_SCHEMA_BUCKET"
 elif [ -f "$DB_SCHEMA_REPO" ]; then
     DB_SCHEMA="$DB_SCHEMA_REPO"
-    echo "[start.sh] Using database.sql from repo: $DB_SCHEMA_REPO"
 else
     DB_SCHEMA=""
 fi
@@ -309,12 +202,10 @@ if [ -n "$DB_SCHEMA" ]; then
         && echo "[start.sh] Database schema imported successfully." \
         || echo "[start.sh] Database schema import had warnings (may be OK on existing data)."
 else
-    echo "[start.sh] WARNING: database.sql not found in repo or bucket. Skipping schema import."
+    echo "[start.sh] WARNING: database.sql not found. Skipping schema import."
 fi
 
-# ============================================================
-# 4b-extra. Clean stray dirs again after import (import may create them)
-# ============================================================
+# Clean stray dirs after import
 if [ -d "$DB_DATADIR" ]; then
     find "$DB_DATADIR" -maxdepth 1 -type d -name '#sql-*' -exec rm -rf {} + 2>/dev/null && \
         echo "[start.sh] Post-import: cleaned #sql-* temp dirs" || true
@@ -325,18 +216,13 @@ if [ -d "$DB_DATADIR" ]; then
             mysql|performance_schema|information_schema|sys) continue ;;
         esac
         if [ -f "$DB_DATADIR/$name.frm" ] || [ -f "$DB_DATADIR/$name.ibd" ]; then
-            echo "[start.sh] Post-import: removing stray dir: $name"
             rm -rf "$entry"
         fi
     done
 fi
 
 # ============================================================
-# 4c. Idempotent bucket-DB schema sync (robust PHP runner).
-#     database.sql handles CREATE TABLE IF NOT EXISTS; db_migrate.php
-#     handles adding any columns that were added in newer code versions.
-#     Runs on EVERY startup to catch schema drift. PDO-based,
-#     guarded + try/catch, so it never fails the container start.
+# 8. Run db_migrate.php for schema drift detection
 # ============================================================
 echo "[start.sh] Syncing bucket DB schema (idempotent)..."
 DB_HOST=127.0.0.1 DB_USER=root DB_PASS="$MYSQL_ROOT_PASSWORD" DB_NAME="$MYSQL_DATABASE" \
@@ -344,27 +230,13 @@ DB_HOST=127.0.0.1 DB_USER=root DB_PASS="$MYSQL_ROOT_PASSWORD" DB_NAME="$MYSQL_DA
     && echo "[start.sh] Bucket DB schema synced." \
     || echo "[start.sh] Bucket DB schema sync had non-fatal warnings."
 
-# ============================================================
-# 4d. Final cleanup: remove any stray dirs created by migration
-# ============================================================
+# Final stray dir cleanup
 if [ -d "$DB_DATADIR" ]; then
-    find "$DB_DATADIR" -maxdepth 1 -type d -name '#sql-*' -exec rm -rf {} + 2>/dev/null && \
-        echo "[start.sh] Post-migration: cleaned #sql-* temp dirs" || true
-    for entry in "$DB_DATADIR"/*/; do
-        [ -d "$entry" ] || continue
-        name="$(basename "$entry")"
-        case "$name" in
-            mysql|performance_schema|information_schema|sys) continue ;;
-        esac
-        if [ -f "$DB_DATADIR/$name.frm" ] || [ -f "$DB_DATADIR/$name.ibd" ]; then
-            echo "[start.sh] Post-migration: removing stray dir: $name"
-            rm -rf "$entry"
-        fi
-    done
+    find "$DB_DATADIR" -maxdepth 1 -type d -name '#sql-*' -exec rm -rf {} + 2>/dev/null || true
 fi
 
 # ============================================================
-# 5. Generate .env file for PHP
+# 9. Generate .env file for PHP
 # ============================================================
 APP_URL="${PROD_APP_URL:-}"
 
@@ -397,14 +269,14 @@ EOF
 echo "[start.sh] .env file generated."
 
 # ============================================================
-# 6. Update Apache port
+# 10. Update Apache port
 # ============================================================
 sed -i "s/80/${PORT:-7860}/g" /etc/apache2/sites-available/000-default.conf
 sed -i "s/80/${PORT:-7860}/g" /etc/apache2/ports.conf
 echo "[start.sh] Apache configured on port ${PORT:-7860}."
 
 # ============================================================
-# 7. Start Apache (foreground)
+# 11. Start Apache (foreground)
 # ============================================================
 echo "[start.sh] Starting Apache..."
 apache2-foreground
