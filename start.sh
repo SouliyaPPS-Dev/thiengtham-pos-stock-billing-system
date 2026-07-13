@@ -120,6 +120,27 @@ else
 fi
 
 # ============================================================
+# 4a. Remove stray per-table directories in the MySQL data dir.
+#     InnoDB tables are stored as files (table.frm / table.ibd),
+#     never as directories. A leftover directory named like a table
+#     (e.g. `quotations/`, sometimes with nested junk inside) shadows
+#     the real table and makes every ALTER/CREATE fail with
+#     errno 21 "Is a directory". Remove any such stray dir. Runs as
+#     root at container start, before the schema sync.
+# ============================================================
+DB_DATADIR="$MYSQL_DATA_DIR/$MYSQL_DATABASE"
+if [ -d "$DB_DATADIR" ]; then
+    for entry in "$DB_DATADIR"/*/; do
+        [ -d "$entry" ] || continue
+        name="$(basename "$entry")"
+        if [ -f "$DB_DATADIR/$name.frm" ] || [ -f "$DB_DATADIR/$name.ibd" ]; then
+            echo "[start.sh] Removing stray table directory: $name"
+            rm -rf "$entry"
+        fi
+    done
+fi
+
+# ============================================================
 # 4b. Idempotent bucket-DB schema sync (robust PHP runner).
 #     database.sql is imported only once; this guarantees any
 #     missing columns/tables (e.g. quotations.customer_id,
