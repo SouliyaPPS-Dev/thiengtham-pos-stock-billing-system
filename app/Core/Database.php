@@ -7,7 +7,7 @@ class Database {
     private $connection;
 
     private function __construct() {
-        $host = $_ENV['DB_HOST'] ?? 'localhost';
+        $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
         $db   = $_ENV['DB_DATABASE'] ?? '';
         $user = $_ENV['DB_USERNAME'] ?? 'root';
         // Note: XAMPP local dev uses DB_PASSWORD=Admin123 as set in .env

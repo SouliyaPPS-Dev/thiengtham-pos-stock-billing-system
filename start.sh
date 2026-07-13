@@ -104,9 +104,10 @@ if $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; then
     CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 EOSQL
 # Second try: connect without password (first run, unix_socket auth)
-else
-    echo "[start.sh] Setting up root password and users..."
+elif $MYSQL_CMD -e "SELECT 1" >/dev/null 2>&1; then
+    echo "[start.sh] Setting up root password and users (switching from unix_socket to mysql_native_password)..."
     $MYSQL_CMD $MYSQL_CHARSET <<EOSQL
+    UPDATE mysql.global_priv SET priv=json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', '') WHERE User='root' AND Host='localhost';
     ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
@@ -115,6 +116,47 @@ else
     CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     FLUSH PRIVILEGES;
 EOSQL
+else
+    echo "[start.sh] Cannot connect as root. Restarting MySQL with --skip-grant-tables to fix auth..."
+    kill $MYSQL_PID 2>/dev/null || true
+    sleep 2
+    mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
+           --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
+           --port=3306 \
+           --skip-grant-tables &
+    MYSQL_PID=$!
+    for i in $(seq 1 30); do
+        if mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
+            echo "[start.sh] MySQL is ready (skip-grant-tables)."
+            break
+        fi
+        sleep 1
+    done
+    $MYSQL_CMD $MYSQL_CHARSET <<EOSQL
+    FLUSH PRIVILEGES;
+    UPDATE mysql.global_priv SET priv=json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', '') WHERE User='root' AND Host='localhost';
+    ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+    CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+    GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+    CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+    GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+    CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+    FLUSH PRIVILEGES;
+EOSQL
+    echo "[start.sh] Auth fixed. Restarting MySQL normally..."
+    kill $MYSQL_PID 2>/dev/null || true
+    sleep 2
+    mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
+           --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
+           --port=3306 &
+    MYSQL_PID=$!
+    for i in $(seq 1 30); do
+        if mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
+            echo "[start.sh] MySQL is ready (normal mode after auth fix)."
+            break
+        fi
+        sleep 1
+    done
 fi
 
 echo "[start.sh] Database '${MYSQL_DATABASE}' ready."
