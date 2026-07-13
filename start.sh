@@ -9,6 +9,19 @@ DB_SCHEMA="/var/www/html/database.sql"
 MYSQL_CHARSET="--default-character-set=utf8mb4"
 MYSQL_SOCK="$MYSQL_RUN_DIR/mysqld.sock"
 
+# Compute mysql_native_password hash: *UPPER(SHA1(SHA1(password)))
+# This is what MariaDB uses internally for mysql_native_password auth.
+compute_native_hash() {
+    local pass="$1"
+    local s1
+    s1=$(printf '%s' "$pass" | sha1sum | awk '{print $1}')
+    local s2
+    s2=$(printf '%s' "$s1" | sha1sum | awk '{print toupper($0)}')
+    echo "*${s2}"
+}
+
+MYSQL_NATIVE_HASH=$(compute_native_hash "$MYSQL_ROOT_PASSWORD")
+
 # ============================================================
 # 1. Initialize MySQL data directory if not already initialized
 # ============================================================
@@ -29,8 +42,7 @@ chown -R mysql:mysql "$MYSQL_DATA_DIR" "$MYSQL_RUN_DIR"
 
 # ============================================================
 # 2. Start MySQL with --skip-grant-tables
-#    This bypasses ALL auth issues during startup.
-#    We fix everything below, then restart normally.
+#    Bypasses ALL auth. We fix everything, then restart normally.
 # ============================================================
 echo "[start.sh] Starting MySQL (skip-grant-tables for auth fix)..."
 
@@ -50,63 +62,72 @@ start_mysql() {
     return 1
 }
 
-# If MySQL is already running from a previous attempt, kill it
 kill $(cat "$MYSQL_RUN_DIR/mysqld.pid" 2>/dev/null) 2>/dev/null || true
 sleep 2
 
-# Try normal start first
-if ! start_mysql ""; then
-    echo "[start.sh] Normal start failed. Trying InnoDB recovery..."
-    kill $MYSQL_PID 2>/dev/null || true; sleep 2
-    rm -rf "$MYSQL_DATA_DIR/$MYSQL_DATABASE" 2>/dev/null || true
-    rm -f "$MYSQL_DATA_DIR"/ibdata1 "$MYSQL_DATA_DIR"/ib_logfile* "$MYSQL_DATA_DIR"/undo00* 2>/dev/null || true
-    if ! start_mysql ""; then
-        echo "[start.sh] InnoDB recovery failed. Full wipe..."
-        kill $MYSQL_PID 2>/dev/null || true; sleep 2
-        rm -rf "$MYSQL_DATA_DIR" 2>/dev/null || true
-        mkdir -p "$MYSQL_DATA_DIR"
-        chown -R mysql:mysql "$MYSQL_DATA_DIR"
-        mysql_install_db --user=mysql --datadir="$MYSQL_DATA_DIR" >/dev/null 2>&1
-        start_mysql "" || { echo "[start.sh] FATAL: Cannot start MySQL."; exit 1; }
-    fi
-fi
+# Always start with skip-grant-tables for the auth fix
+start_mysql "--skip-grant-tables" || { echo "[start.sh] FATAL: Cannot start MySQL for auth fix."; exit 1; }
 
 # ============================================================
 # 3. Fix auth: switch ALL root users to mysql_native_password
+#
 #    MariaDB 10.4+ defaults to unix_socket which blocks TCP.
-#    We use UPDATE mysql.global_priv (direct JSON column update)
-#    because ALTER USER ... IDENTIFIED BY uses the server's
-#    default_authentication_plugin (unix_socket), which doesn't work.
+#    We use UPDATE mysql.global_priv to set the plugin AND hash
+#    directly, because:
+#    - SET PASSWORD requires a 41-digit hex hash (not plaintext)
+#    - ALTER USER ... IDENTIFIED BY uses default plugin (unix_socket)
+#    - PASSWORD() function removed in MariaDB 10.11+
+#
+#    We compute the mysql_native_password hash in bash and embed it.
 # ============================================================
 MYSQL_CMD="mysql --socket=$MYSQL_SOCK -u root"
 
-echo "[start.sh] Fixing auth: switching all root users to mysql_native_password..."
-
-# Try connecting first (works in both skip-grant-tables and normal modes)
-# Use skip-grant-tables for guaranteed access
-kill $MYSQL_PID 2>/dev/null || true; sleep 2
-start_mysql "--skip-grant-tables" || { echo "[start.sh] FATAL: Cannot start MySQL for auth fix."; exit 1; }
+echo "[start.sh] Fixing auth: setting mysql_native_password for all root users..."
+echo "[start.sh] Password hash: ${MYSQL_NATIVE_HASH}"
 
 $MYSQL_CMD $MYSQL_CHARSET <<EOSQL
 FLUSH PRIVILEGES;
 
--- Force ALL root users to mysql_native_password plugin
-UPDATE mysql.global_priv SET priv=json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', '') WHERE User='root';
+-- Fix root@localhost: switch plugin to mysql_native_password and set hash
+UPDATE mysql.global_priv
+SET priv = json_set(
+    priv,
+    '$.plugin', 'mysql_native_password',
+    '$.authentication_string', '${MYSQL_NATIVE_HASH}'
+)
+WHERE User = 'root' AND Host = 'localhost';
 
--- Set password for all root hosts
-SET PASSWORD FOR 'root'@'localhost' = '${MYSQL_ROOT_PASSWORD}';
-SET PASSWORD FOR 'root'@'127.0.0.1' = '${MYSQL_ROOT_PASSWORD}';
-SET PASSWORD FOR 'root'@'%' = '${MYSQL_ROOT_PASSWORD}';
+-- Create root@127.0.0.1 if not exists (TCP connections use this)
+DELETE FROM mysql.global_priv WHERE User = 'root' AND Host = '127.0.0.1';
+INSERT IGNORE INTO mysql.global_priv (User, Host, priv)
+VALUES ('root', '127.0.0.1', CONCAT(
+    '{"plugin":"mysql_native_password","authentication_string":"${MYSQL_NATIVE_HASH}",',
+    '"select_priv":"Y","insert_priv":"Y","update_priv":"Y","delete_priv":"Y",',
+    '"create_priv":"Y","drop_priv":"Y","reload_priv":"Y","process_priv":"Y",',
+    '"file_priv":"Y","grant_priv":"Y","references_priv":"Y","index_priv":"Y",',
+    '"alter_priv":"Y","show_db_priv":"Y","super_priv":"Y",',
+    '"create_tmp_table_priv":"Y","lock_tables_priv":"Y","execute_priv":"Y",',
+    '"repl_slave_priv":"Y","repl_client_priv":"Y","create_view_priv":"Y",',
+    '"show_view_priv":"Y","create_routine_priv":"Y","alter_routine_priv":"Y",',
+    '"create_user_priv":"Y","event_priv":"Y","trigger_priv":"Y",',
+    '"create_tablespace_priv":"Y"}'
+));
 
--- Ensure root@127.0.0.1 exists with full privileges
-CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED VIA mysql_native_password;
-SET PASSWORD FOR 'root'@'127.0.0.1' = '${MYSQL_ROOT_PASSWORD}';
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
-
--- Ensure root@% exists with full privileges
-CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED VIA mysql_native_password;
-SET PASSWORD FOR 'root'@'%' = '${MYSQL_ROOT_PASSWORD}';
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+-- Create root@% if not exists (remote connections)
+DELETE FROM mysql.global_priv WHERE User = 'root' AND Host = '%';
+INSERT IGNORE INTO mysql.global_priv (User, Host, priv)
+VALUES ('root', '%', CONCAT(
+    '{"plugin":"mysql_native_password","authentication_string":"${MYSQL_NATIVE_HASH}",',
+    '"select_priv":"Y","insert_priv":"Y","update_priv":"Y","delete_priv":"Y",',
+    '"create_priv":"Y","drop_priv":"Y","reload_priv":"Y","process_priv":"Y",',
+    '"file_priv":"Y","grant_priv":"Y","references_priv":"Y","index_priv":"Y",',
+    '"alter_priv":"Y","show_db_priv":"Y","super_priv":"Y",',
+    '"create_tmp_table_priv":"Y","lock_tables_priv":"Y","execute_priv":"Y",',
+    '"repl_slave_priv":"Y","repl_client_priv":"Y","create_view_priv":"Y",',
+    '"show_view_priv":"Y","create_routine_priv":"Y","alter_routine_priv":"Y",',
+    '"create_user_priv":"Y","event_priv":"Y","trigger_priv":"Y",',
+    '"create_tablespace_priv":"Y"}'
+));
 
 -- Create the application database
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -180,7 +201,6 @@ fi
 DB_SCHEMA_REPO="/var/www/html/database.sql"
 DB_SCHEMA_BUCKET="/data/database.sql"
 
-# Keep /data/database.sql in sync with repo version
 if [ -f "$DB_SCHEMA_REPO" ]; then
     if [ ! -f "$DB_SCHEMA_BUCKET" ] || ! diff -q "$DB_SCHEMA_REPO" "$DB_SCHEMA_BUCKET" >/dev/null 2>&1; then
         cp "$DB_SCHEMA_REPO" "$DB_SCHEMA_BUCKET"
