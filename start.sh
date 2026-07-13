@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-root}"
+MYSQL_ROOT_PASSWORD="${MYSQL_ROOT_PASSWORD:-Admin123}"
 MYSQL_DATABASE="${MYSQL_DATABASE:-if0_42353445_thiengtham}"
 MYSQL_DATA_DIR="/data/mysql"
 MYSQL_RUN_DIR="/var/run/mysqld"
@@ -81,24 +81,22 @@ if ! start_mysql ""; then
 fi
 
 # ============================================================
-# 3. Fix TCP auth: create root@127.0.0.1 with mysql_native_password
+# 3. Fix TCP auth: ALL in ONE mysql session
+#
+#    CRITICAL: Must do everything in a single mysql connection
+#    because after FLUSH PRIVILEGES switches root@localhost to
+#    mysql_native_password, new socket connections without -p
+#    will fail.
 #
 #    MariaDB 10.4+ defaults to unix_socket for root@localhost.
-#    PHP connects via TCP to 127.0.0.1, so it looks up root@127.0.0.1.
-#    We use unix_socket auth (connects as root OS user, no password)
-#    to create root@127.0.0.1 with mysql_native_password plugin.
-#
-#    Must DROP+CREATE (not CREATE IF NOT EXISTS) because existing
-#    users from prior deploys may have wrong plugin (unix_socket)
-#    or wrong password hash. DROP IF EXISTS is safe before CREATE.
+#    PHP connects via TCP to 127.0.0.1 → looks up root@127.0.0.1.
+#    We connect via unix_socket (OS root → no password needed)
+#    and fix everything before FLUSH PRIVILEGES.
 # ============================================================
-MYSQL_CMD="mysql --socket=$MYSQL_SOCK -u root"
+echo "[start.sh] Setting up TCP auth (single session)..."
 
-echo "[start.sh] Setting up TCP auth for root@127.0.0.1..."
-
-# Step 3a: Switch root@localhost to mysql_native_password + correct hash
-echo "[start.sh] Switching root@localhost to mysql_native_password..."
-$MYSQL_CMD $MYSQL_CHARSET -e "
+mysql --socket="$MYSQL_SOCK" -u root $MYSQL_CHARSET <<EOSQL
+-- 1. Switch root@localhost to mysql_native_password
 UPDATE mysql.global_priv
 SET priv = json_set(
     priv,
@@ -106,70 +104,42 @@ SET priv = json_set(
     '$.authentication_string', '${MYSQL_NATIVE_HASH}'
 )
 WHERE User = 'root' AND Host = 'localhost';
-FLUSH PRIVILEGES;
-" && echo "[start.sh] root@localhost updated." || echo "[start.sh] WARNING: root@localhost update failed."
 
-# Step 3b: Recreate root@127.0.0.1 with mysql_native_password
-# DROP IF EXISTS first to clear any stale entries with wrong plugin/hash
-echo "[start.sh] Recreating root@127.0.0.1..."
-$MYSQL_CMD $MYSQL_CHARSET -e "
+-- 2. Recreate root@127.0.0.1 (DROP + CREATE to clear stale entries)
 DROP USER IF EXISTS 'root'@'127.0.0.1';
 CREATE USER 'root'@'127.0.0.1' IDENTIFIED VIA mysql_native_password USING '${MYSQL_NATIVE_HASH}';
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
-" && echo "[start.sh] root@127.0.0.1 created." || echo "[start.sh] WARNING: root@127.0.0.1 creation failed."
 
-# Step 3c: Recreate root@% with mysql_native_password
-echo "[start.sh] Recreating root@%..."
-$MYSQL_CMD $MYSQL_CHARSET -e "
+-- 3. Recreate root@% (remote connections)
 DROP USER IF EXISTS 'root'@'%';
 CREATE USER 'root'@'%' IDENTIFIED VIA mysql_native_password USING '${MYSQL_NATIVE_HASH}';
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
-" && echo "[start.sh] root@% created." || echo "[start.sh] WARNING: root@% creation failed."
 
-# Step 3d: Verify
-echo "[start.sh] Verifying users..."
-$MYSQL_CMD $MYSQL_CHARSET -e "
-SELECT User, Host, plugin FROM mysql.global_priv WHERE User='root';
-" 2>/dev/null || echo "[start.sh] Could not verify."
-
-# Step 3e: Create the application database
-$MYSQL_CMD $MYSQL_CHARSET -e "
+-- 4. Create the application database
 CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-" && echo "[start.sh] Database '${MYSQL_DATABASE}' ensured."
 
-$MYSQL_CMD $MYSQL_CHARSET -e "FLUSH PRIVILEGES;" 2>/dev/null || true
+-- 5. NOW flush — after this, socket connections need -pAdmin123
+FLUSH PRIVILEGES;
+EOSQL
+
+echo "[start.sh] Auth fix complete."
 
 # ============================================================
 # 4. Verify TCP connection works
 # ============================================================
 echo "[start.sh] Verifying TCP connection..."
 
-# After root@localhost switched to mysql_native_password, socket also needs password
 if mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 1" >/dev/null 2>&1; then
     echo "[start.sh] TCP auth: OK"
 else
     echo "[start.sh] ERROR: TCP auth FAILED"
-    echo "[start.sh] Attempting fallback: start with --skip-grant-tables to fix..."
-    kill $MYSQL_PID 2>/dev/null || true; sleep 2
+fi
 
-    start_mysql "--skip-grant-tables" || { echo "[start.sh] FATAL: Cannot start MySQL for fallback fix."; exit 1; }
-
-    $MYSQL_CMD $MYSQL_CHARSET -e "
-    FLUSH PRIVILEGES;
-    UPDATE mysql.global_priv SET priv=json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', '${MYSQL_NATIVE_HASH}') WHERE User='root';
-    FLUSH PRIVILEGES;
-    " 2>/dev/null || true
-
-    kill $MYSQL_PID 2>/dev/null || true; sleep 2
-    start_mysql "" || { echo "[start.sh] FATAL: Cannot restart MySQL."; exit 1; }
-
-    if mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 1" >/dev/null 2>&1; then
-        echo "[start.sh] TCP auth: OK (after fallback)"
-    else
-        echo "[start.sh] ERROR: TCP auth STILL FAILED after fallback"
-    fi
+# Also verify socket auth with password
+if mysql --socket="$MYSQL_SOCK" -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET -e "SELECT 1" >/dev/null 2>&1; then
+    echo "[start.sh] Socket auth: OK"
+else
+    echo "[start.sh] ERROR: Socket auth FAILED"
 fi
 
 echo "[start.sh] Database '${MYSQL_DATABASE}' ready."
@@ -200,7 +170,7 @@ if [ -d "$DB_DATADIR" ]; then
         case "$name" in
             mysql|performance_schema|information_schema|sys) continue ;;
         esac
-        if ! $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" \
+        if ! mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" \
             -e "SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$MYSQL_DATABASE' AND TABLE_NAME='$name' LIMIT 1" >/dev/null 2>&1; then
             echo "[start.sh] Removing orphan data-dir: $name"
             rm -rf "$entry"
@@ -231,7 +201,7 @@ fi
 
 if [ -n "$DB_SCHEMA" ]; then
     echo "[start.sh] Importing database schema from $DB_SCHEMA (idempotent)..."
-    $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" < "$DB_SCHEMA" \
+    mysql -h 127.0.0.1 -P 3306 -u root -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" < "$DB_SCHEMA" \
         && echo "[start.sh] Database schema imported successfully." \
         || echo "[start.sh] Database schema import had warnings (may be OK on existing data)."
 else
@@ -319,7 +289,7 @@ PROD_DB_DATABASE=${MYSQL_DATABASE}
 
 FONT_FAMILY="'Noto Sans Lao', sans-serif"
 
-IMAGEKIT_PUBLIC_KEY=${IMAGEKIT_PUBLIC_KEY:-}
+IMAGEKIT_PUBLIC_KEY=${IMAGEKIT_PRIVATE_KEY:-}
 IMAGEKIT_PRIVATE_KEY=${IMAGEKIT_PRIVATE_KEY:-}
 IMAGEKIT_URL_ENDPOINT=${IMAGEKIT_URL_ENDPOINT:-}
 EOF
