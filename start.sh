@@ -31,11 +31,9 @@ chown -R mysql:mysql "$MYSQL_DATA_DIR" "$MYSQL_RUN_DIR"
 # ============================================================
 echo "[start.sh] Starting MySQL..."
 
-# Try normal start first; if it fails, attempt InnoDB recovery
 mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
        --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
-       --port=3306 \
-       --innodb-force-recovery=1 &
+       --port=3306 &
 
 MYSQL_PID=$!
 
@@ -95,20 +93,21 @@ fi
 
 # ============================================================
 # 3. Set root password and create database
+#    MariaDB 10.4+ defaults to unix_socket auth for root@localhost.
+#    PHP connects via TCP, so we MUST switch to mysql_native_password.
 # ============================================================
 MYSQL_CMD="mysql --socket=$MYSQL_RUN_DIR/mysqld.sock -u root"
 # First try: connect with password (for restart after first setup)
 if $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" -e "SELECT 1" >/dev/null 2>&1; then
-    echo "[start.sh] Root password already set. Ensuring database exists..."
+    echo "[start.sh] Root password already set (mysql_native_password). Ensuring database exists..."
     $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET <<EOSQL
     CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 EOSQL
 # Second try: connect without password (first run, unix_socket auth)
 elif $MYSQL_CMD -e "SELECT 1" >/dev/null 2>&1; then
-    echo "[start.sh] Setting up root password and users (switching from unix_socket to mysql_native_password)..."
-    $MYSQL_CMD $MYSQL_CHARSET <<EOSQL
-    UPDATE mysql.global_priv SET priv=json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', '') WHERE User='root' AND Host='localhost';
-    ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+    echo "[start.sh] First run — switching root from unix_socket to mysql_native_password..."
+    if $MYSQL_CMD $MYSQL_CHARSET <<EOSQL
+    ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('${MYSQL_ROOT_PASSWORD}');
     CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
     CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
@@ -116,8 +115,46 @@ elif $MYSQL_CMD -e "SELECT 1" >/dev/null 2>&1; then
     CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     FLUSH PRIVILEGES;
 EOSQL
+    then
+        echo "[start.sh] Root auth switched to mysql_native_password successfully."
+    else
+        echo "[start.sh] WARNING: ALTER USER failed, trying skip-grant-tables fallback..."
+        kill $MYSQL_PID 2>/dev/null || true
+        sleep 2
+        mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
+               --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
+               --port=3306 \
+               --skip-grant-tables &
+        MYSQL_PID=$!
+        for i in $(seq 1 30); do
+            if mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then break; fi
+            sleep 1
+        done
+        $MYSQL_CMD $MYSQL_CHARSET <<EOSQL2
+        FLUSH PRIVILEGES;
+        ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('${MYSQL_ROOT_PASSWORD}');
+        CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+        GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+        CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+        GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+        CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+        FLUSH PRIVILEGES;
+EOSQL2
+        echo "[start.sh] Auth fixed via skip-grant-tables. Restarting MySQL normally..."
+        kill $MYSQL_PID 2>/dev/null || true
+        sleep 2
+        mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
+               --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
+               --port=3306 &
+        MYSQL_PID=$!
+        for i in $(seq 1 30); do
+            if mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then break; fi
+            sleep 1
+        done
+    fi
+# Third try: password set but wrong auth plugin (stuck state from old deploy)
 else
-    echo "[start.sh] Cannot connect as root. Restarting MySQL with --skip-grant-tables to fix auth..."
+    echo "[start.sh] Cannot connect as root. Fixing auth via --skip-grant-tables..."
     kill $MYSQL_PID 2>/dev/null || true
     sleep 2
     mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
@@ -132,17 +169,16 @@ else
         fi
         sleep 1
     done
-    $MYSQL_CMD $MYSQL_CHARSET <<EOSQL
+    $MYSQL_CMD $MYSQL_CHARSET <<EOSQL3
     FLUSH PRIVILEGES;
-    UPDATE mysql.global_priv SET priv=json_set(priv, '$.plugin', 'mysql_native_password', '$.authentication_string', '') WHERE User='root' AND Host='localhost';
-    ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
+    ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('${MYSQL_ROOT_PASSWORD}');
     CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
     CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
     GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
     CREATE DATABASE IF NOT EXISTS \`${MYSQL_DATABASE}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
     FLUSH PRIVILEGES;
-EOSQL
+EOSQL3
     echo "[start.sh] Auth fixed. Restarting MySQL normally..."
     kill $MYSQL_PID 2>/dev/null || true
     sleep 2
@@ -217,6 +253,15 @@ fi
 # ============================================================
 DB_SCHEMA_REPO="/var/www/html/database.sql"
 DB_SCHEMA_BUCKET="/data/database.sql"
+
+# Always keep /data/database.sql in sync with repo version
+if [ -f "$DB_SCHEMA_REPO" ]; then
+    if [ ! -f "$DB_SCHEMA_BUCKET" ] || ! diff -q "$DB_SCHEMA_REPO" "$DB_SCHEMA_BUCKET" >/dev/null 2>&1; then
+        cp "$DB_SCHEMA_REPO" "$DB_SCHEMA_BUCKET"
+        echo "[start.sh] Synced database.sql to /data/ (persistent storage)."
+    fi
+fi
+
 if [ -f "$DB_SCHEMA_BUCKET" ]; then
     DB_SCHEMA="$DB_SCHEMA_BUCKET"
     echo "[start.sh] Using database.sql from bucket: $DB_SCHEMA_BUCKET"
