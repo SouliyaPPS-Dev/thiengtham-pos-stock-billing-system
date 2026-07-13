@@ -76,19 +76,21 @@ class Quotation
 
     public function create($data, $items)
     {
-        $this->db()->beginTransaction();
+        $maxRetries = 3;
+        for ($attempt = 0; $attempt < $maxRetries; $attempt++) {
+            $this->db()->beginTransaction();
 
-        try {
-            $number = $this->generateNumber();
+            try {
+                $number = $this->generateNumber();
 
-            $stmt = $this->db()->prepare("INSERT INTO quotations (quotation_number, company_template, supplier_id, supplier_name, supplier_contact, customer_id, customer_name, customer_contact, ref_no, date, expiry_date, subtotal, discount, tax_percent, tax_amount, grand_total, notes, terms, status, created_by, created_at)
-                                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-            $stmt->execute([
-                $number,
+                $stmt = $this->db()->prepare("INSERT INTO quotations (quotation_number, company_template, bid_customer_id, bid_customer_name, bid_customer_contact, customer_id, customer_name, customer_contact, ref_no, date, expiry_date, subtotal, discount, tax_percent, tax_amount, grand_total, notes, terms, status, created_by, created_at)
+                                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+                $stmt->execute([
+                    $number,
                 $data['company_template'] ?? 'luang-prabarg',
-                (!empty($data['supplier_id']) ? $data['supplier_id'] : null),
-                $data['supplier_name'] ?? '',
-                $data['supplier_contact'] ?? '',
+                (!empty($data['bid_customer_id']) ? $data['bid_customer_id'] : null),
+                $data['bid_customer_name'] ?? '',
+                $data['bid_customer_contact'] ?? '',
                 (!empty($data['customer_id']) ? $data['customer_id'] : null),
                 $data['customer_name'] ?? '',
                 $data['customer_contact'] ?? '',
@@ -133,7 +135,12 @@ class Quotation
             return $id;
         } catch (\Exception $e) {
             $this->db()->rollBack();
+            if (str_contains($e->getMessage(), 'Duplicate entry') && $attempt < $maxRetries - 1) {
+                usleep(50000);
+                continue;
+            }
             throw $e;
+        }
         }
     }
 
@@ -147,16 +154,16 @@ class Quotation
             $newStatus = $data['status'] ?? 'Draft';
 
             $stmt = $this->db()->prepare("UPDATE quotations SET
-                company_template = ?, supplier_id = ?, supplier_name = ?, supplier_contact = ?,
+                company_template = ?, bid_customer_id = ?, bid_customer_name = ?, bid_customer_contact = ?,
                 customer_id = ?, customer_name = ?, customer_contact = ?,
                 ref_no = ?, date = ?, expiry_date = ?, subtotal = ?, discount = ?, tax_percent = ?,
                 tax_amount = ?, grand_total = ?, notes = ?, terms = ?, status = ?
                 WHERE id = ?");
             $stmt->execute([
                 $data['company_template'] ?? 'luang-prabarg',
-                (!empty($data['supplier_id']) ? $data['supplier_id'] : null),
-                $data['supplier_name'] ?? '',
-                $data['supplier_contact'] ?? '',
+                (!empty($data['bid_customer_id']) ? $data['bid_customer_id'] : null),
+                $data['bid_customer_name'] ?? '',
+                $data['bid_customer_contact'] ?? '',
                 (!empty($data['customer_id']) ? $data['customer_id'] : null),
                 $data['customer_name'] ?? '',
                 $data['customer_contact'] ?? '',
@@ -222,59 +229,66 @@ class Quotation
             return false;
         }
 
-        $this->db()->beginTransaction();
+        $maxRetries = 3;
+        for ($attempt = 0; $attempt < $maxRetries; $attempt++) {
+            $this->db()->beginTransaction();
 
-        try {
-            $newNumber = $this->generateNumber();
+            try {
+                $newNumber = $this->generateNumber();
 
-            $stmt = $this->db()->prepare("INSERT INTO quotations (quotation_number, company_template, supplier_id, supplier_name, supplier_contact, customer_id, customer_name, customer_contact, ref_no, date, expiry_date, subtotal, discount, tax_percent, tax_amount, grand_total, notes, terms, status, created_by, created_at)
-                                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Draft', ?, NOW())");
-            $stmt->execute([
-                $newNumber,
-                $original['company_template'],
-                $original['supplier_id'],
-                $original['supplier_name'],
-                $original['supplier_contact'],
-                $original['customer_id'],
-                $original['customer_name'],
-                $original['customer_contact'],
-                $original['ref_no'],
-                date('Y-m-d'),
-                $original['expiry_date'],
-                $original['subtotal'],
-                $original['discount'],
-                $original['tax_percent'],
-                $original['tax_amount'],
-                $original['grand_total'],
-                $original['notes'],
-                $original['terms'],
-                $_SESSION['user']['id'] ?? null,
-            ]);
-
-            $newId = $this->db()->lastInsertId();
-
-            $stmtItem = $this->db()->prepare("INSERT INTO quotation_items (quotation_id, product_id, product_name, quantity, unit, unit_price, amount)
-                                               VALUES (?, ?, ?, ?, ?, ?, ?)");
-
-            foreach ($original['items'] as $item) {
-                $stmtItem->execute([
-                    $newId,
-                    $item['product_id'],
-                    $item['product_name'],
-                    $item['quantity'],
-                    $item['unit'],
-                    $item['unit_price'],
-                    $item['amount'],
+                $stmt = $this->db()->prepare("INSERT INTO quotations (quotation_number, company_template, bid_customer_id, bid_customer_name, bid_customer_contact, customer_id, customer_name, customer_contact, ref_no, date, expiry_date, subtotal, discount, tax_percent, tax_amount, grand_total, notes, terms, status, created_by, created_at)
+                                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Draft', ?, NOW())");
+                $stmt->execute([
+                    $newNumber,
+                    $original['company_template'],
+                    $original['bid_customer_id'],
+                    $original['bid_customer_name'],
+                    $original['bid_customer_contact'],
+                    $original['customer_id'],
+                    $original['customer_name'],
+                    $original['customer_contact'],
+                    $original['ref_no'],
+                    date('Y-m-d'),
+                    $original['expiry_date'],
+                    $original['subtotal'],
+                    $original['discount'],
+                    $original['tax_percent'],
+                    $original['tax_amount'],
+                    $original['grand_total'],
+                    $original['notes'],
+                    $original['terms'],
+                    $_SESSION['user']['id'] ?? null,
                 ]);
+
+                $newId = $this->db()->lastInsertId();
+
+                $stmtItem = $this->db()->prepare("INSERT INTO quotation_items (quotation_id, product_id, product_name, quantity, unit, unit_price, amount)
+                                                   VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+                foreach ($original['items'] as $item) {
+                    $stmtItem->execute([
+                        $newId,
+                        $item['product_id'],
+                        $item['product_name'],
+                        $item['quantity'],
+                        $item['unit'],
+                        $item['unit_price'],
+                        $item['amount'],
+                    ]);
+                }
+
+                $this->addHistory($newId, 'created', null, 'Draft', 'ສຳເນົາຈາກໃບສະເໜີລາຄາ #' . $original['quotation_number']);
+
+                $this->db()->commit();
+                return $newId;
+            } catch (\Exception $e) {
+                $this->db()->rollBack();
+                if (str_contains($e->getMessage(), 'Duplicate entry') && $attempt < $maxRetries - 1) {
+                    usleep(50000);
+                    continue;
+                }
+                throw $e;
             }
-
-            $this->addHistory($newId, 'created', null, 'Draft', 'ສຳເນົາຈາກໃບສະເໜີລາຄາ #' . $original['quotation_number']);
-
-            $this->db()->commit();
-            return $newId;
-        } catch (\Exception $e) {
-            $this->db()->rollBack();
-            throw $e;
         }
     }
 
@@ -366,10 +380,15 @@ class Quotation
     public function generateNumber()
     {
         $prefix = 'QTN-' . date('Ymd') . '-';
-        $stmt = $this->db()->prepare("SELECT COUNT(*) as cnt FROM quotations WHERE quotation_number LIKE ? AND DATE(created_at) = CURDATE()");
+        $stmt = $this->db()->prepare("SELECT quotation_number FROM quotations WHERE quotation_number LIKE ? ORDER BY quotation_number DESC LIMIT 1 FOR UPDATE");
         $stmt->execute([$prefix . '%']);
-        $count = (int)$stmt->fetch()['cnt'];
-        return $prefix . str_pad($count + 1, 4, '0', STR_PAD_LEFT);
+        $last = $stmt->fetch();
+        if ($last) {
+            $seq = (int)substr($last['quotation_number'], -4) + 1;
+        } else {
+            $seq = 1;
+        }
+        return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
     }
 
     public function paginate($page, $perPage, $search = '')
@@ -378,7 +397,7 @@ class Quotation
         $params = [];
 
         if (!empty($search)) {
-            $where = '(q.quotation_number LIKE ? OR q.supplier_name LIKE ? OR q.ref_no LIKE ? OR q.customer_name LIKE ?)';
+            $where = '(q.quotation_number LIKE ? OR q.bid_customer_name LIKE ? OR q.ref_no LIKE ? OR q.customer_name LIKE ?)';
             $q = "%{$search}%";
             $params = [$q, $q, $q, $q];
         }
@@ -393,7 +412,7 @@ class Quotation
         $params = [];
 
         if (!empty($search)) {
-            $where = '(quotation_number LIKE ? OR supplier_name LIKE ? OR ref_no LIKE ? OR customer_name LIKE ?)';
+            $where = '(quotation_number LIKE ? OR bid_customer_name LIKE ? OR ref_no LIKE ? OR customer_name LIKE ?)';
             $q = "%{$search}%";
             $params = [$q, $q, $q, $q];
         }
@@ -411,16 +430,16 @@ class Quotation
     {
         $quotations = $this->paginate(1, 99999, $search);
 
-        $header = ['ID', 'ເລກທີ', 'ສົມທົບ', 'ລູກຄ້າ', 'ຜູ້ສະໜອງ', 'ວັນທີ', 'ລາຄາລວມ', 'ສະຖານະ'];
+        $header = ['ID', 'ເລກທີ', 'ສົມທົບ', 'ລູກຄ້າ', 'ລູກຄ້າທີ່ສະເໜີລາຄາ', 'ວັນທີ', 'ລາຄາລວມ', 'ສະຖານະ'];
 
         $rows = [];
         foreach ($quotations as $q) {
             $rows[] = [
                 $q['id'],
                 $q['quotation_number'],
-                $q['supplier_name'] ?? '',
+                $q['bid_customer_name'] ?? '',
                 $q['customer_name'] ?? $q['customer_name_resolved'] ?? '',
-                $q['supplier_name'] ?? '',
+                $q['bid_customer_name'] ?? '',
                 $q['date'] ?? '',
                 number_format($q['grand_total'], 2),
                 $q['status'],

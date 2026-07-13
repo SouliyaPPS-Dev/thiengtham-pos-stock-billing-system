@@ -205,10 +205,10 @@
                 <label>ວັນທີ</label>
                 <span><?= htmlspecialchars(date('d/m/Y H:i', strtotime($invoice['created_at']))) ?></span>
             </div>
-            <?php if (!empty($invoice['supplier_name'])): ?>
+            <?php if (!empty($invoice['bid_customer_name'])): ?>
             <div class="meta-item">
-                <label>ຜູ້ສະໜອງ</label>
-                <span><?= htmlspecialchars($invoice['supplier_name']) ?></span>
+                <label>ລູກຄ້າທີ່ສະເໜີລາຄາ</label>
+                <span><?= htmlspecialchars($invoice['bid_customer_name']) ?></span>
             </div>
             <?php else: ?>
             <div class="meta-item">

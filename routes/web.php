@@ -80,14 +80,14 @@ return [
     '/admin/customers/{id}/delete' => ['Admin\CustomerController', 'delete'],
     '/admin/customers/{id}/view' => ['Admin\CustomerController', 'view'],
 
-    // Suppliers
-    '/admin/suppliers'           => ['Admin\SupplierController', 'index'],
-    '/admin/suppliers/create'    => ['Admin\SupplierController', 'create'],
-    '/admin/suppliers/store'     => ['Admin\SupplierController', 'store'],
-    '/admin/suppliers/{id}/edit' => ['Admin\SupplierController', 'edit'],
-    '/admin/suppliers/{id}/update' => ['Admin\SupplierController', 'update'],
-    '/admin/suppliers/{id}/delete' => ['Admin\SupplierController', 'delete'],
-    '/admin/suppliers/{id}/update-tax' => ['Admin\SupplierController', 'updateTax'],
+    // Bid Customers
+    '/admin/bid-customers'           => ['Admin\BidCustomerController', 'index'],
+    '/admin/bid-customers/create'    => ['Admin\BidCustomerController', 'create'],
+    '/admin/bid-customers/store'     => ['Admin\BidCustomerController', 'store'],
+    '/admin/bid-customers/{id}/edit' => ['Admin\BidCustomerController', 'edit'],
+    '/admin/bid-customers/{id}/update' => ['Admin\BidCustomerController', 'update'],
+    '/admin/bid-customers/{id}/delete' => ['Admin\BidCustomerController', 'delete'],
+    '/admin/bid-customers/{id}/update-tax' => ['Admin\BidCustomerController', 'updateTax'],
 
     // Promotions
     '/admin/promotions'              => ['Admin\PromotionController', 'index'],

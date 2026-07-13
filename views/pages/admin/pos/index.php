@@ -111,7 +111,7 @@
                 <button @click="billParty = 'supplier'; selectedCustomer = null; cSearch = ''; saveState()"
                         :class="billParty === 'supplier' ? 'bg-card shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground/85'"
                         class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5">
-                    <i class="fas fa-truck"></i> ຜູ້ສະໜອງ
+                    <i class="fas fa-truck"></i> ລູກຄ້າທີ່ສະເໜີລາຄາ
                 </button>
             </div>
 
@@ -168,7 +168,7 @@
                     <input type="text"
                            x-model="sSearch"
                            @focus="open = true"
-                           placeholder="ຄົ້ນຫາຊື່ຜູ້ສະໜອງ..."
+                           placeholder="ຄົ້ນຫາຊື່ລູກຄ້າທີ່ສະເໜີລາຄາ..."
                            class="w-full pl-9 pr-8 py-2.5 bg-card border border-border rounded-2xl text-xs font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all">
                     <div class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                         <i class="fas fa-search text-xs"></i>
@@ -183,7 +183,7 @@
                      x-transition:enter-end="opacity-100 transform scale-100"
                      class="absolute left-0 right-0 mt-1 bg-card border rounded-2xl shadow-xl z-50 max-h-48 overflow-y-auto"
                      :style="{ left: $el.parentElement.parentElement.offsetLeft + 'px', right: $el.parentElement.parentElement.offsetLeft + 'px', width: $el.parentElement.parentElement.offsetWidth + 'px' }">
-                    <template x-for="s in suppliers.filter(s => s.name.toLowerCase().includes(sSearch.toLowerCase()) || (s.phone || '').includes(sSearch))" :key="s.id">
+                    <template x-for="s in bidCustomers.filter(s => s.name.toLowerCase().includes(sSearch.toLowerCase()) || (s.phone || '').includes(sSearch))" :key="s.id">
                         <div @click="selectedSupplier = s; sSearch = s.name; open = false; saveState()"
                              class="p-2.5 hover:bg-gray-50 cursor-pointer border-b last:border-0 flex items-center justify-between">
                             <div>
@@ -192,8 +192,8 @@
                             </div>
                         </div>
                     </template>
-                    <template x-if="suppliers.filter(s => s.name.toLowerCase().includes(sSearch.toLowerCase()) || (s.phone || '').includes(sSearch)).length === 0">
-                        <div class="p-3 text-center text-xs text-muted-foreground">ບໍ່ພົບຜູ້ສະໜອງ</div>
+                    <template x-if="bidCustomers.filter(s => s.name.toLowerCase().includes(sSearch.toLowerCase()) || (s.phone || '').includes(sSearch)).length === 0">
+                        <div class="p-3 text-center text-xs text-muted-foreground">ບໍ່ພົບລູກຄ້າທີ່ສະເໜີລາຄາ</div>
                     </template>
                 </div>
                 <template x-if="selectedSupplier">
@@ -318,7 +318,7 @@ function posSystem() {
         categoryFilter: 'all',
         products: <?= json_encode($products ?? []) ?>,
         customers: <?= json_encode($customers ?? []) ?>,
-        suppliers: <?= json_encode($suppliers ?? []) ?>,
+        bidCustomers: <?= json_encode($bidCustomers ?? []) ?>,
         paymentMethods: <?= json_encode($paymentMethods ?? []) ?>,
 
         cart: [],
@@ -373,7 +373,7 @@ function posSystem() {
                     this.selectedCustomer = this.customers.find(c => c.id == data.selectedCustomerId) || null;
                 }
                 if (data.selectedSupplierId) {
-                    this.selectedSupplier = this.suppliers.find(s => s.id == data.selectedSupplierId) || null;
+                    this.selectedSupplier = this.bidCustomers.find(s => s.id == data.selectedSupplierId) || null;
                 }
                 if (data.discount !== undefined) this.discount = data.discount;
                 if (data.paidAmount !== undefined) this.paidAmount = data.paidAmount;
@@ -488,7 +488,7 @@ function posSystem() {
 
             const missing = [];
             if (this.billParty === 'customer' && !this.selectedCustomer) missing.push('ກະລຸນາເລືອກລູກຄ້າ');
-            if (this.billParty === 'supplier' && !this.selectedSupplier) missing.push('ກະລຸນາເລືອກຜູ້ສະໜອງ');
+            if (this.billParty === 'supplier' && !this.selectedSupplier) missing.push('ກະລຸນາເລືອກລູກຄ້າທີ່ສະເໜີລາຄາ');
             if (Number(this.paidAmount) < this.grandTotal) missing.push('ຈຳນວນເງິນທີ່ຮັບຕ້ອງຫຼາຍກວ່າ ຫຼື ເທົ່າກັບຍອດລວມ');
 
             if (missing.length > 0) {
@@ -508,7 +508,7 @@ function posSystem() {
             let partyName = 'ລູກຄ້າທົ່ວໄປ';
             let partyDetail = '';
             if (this.billParty === 'supplier' && this.selectedSupplier) {
-                partyLabel = 'ຜູ້ສະໜອງ';
+                partyLabel = 'ລູກຄ້າທີ່ສະເໜີລາຄາ';
                 partyName = this.selectedSupplier.name;
                 partyDetail = this.selectedSupplier.contact_person ? (this.selectedSupplier.contact_person + (this.selectedSupplier.phone ? ' | ' + this.selectedSupplier.phone : '')) : (this.selectedSupplier.phone || '');
             } else if (this.selectedCustomer) {
@@ -570,8 +570,8 @@ function posSystem() {
                     customer_id: this.billParty === 'customer' ? (this.selectedCustomer?.id || null) : null,
                     customer_name: this.billParty === 'customer' ? (this.selectedCustomer?.fullname || '') : '',
                     customer_phone: this.billParty === 'customer' ? (this.selectedCustomer?.phone || '') : '',
-                    supplier_id: this.billParty === 'supplier' ? (this.selectedSupplier?.id || null) : null,
-                    supplier_name: this.billParty === 'supplier' ? (this.selectedSupplier?.name || '') : '',
+                    bid_customer_id: this.billParty === 'supplier' ? (this.selectedSupplier?.id || null) : null,
+                    bid_customer_name: this.billParty === 'supplier' ? (this.selectedSupplier?.name || '') : '',
                     subtotal: sub,
                     discount: Number(this.discount),
                     grand_total: grand,

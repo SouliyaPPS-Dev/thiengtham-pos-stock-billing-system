@@ -299,13 +299,24 @@
 
             <!-- Meta Info -->
             <div class="meta-grid">
+                <?php if (!empty($quotation['bid_customer_name'])): ?>
                 <div class="field">
-                    <span class="lbl">ຜູ້ສະໜອງ / Supplier</span>
-                    <span class="val"><?= htmlspecialchars($quotation['supplier_name'] ?: '-') ?></span>
-                    <?php if (!empty($quotation['supplier_contact'])): ?>
-                    <span class="sub"><?= htmlspecialchars($quotation['supplier_contact']) ?></span>
+                    <span class="lbl">ລູກຄ້າທີ່ສະເໜີລາຄາ / Customer</span>
+                    <span class="val"><?= htmlspecialchars($quotation['bid_customer_name']) ?></span>
+                    <?php if (!empty($quotation['bid_customer_contact'])): ?>
+                    <span class="sub"><?= htmlspecialchars($quotation['bid_customer_contact']) ?></span>
                     <?php endif; ?>
                 </div>
+                <?php endif; ?>
+                <?php if (!empty($quotation['customer_name'])): ?>
+                <div class="field<?= empty($quotation['bid_customer_name']) ? '' : ' right' ?>">
+                    <span class="lbl">ລູກຄ້າ / Customer</span>
+                    <span class="val"><?= htmlspecialchars($quotation['customer_name']) ?></span>
+                    <?php if (!empty($quotation['customer_contact'])): ?>
+                    <span class="sub"><?= htmlspecialchars($quotation['customer_contact']) ?></span>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
                 <div class="field right">
                     <span class="lbl">ວັນທີ / Date</span>
                     <span class="val"><?= $quotation['date'] ? date('d/m/Y', strtotime($quotation['date'])) : date('d/m/Y') ?></span>
@@ -404,8 +415,8 @@
             </div>
 
             <div class="footer">
-                <?php if ($supplier && !empty($supplier['address'])): ?>
-                ທີ່ຢູ່: <?= htmlspecialchars($supplier['address']) ?>
+                <?php if ($bidCustomer && !empty($bidCustomer['address'])): ?>
+                ທີ່ຢູ່: <?= htmlspecialchars($bidCustomer['address']) ?>
                 <?php endif; ?>
             </div>
         </div>

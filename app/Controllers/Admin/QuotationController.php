@@ -4,7 +4,7 @@ namespace App\Controllers\Admin;
 
 use App\Models\Quotation;
 use App\Models\Product;
-use App\Models\Supplier;
+use App\Models\BidCustomer;
 use App\Models\Customer;
 
 class QuotationController extends \App\Controllers\BaseController
@@ -34,7 +34,7 @@ class QuotationController extends \App\Controllers\BaseController
     public function create()
     {
         $products = (new Product())->getAll('', [], 0, 0);
-        $suppliers = (new Supplier())->all();
+        $bidCustomers = (new BidCustomer())->all();
         $customers = (new Customer())->all();
         $templates = Quotation::templates();
         $settings = (new \App\Models\Settings())->getAll();
@@ -42,7 +42,7 @@ class QuotationController extends \App\Controllers\BaseController
         return view('pages.admin.quotations.create', [
             'title' => 'ສ້າງໃບສະເໜີລາຄາໃໝ່',
             'products' => $products,
-            'suppliers' => $suppliers,
+            'bidCustomers' => $bidCustomers,
             'customers' => $customers,
             'templates' => $templates,
             'quotation' => null,
@@ -56,11 +56,11 @@ class QuotationController extends \App\Controllers\BaseController
         $data = $_POST;
         $items = [];
 
-        if (!empty($data['supplier_id'])) {
-            $supplier = (new Supplier())->find($data['supplier_id']);
-            if ($supplier) {
-                $data['supplier_name'] = $supplier['name'];
-                $data['supplier_contact'] = ($supplier['contact_person'] ?? '') . ($supplier['phone'] ? ' | ' . $supplier['phone'] : '');
+        if (!empty($data['bid_customer_id'])) {
+            $bidCustomer = (new BidCustomer())->find($data['bid_customer_id']);
+            if ($bidCustomer) {
+                $data['bid_customer_name'] = $bidCustomer['name'];
+                $data['bid_customer_contact'] = ($bidCustomer['contact_person'] ?? '') . ($bidCustomer['phone'] ? ' | ' . $bidCustomer['phone'] : '');
             }
         }
 
@@ -137,7 +137,7 @@ class QuotationController extends \App\Controllers\BaseController
         }
 
         $products = (new Product())->getAll('', [], 0, 0);
-        $suppliers = (new Supplier())->all();
+        $bidCustomers = (new BidCustomer())->all();
         $customers = (new Customer())->all();
         $templates = Quotation::templates();
         $settings = (new \App\Models\Settings())->getAll();
@@ -145,7 +145,7 @@ class QuotationController extends \App\Controllers\BaseController
         return view('pages.admin.quotations.create', [
             'title' => 'ແກ້ໄຂໃບສະເໜີລາຄາ',
             'products' => $products,
-            'suppliers' => $suppliers,
+            'bidCustomers' => $bidCustomers,
             'customers' => $customers,
             'templates' => $templates,
             'quotation' => $quotation,
@@ -168,11 +168,11 @@ class QuotationController extends \App\Controllers\BaseController
         $data = $_POST;
         $items = [];
 
-        if (!empty($data['supplier_id'])) {
-            $supplier = (new Supplier())->find($data['supplier_id']);
-            if ($supplier) {
-                $data['supplier_name'] = $supplier['name'];
-                $data['supplier_contact'] = ($supplier['contact_person'] ?? '') . ($supplier['phone'] ? ' | ' . $supplier['phone'] : '');
+        if (!empty($data['bid_customer_id'])) {
+            $bidCustomer = (new BidCustomer())->find($data['bid_customer_id']);
+            if ($bidCustomer) {
+                $data['bid_customer_name'] = $bidCustomer['name'];
+                $data['bid_customer_contact'] = ($bidCustomer['contact_person'] ?? '') . ($bidCustomer['phone'] ? ' | ' . $bidCustomer['phone'] : '');
             }
         }
 
@@ -246,9 +246,9 @@ class QuotationController extends \App\Controllers\BaseController
 
         $settings = (new \App\Models\Settings())->getAll();
 
-        $supplier = null;
-        if (!empty($quotation['supplier_id'])) {
-            $supplier = (new \App\Models\Supplier())->find($quotation['supplier_id']);
+        $bidCustomer = null;
+        if (!empty($quotation['bid_customer_id'])) {
+            $bidCustomer = (new \App\Models\BidCustomer())->find($quotation['bid_customer_id']);
         }
 
         return view('pages.admin.quotations.print', [
@@ -256,7 +256,7 @@ class QuotationController extends \App\Controllers\BaseController
             'quotation' => $quotation,
             'template' => $template,
             'settings' => $settings,
-            'supplier' => $supplier,
+            'bidCustomer' => $bidCustomer,
             'layout' => false,
         ]);
     }

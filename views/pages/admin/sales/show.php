@@ -75,12 +75,12 @@
                             <i class="fas fa-user text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-extrabold text-foreground"><?= !empty($sale['supplier_name']) ? 'ຂໍ້ມູນຜູ້ສະໜອງ' : 'ຂໍ້ມູນລູກຄ້າ' ?></h2>
+                            <h2 class="text-base font-extrabold text-foreground"><?= !empty($sale['bid_customer_name']) ? 'ຂໍ້ມູນລູກຄ້າທີ່ສະເໜີລາຄາ' : 'ຂໍ້ມູນລູກຄ້າ' ?></h2>
                         </div>
                     </div>
                     <div class="space-y-3">
-                        <?php if (!empty($sale['supplier_name'])): ?>
-                        <p class="text-sm font-bold text-foreground"><i class="fas fa-truck mr-2 text-amber-500"></i><?= htmlspecialchars($sale['supplier_name']) ?></p>
+                        <?php if (!empty($sale['bid_customer_name'])): ?>
+                        <p class="text-sm font-bold text-foreground"><i class="fas fa-truck mr-2 text-amber-500"></i><?= htmlspecialchars($sale['bid_customer_name']) ?></p>
                         <?php else: ?>
                         <p class="text-sm font-bold text-foreground"><?= htmlspecialchars($sale['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></p>
                         <?php if (!empty($sale['customer_phone'])): ?>

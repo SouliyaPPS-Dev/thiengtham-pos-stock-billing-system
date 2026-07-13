@@ -132,16 +132,16 @@ class Sale
                 }
             }
 
-            if (!empty($data['supplier_id']) && empty($data['supplier_name'])) {
-                $stmt = $this->db()->prepare("SELECT name FROM suppliers WHERE id = ?");
-                $stmt->execute([$data['supplier_id']]);
+            if (!empty($data['bid_customer_id']) && empty($data['bid_customer_name'])) {
+                $stmt = $this->db()->prepare("SELECT name FROM bid_customers WHERE id = ?");
+                $stmt->execute([$data['bid_customer_id']]);
                 $sup = $stmt->fetch();
                 if ($sup) {
-                    $data['supplier_name'] = $sup['name'];
+                    $data['bid_customer_name'] = $sup['name'];
                 }
             }
 
-            $stmt = $this->db()->prepare("INSERT INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, supplier_id, supplier_name, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at)
+            $stmt = $this->db()->prepare("INSERT INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, bid_customer_id, bid_customer_name, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at)
                                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
             $stmt->execute([
                 $invoiceNo,
@@ -149,8 +149,8 @@ class Sale
                 $data['customer_name'] ?? '',
                 $data['customer_phone'] ?? '',
                 $data['customer_address'] ?? '',
-                (!empty($data['supplier_id']) ? $data['supplier_id'] : null),
-                $data['supplier_name'] ?? '',
+                (!empty($data['bid_customer_id']) ? $data['bid_customer_id'] : null),
+                $data['bid_customer_name'] ?? '',
                 $data['subtotal'] ?? 0,
                 $data['discount'] ?? 0,
                 $data['discount_type'] ?? 'percent',

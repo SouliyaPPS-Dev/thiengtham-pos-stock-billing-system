@@ -147,20 +147,22 @@
                     </div>
                 </div>
 
+                <?php if (!empty($quotation['bid_customer_name'])): ?>
                 <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">
                     <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-50">
                         <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-violet-400 to-violet-500 flex items-center justify-center text-white shadow-lg shadow-violet-200">
                             <i class="fas fa-truck text-sm"></i>
                         </div>
                         <div>
-                            <h2 class="text-base font-extrabold text-foreground">ຂໍ້ມູນຜູ້ສະໜອງ</h2>
+                            <h2 class="text-base font-extrabold text-foreground">ຂໍ້ມູນລູກຄ້າທີ່ສະເໜີລາຄາ</h2>
                         </div>
                     </div>
-                    <p class="text-sm font-bold text-foreground"><?= htmlspecialchars($quotation['supplier_name'] ?: '-') ?></p>
-                    <?php if (!empty($quotation['supplier_contact'])): ?>
-                    <p class="text-sm text-muted-foreground mt-1"><?= htmlspecialchars($quotation['supplier_contact']) ?></p>
+                    <p class="text-sm font-bold text-foreground"><?= htmlspecialchars($quotation['bid_customer_name']) ?></p>
+                    <?php if (!empty($quotation['bid_customer_contact'])): ?>
+                    <p class="text-sm text-muted-foreground mt-1"><?= htmlspecialchars($quotation['bid_customer_contact']) ?></p>
                     <?php endif; ?>
                 </div>
+                <?php endif; ?>
 
                 <?php if (!empty($quotation['customer_name']) || !empty($quotation['customer_name_resolved'])): ?>
                 <div class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8">

@@ -84,16 +84,16 @@
                 </div>
             </a>
 
-            <a href="<?= url('/admin/suppliers') ?>" class="stat-card border-orange-200 block cursor-pointer hover:shadow-md transition-shadow no-underline">
+            <a href="<?= url('/admin/bid-customers') ?>" class="stat-card border-orange-200 block cursor-pointer hover:shadow-md transition-shadow no-underline">
                 <div class="flex items-center justify-between mb-3 md:mb-4">
                     <div class="w-10 h-10 md:w-12 md:h-12 stat-card-icon bg-gradient-to-br from-orange-50 to-orange-100 text-orange-500 shadow-sm shadow-orange-200/30">
                         <i class="fas fa-truck text-lg md:text-xl"></i>
                     </div>
                 </div>
                 <div class="space-y-1">
-                    <h3 class="text-[11px] md:text-sm font-medium text-muted-foreground">ຜູ້ສະໜອງທັງໝົດ</h3>
-                    <div class="text-2xl md:text-3xl font-black text-foreground"><?= number_format($stats['total_suppliers'] ?? 0) ?></div>
-                    <p class="text-[10px] md:text-xs text-muted-foreground">ຜູ້ສະໜອງໃນລະບົບ</p>
+                    <h3 class="text-[11px] md:text-sm font-medium text-muted-foreground">ລູກຄ້າທີ່ສະເໜີລາຄາທັງໝົດ</h3>
+                    <div class="text-2xl md:text-3xl font-black text-foreground"><?= number_format($stats['total_bid_customers'] ?? 0) ?></div>
+                    <p class="text-[10px] md:text-xs text-muted-foreground">ລູກຄ້າທີ່ສະເໜີລາຄາໃນລະບົບ</p>
                 </div>
             </a>
 

@@ -29,8 +29,8 @@
                     <p class="font-bold text-foreground"><?= htmlspecialchars(date('d/m/Y H:i', strtotime($sale['created_at']))) ?></p>
                 </div>
                 <div>
-                    <p class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1"><?= !empty($sale['supplier_name']) ? 'ຜູ້ສະໜອງ' : 'ລູກຄ້າ' ?></p>
-                    <p class="font-bold text-foreground"><?= !empty($sale['supplier_name']) ? htmlspecialchars($sale['supplier_name']) : htmlspecialchars($sale['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></p>
+                    <p class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1"><?= !empty($sale['bid_customer_name']) ? 'ລູກຄ້າທີ່ສະເໜີລາຄາ' : 'ລູກຄ້າ' ?></p>
+                    <p class="font-bold text-foreground"><?= !empty($sale['bid_customer_name']) ? htmlspecialchars($sale['bid_customer_name']) : htmlspecialchars($sale['customer_name'] ?? 'ລູກຄ້າທົ່ວໄປ') ?></p>
                 </div>
                 <div>
                     <p class="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">ສະຖານະ</p>

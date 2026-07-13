@@ -24,7 +24,7 @@
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-muted-foreground group-focus-within:text-primary transition-colors pointer-events-none">
                         <i class="fas fa-search text-xs"></i>
                     </span>
-                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="ຄົ້ນຫາເລກທີໃບ, ຊື່ຜູ້ສະໜອງ, ເລກອ້າງອີງ..." class="w-full pl-9 pr-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-card text-sm placeholder:text-gray-300">
+                    <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="ຄົ້ນຫາເລກທີໃບ, ຊື່ລູກຄ້າທີ່ສະເໜີລາຄາ, ເລກອ້າງອີງ..." class="w-full pl-9 pr-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all bg-card text-sm placeholder:text-gray-300">
                 </div>
             </form>
 
@@ -34,7 +34,7 @@
                         <tr class="border-b border-border">
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider text-center" style="width:48px">#</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ເລກທີໃບ</th>
-                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ຜູ້ສະໜອງ</th>
+                            <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ລູກຄ້າທີ່ສະເໜີລາຄາ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ລູກຄ້າ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ເລກອ້າງອີງ</th>
                             <th class="py-3 px-2 font-bold text-muted-foreground text-xs uppercase tracking-wider">ວັນທີ</th>
@@ -66,7 +66,7 @@
                                     #<?= htmlspecialchars($q['quotation_number']) ?>
                                 </a>
                             </td>
-                            <td class="py-3 px-2 font-medium text-foreground"><?= htmlspecialchars($q['supplier_name'] ?: '-') ?></td>
+                            <td class="py-3 px-2 font-medium text-foreground"><?= htmlspecialchars($q['bid_customer_name'] ?: '-') ?></td>
                             <td class="py-3 px-2 font-medium text-foreground"><?= htmlspecialchars($q['customer_name'] ?? $q['customer_name_resolved'] ?? '-') ?></td>
                             <td class="py-3 px-2 text-foreground/70"><?= htmlspecialchars($q['ref_no'] ?: '-') ?></td>
                             <td class="py-3 px-2 text-foreground/70"><?= $q['date'] ? date('d/m/Y', strtotime($q['date'])) : '-' ?></td>

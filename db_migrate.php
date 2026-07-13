@@ -120,15 +120,43 @@ function cleanStrayDirs($pdo, $db) {
 }
 cleanStrayDirs($pdo, $db);
 
+// ── rename suppliers table/columns to bid_customers ──
+if (tblExists($pdo, $db, 'suppliers') && !tblExists($pdo, $db, 'bid_customers')) {
+    try {
+        $pdo->exec("RENAME TABLE `suppliers` TO `bid_customers`");
+        logline("renamed suppliers -> bid_customers");
+    } catch (\Exception $e) {
+        logline("FAILED rename suppliers: " . $e->getMessage());
+    }
+}
+if (tblExists($pdo, $db, 'bid_customers')) {
+    $colMap = [
+        'supplier_id'      => 'bid_customer_id',
+        'supplier_name'    => 'bid_customer_name',
+        'supplier_contact' => 'bid_customer_contact',
+    ];
+    foreach ($colMap as $old => $new) {
+        if (colExists($pdo, $db, 'bid_customers', $old) && !colExists($pdo, $db, 'bid_customers', $new)) {
+            try {
+                $pdo->exec("ALTER TABLE `bid_customers` CHANGE COLUMN `$old` `$new` " .
+                    ($old === 'supplier_id' ? 'INT' : 'VARCHAR(200)') . " DEFAULT NULL");
+                logline("renamed bid_customers.$old -> $new");
+            } catch (\Exception $e) {
+                logline("FAILED rename bid_customers.$old: " . $e->getMessage());
+            }
+        }
+    }
+}
+
 // ── quotations: ensure full table, then add any missing new columns ──
 createTable($pdo, $db, 'quotations', "
     CREATE TABLE quotations (
         id INT AUTO_INCREMENT PRIMARY KEY,
         quotation_number VARCHAR(50) NOT NULL UNIQUE,
         company_template VARCHAR(50) NOT NULL DEFAULT 'luang-prabarg',
-        supplier_id INT DEFAULT NULL,
-        supplier_name VARCHAR(200) DEFAULT NULL,
-        supplier_contact VARCHAR(200) DEFAULT NULL,
+        bid_customer_id INT DEFAULT NULL,
+        bid_customer_name VARCHAR(200) DEFAULT NULL,
+        bid_customer_contact VARCHAR(200) DEFAULT NULL,
         customer_id INT DEFAULT NULL,
         customer_name VARCHAR(200) DEFAULT NULL,
         customer_contact VARCHAR(200) DEFAULT NULL,

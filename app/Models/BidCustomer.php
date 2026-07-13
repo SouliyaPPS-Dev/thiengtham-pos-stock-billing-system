@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Core\Database;
 
-class Supplier
+class BidCustomer
 {
     protected function db()
     {
@@ -13,7 +13,7 @@ class Supplier
 
     public function getAll($where = '', $params = [], $limit = 0, $offset = 0)
     {
-        $sql = "SELECT * FROM suppliers";
+        $sql = "SELECT * FROM bid_customers";
 
         if (!empty($where)) {
             $sql .= " WHERE $where";
@@ -34,9 +34,9 @@ class Supplier
         return $stmt->fetchAll();
     }
 
-    public function getTotalSuppliers($where = '', $params = [])
+    public function getTotalBidCustomers($where = '', $params = [])
     {
-        $sql = "SELECT COUNT(*) as total FROM suppliers";
+        $sql = "SELECT COUNT(*) as total FROM bid_customers";
 
         if (!empty($where)) {
             $sql .= " WHERE $where";
@@ -49,14 +49,14 @@ class Supplier
 
     public function getById($id)
     {
-        $stmt = $this->db()->prepare("SELECT * FROM suppliers WHERE id = ?");
+        $stmt = $this->db()->prepare("SELECT * FROM bid_customers WHERE id = ?");
         $stmt->execute([$id]);
         return $stmt->fetch();
     }
 
     public function create($data)
     {
-        $stmt = $this->db()->prepare("INSERT INTO suppliers (name, contact_person, phone, email, address, notes, tax_percent, created_at, updated_at)
+        $stmt = $this->db()->prepare("INSERT INTO bid_customers (name, contact_person, phone, email, address, notes, tax_percent, created_at, updated_at)
                                       VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())");
         $stmt->execute([
             $data['name'],
@@ -86,14 +86,14 @@ class Supplier
         $fields[] = "updated_at = NOW()";
         $params[] = $id;
 
-        $sql = "UPDATE suppliers SET " . implode(', ', $fields) . " WHERE id = ?";
+        $sql = "UPDATE bid_customers SET " . implode(', ', $fields) . " WHERE id = ?";
         $stmt = $this->db()->prepare($sql);
         return $stmt->execute($params);
     }
 
     public function delete($id)
     {
-        $stmt = $this->db()->prepare("DELETE FROM suppliers WHERE id = ?");
+        $stmt = $this->db()->prepare("DELETE FROM bid_customers WHERE id = ?");
         return $stmt->execute([$id]);
     }
 
@@ -115,14 +115,14 @@ class Supplier
 
     public function countAll()
     {
-        return $this->getTotalSuppliers();
+        return $this->getTotalBidCustomers();
     }
 
     public function search($query, $page = 1, $perPage = 20)
     {
         $q = "%{$query}%";
         $offset = ($page - 1) * $perPage;
-        $stmt = $this->db()->prepare("SELECT * FROM suppliers WHERE name LIKE ? OR contact_person LIKE ? OR phone LIKE ?
+        $stmt = $this->db()->prepare("SELECT * FROM bid_customers WHERE name LIKE ? OR contact_person LIKE ? OR phone LIKE ?
                                       ORDER BY name ASC LIMIT ? OFFSET ?");
         $stmt->execute([$q, $q, $q, (int)$perPage, (int)$offset]);
         return $stmt->fetchAll();
@@ -131,7 +131,7 @@ class Supplier
     public function countSearch($query)
     {
         $q = "%{$query}%";
-        $stmt = $this->db()->prepare("SELECT COUNT(*) as total FROM suppliers WHERE name LIKE ? OR contact_person LIKE ? OR phone LIKE ?");
+        $stmt = $this->db()->prepare("SELECT COUNT(*) as total FROM bid_customers WHERE name LIKE ? OR contact_person LIKE ? OR phone LIKE ?");
         $stmt->execute([$q, $q, $q]);
         return (int)$stmt->fetch()['total'];
     }

@@ -18,25 +18,25 @@
                 <!-- Left: Settings -->
                 <div class="space-y-6">
                     <div class="bg-card rounded-2xl border border-border shadow-sm p-6">
-                        <h2 class="text-base font-extrabold text-foreground mb-4">ຂໍ້ມູນຜູ້ສະໜອງ</h2>
+                        <h2 class="text-base font-extrabold text-foreground mb-4">ຂໍ້ມູນລູກຄ້າທີ່ສະເໜີລາຄາ</h2>
                         <div class="space-y-3">
                             <div>
-                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ເລືອກຜູ້ສະໜອງ</label>
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ເລືອກລູກຄ້າທີ່ສະເໜີລາຄາ</label>
                                 <select x-model="supplierId" @change="selectSupplier()" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                     <option value="">-- ເລືອກ --</option>
-                                    <?php foreach ($suppliers as $s): ?>
+                                    <?php foreach ($bidCustomers as $s): ?>
                                     <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <input type="hidden" name="supplier_id" x-model="supplierId">
+                                <input type="hidden" name="bid_customer_id" x-model="supplierId">
                             </div>
                             <div>
-                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ຊື່ຜູ້ສະໜອງ</label>
-                                <input type="text" name="supplier_name" x-model="supplierName" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" required>
+                                <label class="text-xs font-bold text-muted-foreground mb-1 block">ຊື່ລູກຄ້າທີ່ສະເໜີລາຄາ</label>
+                                <input type="text" name="bid_customer_name" x-model="supplierName" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-muted-foreground mb-1 block">ຜູ້ຕິດຕໍ່ / ເບີໂທ</label>
-                                <input type="text" name="supplier_contact" x-model="supplierContact" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                <input type="text" name="bid_customer_contact" x-model="supplierContact" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-muted-foreground mb-1 block">ອາກອນມູນຄ່າເພີ້ມ (VAT %)</label>
@@ -51,7 +51,7 @@
                                     <button type="button" @click="saveSupplierTax()" :disabled="!supplierId" class="px-3 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap" :class="supplierId ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-gray-50 text-gray-300 cursor-not-allowed'">
                                         <i class="fas fa-save mr-1"></i> ບັນທຶກ
                                     </button>
-                                    <span class="text-xs text-muted-foreground ml-1">(ຕັ້ງອັດຕາອາກອນຕາມຜູ້ສະໜອງ)</span>
+                                    <span class="text-xs text-muted-foreground ml-1">(ຕັ້ງອັດຕາອາກອນຕາມລູກຄ້າທີ່ສະເໜີລາຄາ)</span>
                                 </div>
                             </div>
                         </div>
@@ -482,9 +482,9 @@ function quotationForm() {
 
     return {
 
-        supplierId: '<?= $isEdit ? ($quotation['supplier_id'] ?? '') : '' ?>',
-        supplierName: '<?= $isEdit ? htmlspecialchars($quotation['supplier_name'] ?? '', ENT_QUOTES) : '' ?>',
-        supplierContact: '<?= $isEdit ? htmlspecialchars($quotation['supplier_contact'] ?? '', ENT_QUOTES) : '' ?>',
+        supplierId: '<?= $isEdit ? ($quotation['bid_customer_id'] ?? '') : '' ?>',
+        supplierName: '<?= $isEdit ? htmlspecialchars($quotation['bid_customer_name'] ?? '', ENT_QUOTES) : '' ?>',
+        supplierContact: '<?= $isEdit ? htmlspecialchars($quotation['bid_customer_contact'] ?? '', ENT_QUOTES) : '' ?>',
         customerId: '<?= $isEdit ? ($quotation['customer_id'] ?? '') : '' ?>',
         customerName: '<?= $isEdit ? htmlspecialchars($quotation['customer_name'] ?? '', ENT_QUOTES) : '' ?>',
         customerContact: '<?= $isEdit ? htmlspecialchars($quotation['customer_contact'] ?? '', ENT_QUOTES) : '' ?>',
@@ -525,7 +525,7 @@ function quotationForm() {
         },
 
         selectSupplier() {
-            const supplier = <?= json_encode($suppliers ?? []) ?>.find(s => s.id == this.supplierId);
+            const supplier = <?= json_encode($bidCustomers ?? []) ?>.find(s => s.id == this.supplierId);
             if (supplier) {
                 this.supplierName = supplier.name;
                 this.supplierContact = (supplier.contact_person || '') + (supplier.phone ? ' | ' + supplier.phone : '');
@@ -547,14 +547,14 @@ function quotationForm() {
             if (!this.supplierId) return;
             const formData = new FormData();
             formData.append('tax_percent', this.taxPercent);
-            fetch('<?= url('/admin/suppliers') ?>/' + this.supplierId + '/update-tax', {
+            fetch('<?= url('/admin/bid-customers') ?>/' + this.supplierId + '/update-tax', {
                 method: 'POST',
                 body: formData
             })
             .then(r => r.json())
             .then(res => {
                 if (res.success) {
-                    Swal.fire({ icon: 'success', title: 'ບັນທຶກສຳເລັດ', text: 'ບັນທຶກອັດຕາອາກອນໃຫ້ຜູ້ສະໜອງສຳເລັດ', timer: 2500, showConfirmButton: false });
+                    Swal.fire({ icon: 'success', title: 'ບັນທຶກສຳເລັດ', text: 'ບັນທຶກອັດຕາອາກອນໃຫ້ລູກຄ້າທີ່ສະເໜີລາຄາສຳເລັດ', timer: 2500, showConfirmButton: false });
                 }
             });
         },

@@ -111,7 +111,7 @@ CREATE TABLE customer_addresses (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Suppliers (Admin POS)
-CREATE TABLE suppliers (
+CREATE TABLE bid_customers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
     contact_person VARCHAR(100),
@@ -133,8 +133,8 @@ CREATE TABLE sales (
     customer_name VARCHAR(200) DEFAULT NULL,
     customer_phone VARCHAR(20) DEFAULT NULL,
     customer_address TEXT,
-    supplier_id INT DEFAULT NULL,
-    supplier_name VARCHAR(200) DEFAULT NULL,
+    bid_customer_id INT DEFAULT NULL,
+    bid_customer_name VARCHAR(200) DEFAULT NULL,
     subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
     discount DECIMAL(12,2) NOT NULL DEFAULT 0,
     discount_type ENUM('percent', 'fixed') DEFAULT 'fixed',
@@ -149,7 +149,7 @@ CREATE TABLE sales (
     created_by INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
-    FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL,
+    FOREIGN KEY (bid_customer_id) REFERENCES bid_customers(id) ON DELETE SET NULL,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_invoice (invoice_number),
     INDEX idx_date (created_at)
@@ -377,8 +377,8 @@ INSERT INTO customer_addresses (customer_id, label, recipient_name, phone, addre
     (1, 'ຫ້ອງການ', 'ສຸລິຍາ ວົງສະຫວັດ', '020 55667788', 'ຕຶກລາວໄອທີ ຊັ້ນ 3 ຫ້ອງ 302', 'ນະຄອນຫຼວງວຽງຈັນ', 'ໄຊເສດຖາ', 'ສະພັນທະ', 0),
     (2, 'ບ້ານ', 'ອະນຸສາ ແກ້ວມະນີ', '020 99887766', 'ບ້ານສະພັນທະ ໃກ້ໂຮງຮຽນ', 'ນະຄອນຫຼວງວຽງຈັນ', 'ໄຊເສດຖາ', 'ສະພັນທະ', 1);
 
--- Insert sample suppliers
-INSERT INTO suppliers (name, contact_person, phone, email, address, notes, status, created_at) VALUES
+-- Insert sample bid_customers
+INSERT INTO bid_customers (name, contact_person, phone, email, address, notes, status, created_at) VALUES
     (' CH.KARNCHANG(LAO)COMPANY LIMITED', 'ທ້າວ ສົມຊາຍ', '020 12345678', 'info@laowater.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສົ່ງທຸກວັນຈັນ ແລະ ວັນພະຫັດ', 'Active', '2026-01-15 08:00:00'),
     ('XAYABURI POWER COMPANY LIMITED', 'ນາງ ມາລິກາ', '020 23456789', 'order@thailaoshop.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສິນຄ້າອຸປະໂພກ ແລະ ບໍລິໂພກ', 'Active', '2026-02-01 09:00:00'),
     ('NAM NGUM 2 POWER COMPANY LIMITED', 'ທ້າວ ບຸນມີ', '020 34567890', 'vte.dist@example.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສົ່ງຟຣີເມື່ອສັ່ງ 500,000 ກີບຂຶ້ນໄປ', 'Active', '2026-02-15 10:00:00');
@@ -472,9 +472,9 @@ CREATE TABLE quotations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     quotation_number VARCHAR(50) NOT NULL UNIQUE,
     company_template VARCHAR(50) NOT NULL DEFAULT 'luang-prabarg',
-    supplier_id INT DEFAULT NULL,
-    supplier_name VARCHAR(200) DEFAULT NULL,
-    supplier_contact VARCHAR(200) DEFAULT NULL,
+    bid_customer_id INT DEFAULT NULL,
+    bid_customer_name VARCHAR(200) DEFAULT NULL,
+    bid_customer_contact VARCHAR(200) DEFAULT NULL,
     customer_id INT DEFAULT NULL,
     customer_name VARCHAR(200) DEFAULT NULL,
     customer_contact VARCHAR(200) DEFAULT NULL,
@@ -493,7 +493,7 @@ CREATE TABLE quotations (
     created_by INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL,
+    FOREIGN KEY (bid_customer_id) REFERENCES bid_customers(id) ON DELETE SET NULL,
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_quotation_number (quotation_number),
@@ -528,7 +528,7 @@ CREATE TABLE quotation_history (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Insert sample quotation (from live database)
-INSERT INTO quotations (quotation_number, company_template, supplier_id, supplier_name, supplier_contact, ref_no, date, subtotal, discount, tax_percent, tax_amount, grand_total, notes, terms, status, created_by, created_at) VALUES
+INSERT INTO quotations (quotation_number, company_template, bid_customer_id, bid_customer_name, bid_customer_contact, ref_no, date, subtotal, discount, tax_percent, tax_amount, grand_total, notes, terms, status, created_by, created_at) VALUES
     ('QTN-20260706-0001', 'luang-prabarg', 1, ' CH.KARNCHANG(LAO)COMPANY LIMITED', 'ທ້າວ ສົມຊາຍ | 020 12345678', 'QUO-1400-2026-06-0010', '2026-07-06', 171000, 0, 10, 17100, 188100, '', '', 'Draft', NULL, '2026-07-06 10:57:54');
 
 INSERT INTO quotation_items (quotation_id, product_id, product_name, quantity, unit, unit_price, amount) VALUES
@@ -547,6 +547,6 @@ INSERT INTO quotation_items (quotation_id, product_id, product_name, quantity, u
 -- Migration for existing databases: add supplier columns to sales table
 -- ==========================================================================
 -- ALTER TABLE sales
---   ADD COLUMN supplier_id INT DEFAULT NULL AFTER customer_address,
---   ADD COLUMN supplier_name VARCHAR(200) DEFAULT NULL AFTER supplier_id,
---   ADD FOREIGN KEY (supplier_id) REFERENCES suppliers(id) ON DELETE SET NULL;
+--   ADD COLUMN bid_customer_id INT DEFAULT NULL AFTER customer_address,
+--   ADD COLUMN bid_customer_name VARCHAR(200) DEFAULT NULL AFTER bid_customer_id,
+--   ADD FOREIGN KEY (bid_customer_id) REFERENCES bid_customers(id) ON DELETE SET NULL;

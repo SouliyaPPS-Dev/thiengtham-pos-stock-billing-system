@@ -2,38 +2,38 @@
     <div class="max-w-2xl mx-auto space-y-6 animate-fade-in">
 
         <div class="flex items-center gap-4">
-            <a href="<?= url('/admin/suppliers') ?>" class="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-muted-foreground hover:bg-gray-200 transition-all">
+            <a href="<?= url('/admin/bid-customers') ?>" class="h-10 w-10 rounded-xl bg-gray-100 flex items-center justify-center text-muted-foreground hover:bg-gray-200 transition-all">
                 <i class="fas fa-arrow-left"></i>
             </a>
             <div>
-                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">ແກ້ໄຂຜູ້ສະໜອງ</h1>
-                <p class="text-sm text-muted-foreground mt-0.5">ແກ້ໄຂຂໍ້ມູນຜູ້ສະໜອງ</p>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">ເພີ່ມລູກຄ້າທີ່ສະເໜີລາຄາໃໝ່</h1>
+                <p class="text-sm text-muted-foreground mt-0.5">ສ້າງຂໍ້ມູນລູກຄ້າທີ່ສະເໜີລາຄາໃໝ່</p>
             </div>
         </div>
 
-        <form action="<?= url('/admin/suppliers/' . $supplier['id'] . '/update') ?>" method="POST" class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8 space-y-5">
+        <form action="<?= url('/admin/bid-customers/store') ?>" method="POST" class="bg-card rounded-2xl border border-border shadow-sm p-6 md:p-8 space-y-5">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="space-y-1.5">
-                    <label class="text-sm font-bold text-foreground/85">ຊື່ຜູ້ສະໜອງ <span class="text-red-400">*</span></label>
-                    <input type="text" name="name" required value="<?= htmlspecialchars($supplier['name']) ?>"
+                    <label class="text-sm font-bold text-foreground/85">ຊື່ລູກຄ້າທີ່ສະເໜີລາຄາ <span class="text-red-400">*</span></label>
+                    <input type="text" name="name" required value="<?= htmlspecialchars($_POST['name'] ?? '') ?>"
                            class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
-                           placeholder="ຊື່ຜູ້ສະໜອງ">
+                           placeholder="ຊື່ລູກຄ້າທີ່ສະເໜີລາຄາ">
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-sm font-bold text-foreground/85">ຜູ້ຕິດຕໍ່</label>
-                    <input type="text" name="contact_person" value="<?= htmlspecialchars($supplier['contact_person'] ?? '') ?>"
+                    <input type="text" name="contact_person" value="<?= htmlspecialchars($_POST['contact_person'] ?? '') ?>"
                            class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
                            placeholder="ຊື່ຜູ້ຕິດຕໍ່">
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-sm font-bold text-foreground/85">ເບີໂທ <span class="text-red-400">*</span></label>
-                    <input type="text" name="phone" required value="<?= htmlspecialchars($supplier['phone'] ?? '') ?>"
+                    <input type="text" name="phone" required value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>"
                            class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
                            placeholder="ເບີໂທລະສັບ">
                 </div>
                 <div class="space-y-1.5">
                     <label class="text-sm font-bold text-foreground/85">ອີເມວ</label>
-                    <input type="email" name="email" value="<?= htmlspecialchars($supplier['email'] ?? '') ?>"
+                    <input type="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
                            class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
                            placeholder="ອີເມວ">
                 </div>
@@ -41,34 +41,33 @@
 
             <div class="space-y-1.5">
                 <label class="text-sm font-bold text-foreground/85">ທີ່ຢູ່</label>
-                <textarea name="address" rows="3" class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none" placeholder="ທີ່ຢູ່"><?= htmlspecialchars($supplier['address'] ?? '') ?></textarea>
+                <textarea name="address" rows="3" class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none" placeholder="ທີ່ຢູ່"><?= htmlspecialchars($_POST['address'] ?? '') ?></textarea>
             </div>
 
             <div class="space-y-1.5">
                 <label class="text-sm font-bold text-foreground/85">ອາກອນມູນຄ່າເພີ່ມ (VAT %)</label>
-                <input type="number" name="tax_percent" step="0.01" min="0" max="100" value="<?= htmlspecialchars($supplier['tax_percent'] ?? '10') ?>"
+                <input type="number" name="tax_percent" step="0.01" min="0" max="100" value="<?= htmlspecialchars($_POST['tax_percent'] ?? '10') ?>"
                        class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm"
                        placeholder="10">
             </div>
             <div class="space-y-1.5">
                 <label class="text-sm font-bold text-foreground/85">ຫມາຍເຫດ</label>
-                <textarea name="notes" rows="2" class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none" placeholder="ຫມາຍເຫດ"><?= htmlspecialchars($supplier['notes'] ?? '') ?></textarea>
+                <textarea name="notes" rows="2" class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm resize-none" placeholder="ຫມາຍເຫດ"><?= htmlspecialchars($_POST['notes'] ?? '') ?></textarea>
             </div>
-
             <div class="space-y-1.5">
                 <label class="text-sm font-bold text-foreground/85">ສະຖານະ</label>
                 <select name="status" class="w-full px-4 py-2.5 border border-border rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none text-sm">
-                    <option value="Active" <?= ($supplier['status'] ?? 'Active') === 'Active' ? 'selected' : '' ?>>ເປີດໃຊ້</option>
-                    <option value="Inactive" <?= ($supplier['status'] ?? '') === 'Inactive' ? 'selected' : '' ?>>ປິດໃຊ້</option>
+                    <option value="Active" selected>ເປີດໃຊ້</option>
+                    <option value="Inactive">ປິດໃຊ້</option>
                 </select>
             </div>
 
             <div class="flex items-center gap-3 pt-2">
                 <button type="submit" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-200 active:scale-[0.97]">
                     <i class="fas fa-save"></i>
-                    ບັນທຶກການແກ້ໄຂ
+                    ບັນທຶກ
                 </button>
-                <a href="<?= url('/admin/suppliers') ?>" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-foreground/85 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">
+                <a href="<?= url('/admin/bid-customers') ?>" class="inline-flex items-center gap-2 px-6 py-2.5 bg-gray-100 text-foreground/85 rounded-xl font-bold text-sm hover:bg-gray-200 transition-all">
                     <i class="fas fa-times"></i>
                     ຍົກເລີກ
                 </a>

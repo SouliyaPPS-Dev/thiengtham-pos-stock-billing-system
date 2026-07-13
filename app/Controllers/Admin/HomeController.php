@@ -5,7 +5,7 @@ namespace App\Controllers\Admin;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\Customer;
-use App\Models\Supplier;
+use App\Models\BidCustomer;
 
 class HomeController extends \App\Controllers\BaseController
 {
@@ -14,7 +14,7 @@ class HomeController extends \App\Controllers\BaseController
         $productModel = new Product();
         $saleModel = new Sale();
         $customerModel = new Customer();
-        $supplierModel = new Supplier();
+        $bidCustomerModel = new BidCustomer();
 
         $hasFrom = !empty($_GET['from_date']);
         $hasTo = !empty($_GET['to_date']);
@@ -30,7 +30,7 @@ class HomeController extends \App\Controllers\BaseController
             'low_stock' => $productModel->getLowStockCount(),
             'sales_today' => $saleModel->getTodayTotal(),
             'total_customers' => $customerModel->getTotalCustomers(),
-            'total_suppliers' => $supplierModel->getTotalSuppliers(),
+            'total_bid_customers' => $bidCustomerModel->getTotalBidCustomers(),
             'recent_sales' => $saleModel->getRecent(10),
             'popular_products' => $saleModel->getPopularProducts(5),
             'sales_by_day' => $saleModel->getSalesByDay($chartFrom, $chartTo),
