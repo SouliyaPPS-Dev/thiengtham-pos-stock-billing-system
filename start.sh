@@ -15,7 +15,7 @@ compute_native_hash() {
     local s1
     s1=$(printf '%s' "$pass" | sha1sum | awk '{print $1}')
     local s2
-    s2=$(printf '%s' "$s1" | sha1sum | awk '{print toupper($0)}')
+    s2=$(printf '%s' "$s1" | sha1sum | awk '{print toupper($1)}')
     echo "*${s2}"
 }
 
@@ -87,13 +87,16 @@ fi
 #    PHP connects via TCP to 127.0.0.1, so it looks up root@127.0.0.1.
 #    We use unix_socket auth (connects as root OS user, no password)
 #    to create root@127.0.0.1 with mysql_native_password plugin.
+#
+#    Must DROP+CREATE (not CREATE IF NOT EXISTS) because existing
+#    users from prior deploys may have wrong plugin (unix_socket)
+#    or wrong password hash. DROP IF EXISTS is safe before CREATE.
 # ============================================================
-# Connect via socket using unix_socket auth (no password needed)
 MYSQL_CMD="mysql --socket=$MYSQL_SOCK -u root"
 
 echo "[start.sh] Setting up TCP auth for root@127.0.0.1..."
 
-# Step 3a: Switch root@localhost to mysql_native_password + hash
+# Step 3a: Switch root@localhost to mysql_native_password + correct hash
 echo "[start.sh] Switching root@localhost to mysql_native_password..."
 $MYSQL_CMD $MYSQL_CHARSET -e "
 UPDATE mysql.global_priv
@@ -106,18 +109,23 @@ WHERE User = 'root' AND Host = 'localhost';
 FLUSH PRIVILEGES;
 " && echo "[start.sh] root@localhost updated." || echo "[start.sh] WARNING: root@localhost update failed."
 
-# Step 3b: Create root@127.0.0.1 with mysql_native_password
-echo "[start.sh] Creating root@127.0.0.1..."
+# Step 3b: Recreate root@127.0.0.1 with mysql_native_password
+# DROP IF EXISTS first to clear any stale entries with wrong plugin/hash
+echo "[start.sh] Recreating root@127.0.0.1..."
 $MYSQL_CMD $MYSQL_CHARSET -e "
-CREATE USER IF NOT EXISTS 'root'@'127.0.0.1' IDENTIFIED VIA mysql_native_password USING '${MYSQL_NATIVE_HASH}';
+DROP USER IF EXISTS 'root'@'127.0.0.1';
+CREATE USER 'root'@'127.0.0.1' IDENTIFIED VIA mysql_native_password USING '${MYSQL_NATIVE_HASH}';
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'127.0.0.1' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
 " && echo "[start.sh] root@127.0.0.1 created." || echo "[start.sh] WARNING: root@127.0.0.1 creation failed."
 
-# Step 3c: Create root@% with mysql_native_password
-echo "[start.sh] Creating root@%..."
+# Step 3c: Recreate root@% with mysql_native_password
+echo "[start.sh] Recreating root@%..."
 $MYSQL_CMD $MYSQL_CHARSET -e "
-CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED VIA mysql_native_password USING '${MYSQL_NATIVE_HASH}';
+DROP USER IF EXISTS 'root'@'%';
+CREATE USER 'root'@'%' IDENTIFIED VIA mysql_native_password USING '${MYSQL_NATIVE_HASH}';
 GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
 " && echo "[start.sh] root@% created." || echo "[start.sh] WARNING: root@% creation failed."
 
 # Step 3d: Verify
