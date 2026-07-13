@@ -101,50 +101,74 @@ fi
 echo "[start.sh] Database '${MYSQL_DATABASE}' ready."
 
 # ============================================================
-# 4. Import database schema (with correct UTF-8 charset)
-# ============================================================
-SCHEMA_VERSION_FILE="/data/.schema_imported"
-
-if [ -f "$DB_SCHEMA" ]; then
-    # Force re-import if flag file is missing (e.g. first deploy or data corruption fix)
-    if [ ! -f "$SCHEMA_VERSION_FILE" ]; then
-        echo "[start.sh] Importing database schema from database.sql..."
-        $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" < "$DB_SCHEMA"
-        date > "$SCHEMA_VERSION_FILE"
-        echo "[start.sh] Database schema imported successfully."
-    else
-        echo "[start.sh] Database schema already imported. Skipping."
-    fi
-else
-    echo "[start.sh] WARNING: database.sql not found. Skipping schema import."
-fi
-
-# ============================================================
 # 4a. Remove stray per-table directories in the MySQL data dir.
 #     InnoDB tables are stored as files (table.frm / table.ibd),
 #     never as directories. A leftover directory named like a table
 #     (e.g. `quotations/`, sometimes with nested junk inside) shadows
 #     the real table and makes every ALTER/CREATE fail with
-#     errno 21 "Is a directory". Remove any such stray dir. Runs as
-#     root at container start, before the schema sync.
+#     errno 21 "Is a directory". Remove ALL non-system directories
+#     BEFORE schema import and migration so both can proceed.
 # ============================================================
 DB_DATADIR="$MYSQL_DATA_DIR/$MYSQL_DATABASE"
 if [ -d "$DB_DATADIR" ]; then
     for entry in "$DB_DATADIR"/*/; do
         [ -d "$entry" ] || continue
         name="$(basename "$entry")"
+        case "$name" in
+            mysql|performance_schema|information_schema|sys) continue ;;
+        esac
         if [ -f "$DB_DATADIR/$name.frm" ] || [ -f "$DB_DATADIR/$name.ibd" ]; then
-            echo "[start.sh] Removing stray table directory: $name"
+            echo "[start.sh] Removing stray table directory (has sibling .frm/.ibd): $name"
+            rm -rf "$entry"
+        fi
+    done
+    for entry in "$DB_DATADIR"/*/; do
+        [ -d "$entry" ] || continue
+        name="$(basename "$entry")"
+        case "$name" in
+            mysql|performance_schema|information_schema|sys) continue ;;
+        esac
+        if ! $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" -e "SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='$MYSQL_DATABASE' AND TABLE_NAME='$name' LIMIT 1" >/dev/null 2>&1; then
+            echo "[start.sh] Removing orphan data-dir (no such table): $name"
             rm -rf "$entry"
         fi
     done
 fi
 
 # ============================================================
-# 4b. Idempotent bucket-DB schema sync (robust PHP runner).
-#     database.sql is imported only once; this guarantees any
-#     missing columns/tables (e.g. quotations.customer_id,
-#     quotation_history) are added on EVERY startup. PDO-based,
+# 4b. Import database schema (with correct UTF-8 charset)
+#    Always re-import because database.sql is now fully idempotent
+#    (CREATE DATABASE IF NOT EXISTS, CREATE TABLE IF NOT EXISTS,
+#    INSERT IGNORE). This guarantees any missing columns added by
+#    new schema versions are present even on existing bucket data.
+#    Priority: bucket mount (/data/database.sql) > repo (/var/www/html/database.sql)
+# ============================================================
+DB_SCHEMA_REPO="/var/www/html/database.sql"
+DB_SCHEMA_BUCKET="/data/database.sql"
+if [ -f "$DB_SCHEMA_BUCKET" ]; then
+    DB_SCHEMA="$DB_SCHEMA_BUCKET"
+    echo "[start.sh] Using database.sql from bucket: $DB_SCHEMA_BUCKET"
+elif [ -f "$DB_SCHEMA_REPO" ]; then
+    DB_SCHEMA="$DB_SCHEMA_REPO"
+    echo "[start.sh] Using database.sql from repo: $DB_SCHEMA_REPO"
+else
+    DB_SCHEMA=""
+fi
+
+if [ -n "$DB_SCHEMA" ]; then
+    echo "[start.sh] Importing database schema from $DB_SCHEMA (idempotent)..."
+    $MYSQL_CMD -p"$MYSQL_ROOT_PASSWORD" $MYSQL_CHARSET "$MYSQL_DATABASE" < "$DB_SCHEMA" \
+        && echo "[start.sh] Database schema imported successfully." \
+        || echo "[start.sh] Database schema import had warnings (may be OK on existing data)."
+else
+    echo "[start.sh] WARNING: database.sql not found in repo or bucket. Skipping schema import."
+fi
+
+# ============================================================
+# 4c. Idempotent bucket-DB schema sync (robust PHP runner).
+#     database.sql handles CREATE TABLE IF NOT EXISTS; db_migrate.php
+#     handles adding any columns that were added in newer code versions.
+#     Runs on EVERY startup to catch schema drift. PDO-based,
 #     guarded + try/catch, so it never fails the container start.
 # ============================================================
 echo "[start.sh] Syncing bucket DB schema (idempotent)..."

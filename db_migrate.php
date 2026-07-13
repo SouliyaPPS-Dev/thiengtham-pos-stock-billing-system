@@ -68,6 +68,17 @@ function addIdx($pdo, $db, $t, $i, $def) {
     catch (\Exception $e) { logline("idx skip $i: " . $e->getMessage()); }
 }
 
+function addFk($pdo, $db, $t, $fkName, $def) {
+    if (fkExists($pdo, $db, $t, $fkName)) { logline("fk exists $fkName"); return; }
+    try { $pdo->exec("ALTER TABLE `$t` ADD CONSTRAINT `$fkName` $def"); logline("fk added $fkName"); }
+    catch (\Exception $e) { logline("fk skip $fkName: " . $e->getMessage()); }
+}
+
+function fkExists($pdo, $db, $t, $fkName) {
+    $r = $pdo->query("SELECT 1 FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = " . $pdo->quote($db) . " AND TABLE_NAME = " . $pdo->quote($t) . " AND CONSTRAINT_NAME = " . $pdo->quote($fkName) . " AND CONSTRAINT_TYPE = 'FOREIGN KEY'")->fetch();
+    return (bool)$r;
+}
+
 function createTable($pdo, $db, $t, $sql) {
     if (tblExists($pdo, $db, $t)) { logline("table exists $t"); return; }
     try { $pdo->exec($sql); logline("created $t"); }
@@ -180,11 +191,27 @@ createTable($pdo, $db, 'quotations', "
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ");
 
-addCol($pdo, $db, 'quotations', 'customer_id',          'INT DEFAULT NULL');
-addCol($pdo, $db, 'quotations', 'customer_name',        'VARCHAR(200) DEFAULT NULL');
-addCol($pdo, $db, 'quotations', 'customer_contact',     'VARCHAR(200) DEFAULT NULL');
-addCol($pdo, $db, 'quotations', 'expiry_date',          'DATE DEFAULT NULL');
-addCol($pdo, $db, 'quotations', 'converted_to_sale_id', 'INT DEFAULT NULL');
+// CRITICAL: these columns are required by the PHP Quotation model.
+// If addCol fails (e.g. stray directory), try again after another cleanup.
+$criticalCols = [
+    'customer_id'          => 'INT DEFAULT NULL',
+    'customer_name'        => 'VARCHAR(200) DEFAULT NULL',
+    'customer_contact'     => 'VARCHAR(200) DEFAULT NULL',
+    'expiry_date'          => 'DATE DEFAULT NULL',
+    'converted_to_sale_id' => 'INT DEFAULT NULL',
+    'bid_customer_id'      => 'INT DEFAULT NULL',
+    'bid_customer_name'    => 'VARCHAR(200) DEFAULT NULL',
+    'bid_customer_contact' => 'VARCHAR(200) DEFAULT NULL',
+    'company_template'     => "VARCHAR(50) NOT NULL DEFAULT 'luang-prabarg'",
+    'ref_no'               => 'VARCHAR(100) DEFAULT NULL',
+];
+foreach ($criticalCols as $col => $def) {
+    if (!colExists($pdo, $db, 'quotations', $col)) {
+        logline("RETRY: $col missing, cleaning stray dirs and retrying...");
+        cleanStrayDirs($pdo, $db);
+    }
+    addCol($pdo, $db, 'quotations', $col, $def);
+}
 addIdx($pdo, $db, 'quotations', 'idx_converted', '(converted_to_sale_id)');
 
 // ── quotation_items ──
@@ -216,9 +243,58 @@ createTable($pdo, $db, 'quotation_history', "
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ");
 
-$ok = colExists($pdo, $db, 'quotations', 'customer_id');
-logline($ok ? "MIGRATION DONE (customer_id present)" : "MIGRATION DONE (WARNING: customer_id still missing)");
+// ── add missing columns to quotation_history ──
+addCol($pdo, $db, 'quotation_history', 'old_status', 'VARCHAR(50) DEFAULT NULL');
+addCol($pdo, $db, 'quotation_history', 'new_status', 'VARCHAR(50) DEFAULT NULL');
+addCol($pdo, $db, 'quotation_history', 'notes', 'TEXT');
+addCol($pdo, $db, 'quotation_history', 'performed_by', 'INT DEFAULT NULL');
+addCol($pdo, $db, 'quotation_history', 'created_at', 'TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
+
+// ── add missing columns to quotation_items ──
+addCol($pdo, $db, 'quotation_items', 'unit', "VARCHAR(50) DEFAULT 'SET'");
+addCol($pdo, $db, 'quotation_items', 'amount', 'DECIMAL(12,2) NOT NULL DEFAULT 0');
+
+// ── ensure foreign keys on quotation_items ──
+addFk($pdo, $db, 'quotation_items', 'fk_qi_quotation', 'FOREIGN KEY (quotation_id) REFERENCES quotations(id) ON DELETE CASCADE');
+addFk($pdo, $db, 'quotation_items', 'fk_qi_product', 'FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL');
+
+// ── ensure foreign keys on quotation_history ──
+addFk($pdo, $db, 'quotation_history', 'fk_qh_quotation', 'FOREIGN KEY (quotation_id) REFERENCES quotations(id) ON DELETE CASCADE');
+addFk($pdo, $db, 'quotation_history', 'fk_qh_performed_by', 'FOREIGN KEY (performed_by) REFERENCES users(id) ON DELETE SET NULL');
+
+// ── ensure foreign keys on quotations ──
+addFk($pdo, $db, 'quotations', 'fk_q_bid_customer', 'FOREIGN KEY (bid_customer_id) REFERENCES bid_customers(id) ON DELETE SET NULL');
+addFk($pdo, $db, 'quotations', 'fk_q_customer', 'FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL');
+addFk($pdo, $db, 'quotations', 'fk_q_created_by', 'FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL');
+
+// Final verification: check all critical columns exist
+$requiredCols = ['customer_id', 'customer_name', 'customer_contact', 'expiry_date', 'converted_to_sale_id', 'bid_customer_id'];
+$missing = [];
+foreach ($requiredCols as $c) {
+    if (!colExists($pdo, $db, 'quotations', $c)) $missing[] = $c;
+}
+if (empty($missing)) {
+    logline("MIGRATION DONE - all critical quotation columns present");
+} else {
+    logline("MIGRATION WARNING: missing columns in quotations: " . implode(', ', $missing));
+    logline("Attempting emergency cleanup of stray data dirs...");
+    cleanStrayDirs($pdo, $db);
+    foreach ($missing as $c) {
+        $def = $criticalCols[$c] ?? 'VARCHAR(200) DEFAULT NULL';
+        addCol($pdo, $db, 'quotations', $c, $def);
+    }
+    // Re-check
+    $stillMissing = [];
+    foreach ($requiredCols as $c) {
+        if (!colExists($pdo, $db, 'quotations', $c)) $stillMissing[] = $c;
+    }
+    if (empty($stillMissing)) {
+        logline("RECOVERY SUCCESS - all columns now present after emergency cleanup");
+    } else {
+        logline("RECOVERY FAILED: still missing: " . implode(', ', $stillMissing));
+    }
+}
 $out = ob_get_clean();
 echo $out;
 @file_put_contents($MIGRATE_LOG, date('c') . "\n" . $out);
-exit($ok ? 0 : 0);
+exit(0);

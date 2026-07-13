@@ -1,13 +1,13 @@
 -- POS Stock Billing System + E-Commerce Database Schema
 -- Database: if0_42353445_thiengtham
 -- Supports two systems: /admin (POS) and / (E-commerce)
+-- Idempotent: safe to re-run on Hugging Face Spaces persistent storage
 
-DROP DATABASE IF EXISTS if0_42353445_thiengtham;
-CREATE DATABASE if0_42353445_thiengtham CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS if0_42353445_thiengtham CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE if0_42353445_thiengtham;
 
 -- Users / Staff (Admin POS only)
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Categories (shared)
-CREATE TABLE categories (
+CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     slug VARCHAR(100) DEFAULT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE categories (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Products (shared between POS and E-commerce)
-CREATE TABLE products (
+CREATE TABLE IF NOT EXISTS products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
     slug VARCHAR(200) DEFAULT NULL,
@@ -61,7 +61,7 @@ CREATE TABLE products (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Product Images Gallery (E-commerce)
-CREATE TABLE product_images (
+CREATE TABLE IF NOT EXISTS product_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
     image VARCHAR(255) NOT NULL,
@@ -71,7 +71,7 @@ CREATE TABLE product_images (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Customers (shared)
-CREATE TABLE customers (
+CREATE TABLE IF NOT EXISTS customers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     fullname VARCHAR(100) NOT NULL,
     phone VARCHAR(20) DEFAULT NULL,
@@ -93,7 +93,7 @@ CREATE TABLE customers (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Customer Addresses (E-commerce)
-CREATE TABLE customer_addresses (
+CREATE TABLE IF NOT EXISTS customer_addresses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT NOT NULL,
     label VARCHAR(50) DEFAULT 'ບ້ານ',
@@ -111,7 +111,7 @@ CREATE TABLE customer_addresses (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Bid Customers (Admin POS)
-CREATE TABLE bid_customers (
+CREATE TABLE IF NOT EXISTS bid_customers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
     contact_person VARCHAR(100),
@@ -126,7 +126,7 @@ CREATE TABLE bid_customers (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Sales / Invoices (Admin POS)
-CREATE TABLE sales (
+CREATE TABLE IF NOT EXISTS sales (
     id INT AUTO_INCREMENT PRIMARY KEY,
     invoice_number VARCHAR(50) NOT NULL UNIQUE,
     customer_id INT DEFAULT NULL,
@@ -156,7 +156,7 @@ CREATE TABLE sales (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Sale Items (Admin POS)
-CREATE TABLE sale_items (
+CREATE TABLE IF NOT EXISTS sale_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sale_id INT NOT NULL,
     product_id INT DEFAULT NULL,
@@ -170,7 +170,7 @@ CREATE TABLE sale_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- E-commerce Orders
-CREATE TABLE orders (
+CREATE TABLE IF NOT EXISTS orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_number VARCHAR(50) NOT NULL UNIQUE,
     customer_id INT DEFAULT NULL,
@@ -200,7 +200,7 @@ CREATE TABLE orders (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Order Items (E-commerce)
-CREATE TABLE order_items (
+CREATE TABLE IF NOT EXISTS order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
     product_id INT DEFAULT NULL,
@@ -214,7 +214,7 @@ CREATE TABLE order_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Shopping Cart (E-commerce)
-CREATE TABLE cart_items (
+CREATE TABLE IF NOT EXISTS cart_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     session_id VARCHAR(100) DEFAULT NULL,
     customer_id INT DEFAULT NULL,
@@ -229,7 +229,7 @@ CREATE TABLE cart_items (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Expenses (Admin POS)
-CREATE TABLE expenses (
+CREATE TABLE IF NOT EXISTS expenses (
     id INT AUTO_INCREMENT PRIMARY KEY,
     expense_date DATE NOT NULL,
     category_id INT DEFAULT NULL,
@@ -241,7 +241,7 @@ CREATE TABLE expenses (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Expense Categories
-CREATE TABLE expense_categories (
+CREATE TABLE IF NOT EXISTS expense_categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
@@ -249,7 +249,7 @@ CREATE TABLE expense_categories (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Payment Methods (Admin POS)
-CREATE TABLE payment_methods (
+CREATE TABLE IF NOT EXISTS payment_methods (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     details TEXT,
@@ -258,7 +258,7 @@ CREATE TABLE payment_methods (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Settings (key-value, shared)
-CREATE TABLE settings (
+CREATE TABLE IF NOT EXISTS settings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     setting_key VARCHAR(100) NOT NULL UNIQUE,
     setting_value TEXT,
@@ -266,7 +266,7 @@ CREATE TABLE settings (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- E-commerce Banners
-CREATE TABLE banners (
+CREATE TABLE IF NOT EXISTS banners (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) DEFAULT NULL,
     subtitle VARCHAR(500) DEFAULT NULL,
@@ -278,7 +278,7 @@ CREATE TABLE banners (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- E-commerce Promotions / Sponsors
-CREATE TABLE promotions (
+CREATE TABLE IF NOT EXISTS promotions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) DEFAULT NULL,
     image VARCHAR(255) NOT NULL,
@@ -362,29 +362,29 @@ INSERT INTO products (name, slug, sku, category_id, cost_price, selling_price, s
 ON DUPLICATE KEY UPDATE name = name;
 
 -- Insert sample customers (password: 123456)
-INSERT INTO customers (fullname, phone, email, password, address, province, district, village, status, created_at) VALUES
+INSERT IGNORE INTO customers (fullname, phone, email, password, address, province, district, village, status, created_at) VALUES
     ('ສຸລິຍາ ວົງສະຫວັດ', '020 55667788', 'suriya@example.com', '$2y$10$jqUyvZnfaFvtc/F/cgTWG.ziCX4F/yjYmIy61xGd1fT9xpHCjEbei', 'ບ້ານໂພນສີໄຄ', 'ນະຄອນຫຼວງວຽງຈັນ', 'ຈັນທະບູລີ', 'ໂພນສີໄຄ', 'Active', '2026-06-25 10:30:00'),
     ('ອະນຸສາ ແກ້ວມະນີ', '020 99887766', 'anousa@example.com', '$2y$10$jqUyvZnfaFvtc/F/cgTWG.ziCX4F/yjYmIy61xGd1fT9xpHCjEbei', 'ບ້ານສະພັນທະ', 'ນະຄອນຫຼວງວຽງຈັນ', 'ໄຊເສດຖາ', 'ສະພັນທະ', 'Active', '2026-06-20 14:00:00'),
     ('ບຸນທອນ ສີສະຫວາດ', '020 77441122', 'bounthong@example.com', '$2y$10$jqUyvZnfaFvtc/F/cgTWG.ziCX4F/yjYmIy61xGd1fT9xpHCjEbei', 'ບ້ານດົງໂດກ', 'ນະຄອນຫຼວງວຽງຈັນ', 'ສີໂຄດຕະບອງ', 'ດົງໂດກ', 'Active', '2026-06-15 09:00:00');
 
 -- Insert additional customer (from live database)
-INSERT INTO customers (fullname, phone, email, password, address, province, district, village, status, created_at) VALUES
+INSERT IGNORE INTO customers (fullname, phone, email, password, address, province, district, village, status, created_at) VALUES
     ('souliya pps', '+856 2078287500', 'souliyapps@gmail.com', '$2y$10$gP3vt//5YYgtTfnF1T..UOZZSeZlsNTrHQt.Uca/Xd7.oxbnurhhO', 'Xaythany District Phakhao', '', '', '', 'Active', '2026-07-06 11:45:00');
 
 -- Insert sample customer addresses
-INSERT INTO customer_addresses (customer_id, label, recipient_name, phone, address, province, district, village, is_default) VALUES
+INSERT IGNORE INTO customer_addresses (customer_id, label, recipient_name, phone, address, province, district, village, is_default) VALUES
     (1, 'ບ້ານ', 'ສຸລິຍາ ວົງສະຫວັດ', '020 55667788', 'ບ້ານໂພນສີໄຄ ເສັ້ນ 13 ໃຕ້', 'ນະຄອນຫຼວງວຽງຈັນ', 'ຈັນທະບູລີ', 'ໂພນສີໄຄ', 1),
     (1, 'ຫ້ອງການ', 'ສຸລິຍາ ວົງສະຫວັດ', '020 55667788', 'ຕຶກລາວໄອທີ ຊັ້ນ 3 ຫ້ອງ 302', 'ນະຄອນຫຼວງວຽງຈັນ', 'ໄຊເສດຖາ', 'ສະພັນທະ', 0),
     (2, 'ບ້ານ', 'ອະນຸສາ ແກ້ວມະນີ', '020 99887766', 'ບ້ານສະພັນທະ ໃກ້ໂຮງຮຽນ', 'ນະຄອນຫຼວງວຽງຈັນ', 'ໄຊເສດຖາ', 'ສະພັນທະ', 1);
 
 -- Insert sample bid_customers
-INSERT INTO bid_customers (name, contact_person, phone, email, address, notes, status, created_at) VALUES
+INSERT IGNORE INTO bid_customers (name, contact_person, phone, email, address, notes, status, created_at) VALUES
     (' CH.KARNCHANG(LAO)COMPANY LIMITED', 'ທ້າວ ສົມຊາຍ', '020 12345678', 'info@laowater.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສົ່ງທຸກວັນຈັນ ແລະ ວັນພະຫັດ', 'Active', '2026-01-15 08:00:00'),
     ('XAYABURI POWER COMPANY LIMITED', 'ນາງ ມາລິກາ', '020 23456789', 'order@thailaoshop.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສິນຄ້າອຸປະໂພກ ແລະ ບໍລິໂພກ', 'Active', '2026-02-01 09:00:00'),
     ('NAM NGUM 2 POWER COMPANY LIMITED', 'ທ້າວ ບຸນມີ', '020 34567890', 'vte.dist@example.la', '215 Lane xang Avenue ,Ban Xieng yeun Muang  Chanthabouly  ,Vientiane, Lao P D R', 'ສົ່ງຟຣີເມື່ອສັ່ງ 500,000 ກີບຂຶ້ນໄປ', 'Active', '2026-02-15 10:00:00');
 
 -- Insert sample product images (e-commerce gallery)
-INSERT INTO product_images (product_id, image, sort_order) VALUES
+INSERT IGNORE INTO product_images (product_id, image, sort_order) VALUES
     (1, 'https://picsum.photos/id/10/600/600', 1),
     (2, 'https://picsum.photos/id/11/600/600', 1),
     (2, 'https://picsum.photos/id/12/600/600', 2),
@@ -395,7 +395,7 @@ INSERT INTO product_images (product_id, image, sort_order) VALUES
     (8, 'https://picsum.photos/id/17/600/600', 1);
 
 -- Insert sample sales (for demo on /admin/sales)
-INSERT INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at) VALUES
+INSERT IGNORE INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at) VALUES
     ('INV-20260701-0001', NULL, 'ລູກຄ້າທົ່ວໄປ', '', '', 61000, 0, 'fixed', 0, 0, 61000, 'cash', 65000, 4000, '', 'Completed', 1, '2026-07-01 09:15:00'),
     ('INV-20260630-0001', 1, 'ສຸລິຍາ ວົງສະຫວັດ', '020 55667788', 'ບ້ານໂພນສີໄຄ', 129000, 5000, 'fixed', 0, 0, 124000, 'QR Code', 124000, 0, 'ສ່ວນຫຼຸດລູກຄ້າປະຈຳ', 'Completed', 1, '2026-06-30 14:30:00'),
     ('INV-20260628-0001', NULL, 'ລູກຄ້າທົ່ວໄປ', '020 11112222', '', 176000, 10000, 'fixed', 0, 0, 166000, 'cash', 170000, 4000, '', 'Completed', 2, '2026-06-28 10:00:00'),
@@ -403,53 +403,53 @@ INSERT INTO sales (invoice_number, customer_id, customer_name, customer_phone, c
     ('INV-20260620-0001', 3, 'ບຸນທອນ ສີສະຫວາດ', '020 77441122', 'ບ້ານດົງໂດກ', 40000, 0, 'fixed', 0, 0, 40000, 'QR Code', 40000, 0, '', 'Completed', 2, '2026-06-20 11:20:00');
 
 -- Insert additional sale (from live database)
-INSERT INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at) VALUES
+INSERT IGNORE INTO sales (invoice_number, customer_id, customer_name, customer_phone, customer_address, subtotal, discount, discount_type, tax_percent, tax_amount, grand_total, payment_method, amount_paid, change_amount, notes, status, created_by, created_at) VALUES
     ('INV-20260705-0001', 3, 'ບຸນທອນ ສີສະຫວາດ', '020 77441122', '', 4000, 0, 'percent', 0, 0, 4000, 'QR Code', 4000, 0, '', 'Completed', NULL, '2026-07-05 22:32:27');
 
 -- Insert sample sale_items (must match the 5 sales above)
-INSERT INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
+INSERT IGNORE INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
     (1, 1, 'ນ້ຳດື່ມສະອາດ 600ml', 5, 4000, 20000),
     (1, 4, 'ນ້ຳປາ 500ml', 2, 8000, 16000),
     (1, 6, 'ກາເຟສຳເລັດຮູບ', 1, 25000, 25000);
 
-INSERT INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
+INSERT IGNORE INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
     (2, 2, 'ເຂົ້າສານ 5ກກ', 3, 35000, 105000),
     (2, 3, 'ນ້ຳມັນພືດ 1ລ', 2, 12000, 24000);
 
-INSERT INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
+INSERT IGNORE INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
     (3, 2, 'ເຂົ້າສານ 5ກກ', 3, 35000, 105000),
     (3, 1, 'ນ້ຳດື່ມສະອາດ 600ml', 12, 4000, 48000),
     (3, 5, 'ໝີ່ສຳຣະເຄັດ ຊອງໃຫຍ່', 5, 4600, 23000);
 
-INSERT INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
+INSERT IGNORE INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
     (4, 9, 'ຜ້ງຊັກຟອກ 2ກກ', 2, 28000, 56000);
 
-INSERT INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
+INSERT IGNORE INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
     (5, 5, 'ໝີ່ສຳຣະເຄັດ ຊອງໃຫຍ່', 8, 5000, 40000);
 
 -- Insert additional sale_items (from live database)
-INSERT INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
+INSERT IGNORE INTO sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
     (6, 1, '', 1, 4000, 4000);
 
 -- Insert sample e-commerce orders
-INSERT INTO orders (order_number, customer_id, customer_name, customer_phone, customer_email, shipping_address, shipping_province, shipping_district, shipping_village, shipping_fee, subtotal, discount, grand_total, payment_method, payment_status, order_status, created_at) VALUES
+INSERT IGNORE INTO orders (order_number, customer_id, customer_name, customer_phone, customer_email, shipping_address, shipping_province, shipping_district, shipping_village, shipping_fee, subtotal, discount, grand_total, payment_method, payment_status, order_status, created_at) VALUES
     ('ORD-20260701-0001', 1, 'ສຸລິຍາ ວົງສະຫວັດ', '020 55667788', 'suriya@example.com', 'ບ້ານໂພນສີໄຄ ເສັ້ນ 13 ໃຕ້', 'ນະຄອນຫຼວງວຽງຈັນ', 'ຈັນທະບູລີ', 'ໂພນສີໄຄ', 15000, 125000, 0, 140000, 'cod', 'Pending', 'Pending', '2026-07-01 08:00:00'),
     ('ORD-20260628-0002', 2, 'ອະນຸສາ ແກ້ວມະນີ', '020 99887766', 'anousa@example.com', 'ບ້ານສະພັນທະ ໃກ້ໂຮງຮຽນ', 'ນະຄອນຫຼວງວຽງຈັນ', 'ໄຊເສດຖາ', 'ສະພັນທະ', 15000, 230000, 10000, 235000, 'cod', 'Paid', 'Delivered', '2026-06-28 15:00:00');
 
 -- Insert sample order items
-INSERT INTO order_items (order_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
+INSERT IGNORE INTO order_items (order_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
     (1, 3, 'ນ້ຳມັນພືດ 1ລ', 5, 12000, 60000),
     (1, 5, 'ໝີ່ສຳຣະເຄັດ ຊອງໃຫຍ່', 10, 5000, 50000),
     (1, 8, 'ນ້ຳອັດລົມ 1.25ລ', 3, 5000, 15000);
 
-INSERT INTO order_items (order_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
+INSERT IGNORE INTO order_items (order_id, product_id, product_name, quantity, unit_price, subtotal) VALUES
     (2, 2, 'ເຂົ້າສານ 5ກກ', 4, 35000, 140000),
     (2, 6, 'ກາເຟສຳເລັດຮູບ', 2, 25000, 50000),
     (2, 7, 'ຊາຂຽວ ຊອງໃຫຍ່', 2, 18000, 36000),
     (2, 10, 'ສະບູອາບນ້ຳ', 4, 10000, 40000);
 
 -- Insert sample expenses
-INSERT INTO expenses (expense_date, category_id, amount, description, created_by, created_at) VALUES
+INSERT IGNORE INTO expenses (expense_date, category_id, amount, description, created_by, created_at) VALUES
     ('2026-07-01', 1, 1500000, 'ຄ່າເຊົ່າຮ້ານ ເດືອນກໍລະກົດ', 1, '2026-07-01 08:00:00'),
     ('2026-07-01', 2, 350000, 'ຄ່າໄຟຟ້າ ເດືອນມິຖຸນາ', 1, '2026-07-01 08:30:00'),
     ('2026-06-30', 3, 2000000, 'ເງິນເດືອນພະນັກງານ 2 ຄົນ', 1, '2026-06-30 17:00:00'),
@@ -459,16 +459,15 @@ INSERT INTO expenses (expense_date, category_id, amount, description, created_by
     ('2026-06-15', 5, 45000, 'ຄ່າກາເຟ ແລະ ນ້ຳດື່ມພະນັກງານ', 2, '2026-06-15 09:30:00');
 
 -- Insert sample e-commerce banners
-INSERT INTO banners (title, subtitle, image, link, sort_order, status) VALUES
+INSERT IGNORE INTO banners (title, subtitle, image, link, sort_order, status) VALUES
     ('ສິນຄ້າໃໝ່ມາຮອດແລ້ວ!', 'ສິນຄ້າຄຸນນະພາບສູງ ລາຄາຖືກ ສົ່ງທົ່ວປະເທດ', 'https://picsum.photos/id/10/1200/400', '/products', 1, 'Active'),
     ('ໂປຣໂມຊັ້ນພິເສດ', 'ຊື້ 5 ຂຶ້ນໄປ ຮັບສ່ວນຫຼຸດ 10%', 'https://picsum.photos/id/11/1200/400', '/products?category=drinks', 2, 'Active');
 
 -- ==========================================================================
 -- Quotations System (Quotation/Bill templates from Excel files)
 -- ==========================================================================
-DROP TABLE IF EXISTS quotation_items, quotations;
 
-CREATE TABLE quotations (
+CREATE TABLE IF NOT EXISTS quotations (
     id INT AUTO_INCREMENT PRIMARY KEY,
     quotation_number VARCHAR(50) NOT NULL UNIQUE,
     company_template VARCHAR(50) NOT NULL DEFAULT 'luang-prabarg',
@@ -500,7 +499,7 @@ CREATE TABLE quotations (
     INDEX idx_converted (converted_to_sale_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE quotation_items (
+CREATE TABLE IF NOT EXISTS quotation_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     quotation_id INT NOT NULL,
     product_id INT DEFAULT NULL,
@@ -513,7 +512,7 @@ CREATE TABLE quotation_items (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE quotation_history (
+CREATE TABLE IF NOT EXISTS quotation_history (
     id INT AUTO_INCREMENT PRIMARY KEY,
     quotation_id INT NOT NULL,
     action VARCHAR(50) NOT NULL,
@@ -528,10 +527,10 @@ CREATE TABLE quotation_history (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Insert sample quotation (from live database)
-INSERT INTO quotations (quotation_number, company_template, bid_customer_id, bid_customer_name, bid_customer_contact, ref_no, date, subtotal, discount, tax_percent, tax_amount, grand_total, notes, terms, status, created_by, created_at) VALUES
+INSERT IGNORE INTO quotations (quotation_number, company_template, bid_customer_id, bid_customer_name, bid_customer_contact, ref_no, date, subtotal, discount, tax_percent, tax_amount, grand_total, notes, terms, status, created_by, created_at) VALUES
     ('QTN-20260706-0001', 'luang-prabarg', 1, ' CH.KARNCHANG(LAO)COMPANY LIMITED', 'ທ້າວ ສົມຊາຍ | 020 12345678', 'QUO-1400-2026-06-0010', '2026-07-06', 171000, 0, 10, 17100, 188100, '', '', 'Draft', NULL, '2026-07-06 10:57:54');
 
-INSERT INTO quotation_items (quotation_id, product_id, product_name, quantity, unit, unit_price, amount) VALUES
+INSERT IGNORE INTO quotation_items (quotation_id, product_id, product_name, quantity, unit, unit_price, amount) VALUES
     (1, 10, 'ສະບູອາບນ້ຳ', 1, 'ກ້ອນ', 10000, 10000),
     (1, 9, 'ຜ້ງຊັກຟອກ 2ກກ', 1, 'ຖົງ', 28000, 28000),
     (1, 7, 'ຊາຂຽວ ຊອງໃຫຍ່', 2, 'ຊອງ', 18000, 36000),
@@ -544,9 +543,42 @@ INSERT INTO quotation_items (quotation_id, product_id, product_name, quantity, u
     (1, 6, 'ກາເຟສຳເລັດຮູບ', 1, 'ກະປຸກ', 25000, 25000);
 
 -- ==========================================================================
--- Migration for existing databases: add bid_customer columns to sales table
+-- Schema patch: ensure ALL columns exist on existing bucket databases.
+-- CREATE TABLE IF NOT EXISTS only skips if the table exists; it does NOT
+-- add missing columns. These ALTER TABLE ADD COLUMN IF NOT EXISTS (MariaDB)
+-- guarantee every column is present, even on tables created by older
+-- versions of this file. Runs on every container start (idempotent).
 -- ==========================================================================
--- ALTER TABLE sales
---   ADD COLUMN bid_customer_id INT DEFAULT NULL AFTER customer_address,
---   ADD COLUMN bid_customer_name VARCHAR(200) DEFAULT NULL AFTER bid_customer_id,
---   ADD FOREIGN KEY (bid_customer_id) REFERENCES bid_customers(id) ON DELETE SET NULL;
+
+-- quotations (critical: customer_id, company_template, etc.)
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS company_template VARCHAR(50) NOT NULL DEFAULT 'luang-prabarg';
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS bid_customer_id INT DEFAULT NULL;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS bid_customer_name VARCHAR(200) DEFAULT NULL;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS bid_customer_contact VARCHAR(200) DEFAULT NULL;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS customer_id INT DEFAULT NULL;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS customer_name VARCHAR(200) DEFAULT NULL;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS customer_contact VARCHAR(200) DEFAULT NULL;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS ref_no VARCHAR(100) DEFAULT NULL;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS date DATE DEFAULT NULL;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS expiry_date DATE DEFAULT NULL;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS converted_to_sale_id INT DEFAULT NULL;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS status ENUM('Draft','Sent','Approved','Rejected') NOT NULL DEFAULT 'Draft';
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+-- quotation_items
+ALTER TABLE quotation_items ADD COLUMN IF NOT EXISTS unit VARCHAR(50) DEFAULT 'SET';
+ALTER TABLE quotation_items ADD COLUMN IF NOT EXISTS amount DECIMAL(12,2) NOT NULL DEFAULT 0;
+
+-- quotation_history
+ALTER TABLE quotation_history ADD COLUMN IF NOT EXISTS old_status VARCHAR(50) DEFAULT NULL;
+ALTER TABLE quotation_history ADD COLUMN IF NOT EXISTS new_status VARCHAR(50) DEFAULT NULL;
+ALTER TABLE quotation_history ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE quotation_history ADD COLUMN IF NOT EXISTS performed_by INT DEFAULT NULL;
+ALTER TABLE quotation_history ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- sales (bid_customer columns for quotation conversion)
+ALTER TABLE sales ADD COLUMN IF NOT EXISTS bid_customer_id INT DEFAULT NULL;
+ALTER TABLE sales ADD COLUMN IF NOT EXISTS bid_customer_name VARCHAR(200) DEFAULT NULL;
+
+-- bid_customers rename migration (old name -> new name)
+-- handled in db_migrate.php since CHANGE COLUMN needs the old name to exist
