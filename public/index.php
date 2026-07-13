@@ -59,10 +59,10 @@ if ($isLocalhost) {
     $_ENV['APP_ENV'] = 'development';
 } elseif (!empty(getenv('SPACE_ID')) || ($_ENV['APP_ENV_HF'] ?? null) === 'true') {
     $_ENV['APP_ENV'] = 'production';
-} elseif (strpos($host, 'infinityfree') !== false) {
-    $_ENV['APP_ENV'] = 'infinityfree';
+} else {
     $ifreeFile = __DIR__ . '/../.env.infinityfree';
     if (file_exists($ifreeFile)) {
+        $_ENV['APP_ENV'] = 'infinityfree';
         $lines = file($ifreeFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         foreach ($lines as $line) {
             $line = trim($line);
@@ -77,9 +77,9 @@ if ($isLocalhost) {
                 $_ENV[$name] = $value;
             }
         }
+    } else {
+        $_ENV['APP_ENV'] = 'production';
     }
-} else {
-    $_ENV['APP_ENV'] = 'production';
 }
 
 $isDebug = (getenv('APP_DEBUG') ?: $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? 'false') === 'true';

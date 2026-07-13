@@ -8,13 +8,13 @@ class Database {
 
     private function __construct() {
         $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
+        $port = $_ENV['DB_PORT'] ?? '3306';
         $db   = $_ENV['DB_DATABASE'] ?? '';
         $user = $_ENV['DB_USERNAME'] ?? 'root';
-        // Note: XAMPP local dev uses DB_PASSWORD=Admin123 as set in .env
         $pass = $_ENV['DB_PASSWORD'] ?? '';
         $charset = 'utf8mb4';
 
-        $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+        $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
         $options = [
             \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
             \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
