@@ -135,10 +135,15 @@ if (($_GET['diag'] ?? '') === 'd1ag-7f3k') {
             $has = $pdo->query("SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=".$pdo->quote($dbn)." AND TABLE_NAME='quotations' AND COLUMN_NAME=".$pdo->quote($c))->fetch();
             if ($has) { echo "$c: exists\n"; continue; }
             try {
-                $pdo->exec("ALTER TABLE quotations ADD COLUMN `$c` $def");
-                echo "$c: ADDED\n";
-            } catch (\Exception $e) {
-                echo "$c: FAIL -> " . $e->getMessage() . "\n";
+                $pdo->exec("ALTER TABLE quotations ADD COLUMN `$c` $def, ALGORITHM=INSTANT");
+                echo "$c: ADDED (instant)\n";
+            } catch (\Exception $e1) {
+                try {
+                    $pdo->exec("ALTER TABLE quotations ADD COLUMN `$c` $def");
+                    echo "$c: ADDED (copy)\n";
+                } catch (\Exception $e2) {
+                    echo "$c: FAIL -> " . $e2->getMessage() . "\n";
+                }
             }
         }
         $cols = $pdo->query("SHOW COLUMNS FROM quotations")->fetchAll(PDO::FETCH_COLUMN);

@@ -46,22 +46,20 @@ function idxExists($pdo, $db, $t, $i) {
 function addCol($pdo, $db, $t, $c, $def) {
     if (colExists($pdo, $db, $t, $c)) { logline("exists $t.$c"); return true; }
     try {
-        $pdo->exec("ALTER TABLE `$t` ADD COLUMN `$c` $def");
+        $pdo->exec("ALTER TABLE `$t` ADD COLUMN `$c` $def, ALGORITHM=INSTANT");
+        logline("added $t.$c (instant)");
+        return true;
     } catch (\Exception $e) {
-        logline("skip $t.$c (attempt 1: $def): " . $e->getMessage());
-        // Fallback: append without any positional clause.
+        // INSTANT unsupported for this op (or server too old) — fall back.
         try {
-            $base = preg_replace('/\s+AFTER\s+`?[\w]+`?/i', '', $def);
-            $base = preg_replace('/\s+FIRST/i', '', $base);
-            $pdo->exec("ALTER TABLE `$t` ADD COLUMN `$c` $base");
+            $pdo->exec("ALTER TABLE `$t` ADD COLUMN `$c` $def");
+            logline("added $t.$c");
+            return true;
         } catch (\Exception $e2) {
             logline("FAILED $t.$c: " . $e2->getMessage());
             return false;
         }
     }
-    if (colExists($pdo, $db, $t, $c)) { logline("added $t.$c"); return true; }
-    logline("FAILED $t.$c: column still missing after ALTER");
-    return false;
 }
 
 function addIdx($pdo, $db, $t, $i, $def) {
