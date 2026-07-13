@@ -105,6 +105,22 @@ if (($_GET['diag'] ?? '') === 'd1ag-7f3k') {
     $dbu = $_ENV['DB_USERNAME'] ?? 'root';
     $dbp = $_ENV['DB_PASSWORD'] ?? 'root';
     $dbn = $_ENV['DB_DATABASE'] ?? 'if0_42353445_thiengtham';
+    echo "ENV: DB_HOST=$dbh DB_USER=$dbu DB_NAME=$dbn\n";
+    echo "ENV: PROD_DB_HOSTNAME=" . ($_ENV['PROD_DB_HOSTNAME'] ?? 'NOT SET') . "\n";
+    echo "ENV: APP_ENV=" . ($_ENV['APP_ENV'] ?? 'NOT SET') . "\n";
+    echo "ENV: APP_ENV_HF=" . ($_ENV['APP_ENV_HF'] ?? 'NOT SET') . "\n";
+    echo "DSN: mysql:host=$dbh;dbname=$dbn\n";
+    echo "--- MySQL auth state (via CLI) ---\n";
+    $cmd = 'mysql -u root -p' . escapeshellarg($dbp) . ' -e "SELECT User,Host,plugin,authentication_string FROM mysql.global_priv WHERE User=\'root\';" 2>&1';
+    echo "$ " . str_replace($dbp, '****', $cmd) . "\n";
+    echo shell_exec($cmd) . "\n";
+    echo "--- TCP test ---\n";
+    $tcpTest = 'mysql -h 127.0.0.1 -P 3306 -u root -p' . escapeshellarg($dbp) . ' -e "SELECT 1 AS test" 2>&1';
+    echo shell_exec($tcpTest) . "\n";
+    echo "--- Socket test ---\n";
+    $sockTest = 'mysql -u root -p' . escapeshellarg($dbp) . ' -e "SELECT 1 AS test" 2>&1';
+    echo shell_exec($sockTest) . "\n";
+    echo "--- End diagnostics ---\n";
     try {
         $pdo = new PDO("mysql:host=$dbh;dbname=$dbn;charset=utf8mb4", $dbu, $dbp, [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION]);
         echo "CONNECTED db=$dbn\n";
