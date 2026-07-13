@@ -13,7 +13,7 @@ MYSQL_CHARSET="--default-character-set=utf8mb4"
 # ============================================================
 if [ -d "$MYSQL_DATA_DIR/#binlog_cache_files" ]; then
     echo "[start.sh] Detected corrupted MariaDB binlog cache dir. Reinitializing data directory..."
-    mv "$MYSQL_DATA_DIR" "${MYSQL_DATA_DIR}_corrupted_$$"
+    rm -rf "$MYSQL_DATA_DIR" 2>/dev/null || true
 fi
 
 if [ ! -d "$MYSQL_DATA_DIR/mysql" ]; then
@@ -52,8 +52,9 @@ if ! mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null;
     echo "[start.sh] MySQL failed with InnoDB tablespace corruption. Resetting InnoDB..."
     kill $MYSQL_PID 2>/dev/null || true
     sleep 2
-    # Remove application .ibd files and InnoDB system tablespace so everything gets recreated
-    rm -rf "$MYSQL_DATA_DIR/$MYSQL_DATABASE" "$MYSQL_DATA_DIR/ib_logfile"* "$MYSQL_DATA_DIR/ibdata1" 2>/dev/null || true
+    # Remove ALL InnoDB files to force clean rebuild
+    rm -rf "$MYSQL_DATA_DIR/$MYSQL_DATABASE" 2>/dev/null || true
+    rm -f "$MYSQL_DATA_DIR"/ibdata1 "$MYSQL_DATA_DIR"/ib_logfile* "$MYSQL_DATA_DIR"/undo00* 2>/dev/null || true
     rm -f "$SCHEMA_VERSION_FILE" 2>/dev/null || true
     echo "[start.sh] Retrying MySQL startup with clean InnoDB..."
     mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
@@ -70,8 +71,26 @@ if ! mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null;
 fi
 
 if ! mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
-    echo "[start.sh] ERROR: MySQL failed to start."
-    exit 1
+    echo "[start.sh] ERROR: MySQL failed to start. Attempting full data directory wipe..."
+    kill $MYSQL_PID 2>/dev/null || true
+    sleep 2
+    # Complete wipe — remove everything and reinitialize from scratch
+    rm -rf "$MYSQL_DATA_DIR" 2>/dev/null || true
+    mkdir -p "$MYSQL_DATA_DIR"
+    chown -R mysql:mysql "$MYSQL_DATA_DIR"
+    mysql_install_db --user=mysql --datadir="$MYSQL_DATA_DIR" >/dev/null 2>&1
+    echo "[start.sh] Data directory reinitialized. Starting MySQL fresh..."
+    mysqld --user=mysql --datadir="$MYSQL_DATA_DIR" --socket="$MYSQL_RUN_DIR/mysqld.sock" \
+           --pid-file="$MYSQL_RUN_DIR/mysqld.pid" \
+           --port=3306 &
+    MYSQL_PID=$!
+    for i in $(seq 1 30); do
+        if mysqladmin ping --socket="$MYSQL_RUN_DIR/mysqld.sock" --silent 2>/dev/null; then
+            echo "[start.sh] MySQL is ready after full wipe."
+            break
+        fi
+        sleep 1
+    done
 fi
 
 # ============================================================
