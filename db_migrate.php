@@ -120,7 +120,15 @@ function cleanStrayDirs($pdo, $db) {
         if ($entries === false) return;
         foreach (array_diff($entries, ['.', '..', 'db.opt']) as $entry) {
             $full = $dbDir . '/' . $entry;
-            if (is_dir($full) && isset($tblSet[$entry])) {
+            if (!is_dir($full)) continue;
+            // Always remove #sql-* temp dirs (orphaned ALTER TABLE fragments)
+            if (strpos($entry, '#sql-') === 0) {
+                if (delTree($full)) { logline("removed #sql-* temp dir: $entry"); }
+                else { logline("note: could not remove #sql-* dir: $entry"); }
+                continue;
+            }
+            // Remove dirs that shadow a real table
+            if (isset($tblSet[$entry])) {
                 if (delTree($full)) { logline("removed stray data-dir: $entry"); }
                 else { logline("note: could not remove stray data-dir: $entry"); }
             }

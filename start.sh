@@ -101,16 +101,25 @@ fi
 echo "[start.sh] Database '${MYSQL_DATABASE}' ready."
 
 # ============================================================
-# 4a. Remove stray per-table directories in the MySQL data dir.
-#     InnoDB tables are stored as files (table.frm / table.ibd),
-#     never as directories. A leftover directory named like a table
-#     (e.g. `quotations/`, sometimes with nested junk inside) shadows
-#     the real table and makes every ALTER/CREATE fail with
-#     errno 21 "Is a directory". Remove ALL non-system directories
-#     BEFORE schema import and migration so both can proceed.
+# 4a. Remove ALL stray directories in the MySQL data dir.
+#     InnoDB stores tables as files (table.frm / table.ibd),
+#     NEVER as directories. Stray directories cause errno 21
+#     "Is a directory" on every ALTER/CREATE TABLE.
+#
+#     Two categories of stray dirs:
+#     1. Table-name dirs (e.g. `quotations/`) - shadow the real table
+#     2. MariaDB temp dirs (`#sql-*`) - orphaned from failed ALTER TABLE
+#
+#     We run this as root BEFORE schema import so both can succeed.
+#     Also run a second pass AFTER import to clean any created by import.
 # ============================================================
 DB_DATADIR="$MYSQL_DATA_DIR/$MYSQL_DATABASE"
 if [ -d "$DB_DATADIR" ]; then
+    # Pass 1: Remove #sql-* temp dirs (orphaned ALTER TABLE fragments)
+    find "$DB_DATADIR" -maxdepth 1 -type d -name '#sql-*' -exec rm -rf {} + 2>/dev/null && \
+        echo "[start.sh] Cleaned #sql-* temp directories" || true
+
+    # Pass 2: Remove table-name dirs that have sibling .frm/.ibd files
     for entry in "$DB_DATADIR"/*/; do
         [ -d "$entry" ] || continue
         name="$(basename "$entry")"
@@ -122,6 +131,8 @@ if [ -d "$DB_DATADIR" ]; then
             rm -rf "$entry"
         fi
     done
+
+    # Pass 3: Remove orphan dirs (no matching table in DB)
     for entry in "$DB_DATADIR"/*/; do
         [ -d "$entry" ] || continue
         name="$(basename "$entry")"
@@ -165,6 +176,25 @@ else
 fi
 
 # ============================================================
+# 4b-extra. Clean stray dirs again after import (import may create them)
+# ============================================================
+if [ -d "$DB_DATADIR" ]; then
+    find "$DB_DATADIR" -maxdepth 1 -type d -name '#sql-*' -exec rm -rf {} + 2>/dev/null && \
+        echo "[start.sh] Post-import: cleaned #sql-* temp dirs" || true
+    for entry in "$DB_DATADIR"/*/; do
+        [ -d "$entry" ] || continue
+        name="$(basename "$entry")"
+        case "$name" in
+            mysql|performance_schema|information_schema|sys) continue ;;
+        esac
+        if [ -f "$DB_DATADIR/$name.frm" ] || [ -f "$DB_DATADIR/$name.ibd" ]; then
+            echo "[start.sh] Post-import: removing stray dir: $name"
+            rm -rf "$entry"
+        fi
+    done
+fi
+
+# ============================================================
 # 4c. Idempotent bucket-DB schema sync (robust PHP runner).
 #     database.sql handles CREATE TABLE IF NOT EXISTS; db_migrate.php
 #     handles adding any columns that were added in newer code versions.
@@ -176,6 +206,25 @@ DB_HOST=127.0.0.1 DB_USER=root DB_PASS="$MYSQL_ROOT_PASSWORD" DB_NAME="$MYSQL_DA
     php /var/www/html/db_migrate.php \
     && echo "[start.sh] Bucket DB schema synced." \
     || echo "[start.sh] Bucket DB schema sync had non-fatal warnings."
+
+# ============================================================
+# 4d. Final cleanup: remove any stray dirs created by migration
+# ============================================================
+if [ -d "$DB_DATADIR" ]; then
+    find "$DB_DATADIR" -maxdepth 1 -type d -name '#sql-*' -exec rm -rf {} + 2>/dev/null && \
+        echo "[start.sh] Post-migration: cleaned #sql-* temp dirs" || true
+    for entry in "$DB_DATADIR"/*/; do
+        [ -d "$entry" ] || continue
+        name="$(basename "$entry")"
+        case "$name" in
+            mysql|performance_schema|information_schema|sys) continue ;;
+        esac
+        if [ -f "$DB_DATADIR/$name.frm" ] || [ -f "$DB_DATADIR/$name.ibd" ]; then
+            echo "[start.sh] Post-migration: removing stray dir: $name"
+            rm -rf "$entry"
+        fi
+    done
+fi
 
 # ============================================================
 # 5. Generate .env file for PHP
