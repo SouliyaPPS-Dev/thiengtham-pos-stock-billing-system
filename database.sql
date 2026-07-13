@@ -110,7 +110,7 @@ CREATE TABLE customer_addresses (
     FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Suppliers (Admin POS)
+-- Bid Customers (Admin POS)
 CREATE TABLE bid_customers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
@@ -544,7 +544,7 @@ INSERT INTO quotation_items (quotation_id, product_id, product_name, quantity, u
     (1, 6, 'ກາເຟສຳເລັດຮູບ', 1, 'ກະປຸກ', 25000, 25000);
 
 -- ==========================================================================
--- Migration for existing databases: add supplier columns to sales table
+-- Migration for existing databases: add bid_customer columns to sales table
 -- ==========================================================================
 -- ALTER TABLE sales
 --   ADD COLUMN bid_customer_id INT DEFAULT NULL AFTER customer_address,

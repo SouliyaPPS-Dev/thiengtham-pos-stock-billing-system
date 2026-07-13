@@ -13,6 +13,7 @@
         </div>
 
         <form method="POST" action="<?= $isEdit ? url('/admin/quotations/' . $quotation['id'] . '/update') : url('/admin/quotations/store') ?>" @submit.prevent="submitForm()">
+            <input type="hidden" name="action" x-model="formAction">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 <!-- Left: Settings -->
@@ -22,21 +23,21 @@
                         <div class="space-y-3">
                             <div>
                                 <label class="text-xs font-bold text-muted-foreground mb-1 block">ເລືອກລູກຄ້າທີ່ສະເໜີລາຄາ</label>
-                                <select x-model="supplierId" @change="selectSupplier()" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                <select x-model="bidCustomerId" @change="selectBidCustomer()" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                                     <option value="">-- ເລືອກ --</option>
                                     <?php foreach ($bidCustomers as $s): ?>
                                     <option value="<?= $s['id'] ?>"><?= htmlspecialchars($s['name']) ?></option>
                                     <?php endforeach; ?>
                                 </select>
-                                <input type="hidden" name="bid_customer_id" x-model="supplierId">
+                                <input type="hidden" name="bid_customer_id" x-model="bidCustomerId">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-muted-foreground mb-1 block">ຊື່ລູກຄ້າທີ່ສະເໜີລາຄາ</label>
-                                <input type="text" name="bid_customer_name" x-model="supplierName" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                <input type="text" name="bid_customer_name" x-model="bidCustomerName" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-muted-foreground mb-1 block">ຜູ້ຕິດຕໍ່ / ເບີໂທ</label>
-                                <input type="text" name="bid_customer_contact" x-model="supplierContact" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
+                                <input type="text" name="bid_customer_contact" x-model="bidCustomerContact" class="w-full px-3 py-2.5 border border-border rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
                             </div>
                             <div>
                                 <label class="text-xs font-bold text-muted-foreground mb-1 block">ອາກອນມູນຄ່າເພີ້ມ (VAT %)</label>
@@ -48,7 +49,7 @@
                                         <option value="7">
                                         <option value="10">
                                     </datalist>
-                                    <button type="button" @click="saveSupplierTax()" :disabled="!supplierId" class="px-3 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap" :class="supplierId ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-gray-50 text-gray-300 cursor-not-allowed'">
+                                    <button type="button" @click="saveBidCustomerTax()" :disabled="!bidCustomerId" class="px-3 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap" :class="bidCustomerId ? 'bg-blue-50 text-blue-600 hover:bg-blue-100' : 'bg-gray-50 text-gray-300 cursor-not-allowed'">
                                         <i class="fas fa-save mr-1"></i> ບັນທຶກ
                                     </button>
                                     <span class="text-xs text-muted-foreground ml-1">(ຕັ້ງອັດຕາອາກອນຕາມລູກຄ້າທີ່ສະເໜີລາຄາ)</span>
@@ -370,8 +371,8 @@
                             Export PDF
                         </a>
                         <?php endif; ?>
-                        <button type="submit" name="action" value="save" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-300">ບັນທຶກ</button>
-                        <button type="submit" name="action" value="save_print" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-300">
+                        <button type="submit" @click="formAction = 'save'" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-300">ບັນທຶກ</button>
+                        <button type="submit" @click="formAction = 'save_print'" class="px-5 py-2.5 bg-gradient-to-r from-sky-500 to-sky-600 text-white rounded-xl font-bold text-sm hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-300">
                             <i class="fas fa-print"></i> ບັນທຶກ ແລະ ພິມ
                         </button>
                     </div>
@@ -482,9 +483,10 @@ function quotationForm() {
 
     return {
 
-        supplierId: '<?= $isEdit ? ($quotation['bid_customer_id'] ?? '') : '' ?>',
-        supplierName: '<?= $isEdit ? htmlspecialchars($quotation['bid_customer_name'] ?? '', ENT_QUOTES) : '' ?>',
-        supplierContact: '<?= $isEdit ? htmlspecialchars($quotation['bid_customer_contact'] ?? '', ENT_QUOTES) : '' ?>',
+        formAction: 'save',
+        bidCustomerId: '<?= $isEdit ? ($quotation['bid_customer_id'] ?? '') : '' ?>',
+        bidCustomerName: '<?= $isEdit ? htmlspecialchars($quotation['bid_customer_name'] ?? '', ENT_QUOTES) : '' ?>',
+        bidCustomerContact: '<?= $isEdit ? htmlspecialchars($quotation['bid_customer_contact'] ?? '', ENT_QUOTES) : '' ?>',
         customerId: '<?= $isEdit ? ($quotation['customer_id'] ?? '') : '' ?>',
         customerName: '<?= $isEdit ? htmlspecialchars($quotation['customer_name'] ?? '', ENT_QUOTES) : '' ?>',
         customerContact: '<?= $isEdit ? htmlspecialchars($quotation['customer_contact'] ?? '', ENT_QUOTES) : '' ?>',
@@ -524,14 +526,21 @@ function quotationForm() {
             })));
         },
 
-        selectSupplier() {
-            const supplier = <?= json_encode($bidCustomers ?? []) ?>.find(s => s.id == this.supplierId);
-            if (supplier) {
-                this.supplierName = supplier.name;
-                this.supplierContact = (supplier.contact_person || '') + (supplier.phone ? ' | ' + supplier.phone : '');
-                if (supplier.tax_percent || supplier.tax_percent === 0) {
-                    this.taxPercent = parseFloat(supplier.tax_percent);
+        selectBidCustomer() {
+            const bidCustomer = <?= json_encode($bidCustomers ?? []) ?>.find(s => s.id == this.bidCustomerId);
+            if (bidCustomer) {
+                this.bidCustomerName = bidCustomer.name;
+                this.bidCustomerContact = (bidCustomer.contact_person || '') + (bidCustomer.phone ? ' | ' + bidCustomer.phone : '');
+                if (bidCustomer.tax_percent || bidCustomer.tax_percent === 0) {
+                    this.taxPercent = parseFloat(bidCustomer.tax_percent);
                 }
+                this.customerId = '';
+                this.customerName = '';
+                this.customerContact = '';
+            } else {
+                this.bidCustomerName = '';
+                this.bidCustomerContact = '';
+                this.taxPercent = 10;
             }
         },
 
@@ -540,14 +549,20 @@ function quotationForm() {
             if (customer) {
                 this.customerName = customer.fullname;
                 this.customerContact = (customer.phone || '') + (customer.email ? ' | ' + customer.email : '');
+                this.bidCustomerId = '';
+                this.bidCustomerName = '';
+                this.bidCustomerContact = '';
+            } else {
+                this.customerName = '';
+                this.customerContact = '';
             }
         },
 
-        saveSupplierTax() {
-            if (!this.supplierId) return;
+        saveBidCustomerTax() {
+            if (!this.bidCustomerId) return;
             const formData = new FormData();
             formData.append('tax_percent', this.taxPercent);
-            fetch('<?= url('/admin/bid-customers') ?>/' + this.supplierId + '/update-tax', {
+            fetch('<?= url('/admin/bid-customers') ?>/' + this.bidCustomerId + '/update-tax', {
                 method: 'POST',
                 body: formData
             })

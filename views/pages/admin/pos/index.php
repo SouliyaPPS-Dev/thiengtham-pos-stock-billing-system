@@ -100,16 +100,16 @@
             </div>
         </div>
 
-        <!-- Bill Party: Customer / Supplier Toggle -->
+        <!-- Bill Party: Customer / Bid Customer Toggle -->
         <div class="p-3 md:p-4 border-b bg-gray-50/30 space-y-3">
             <div class="flex bg-gray-100 p-0.5 rounded-xl border border-border">
-                <button @click="billParty = 'customer'; selectedSupplier = null; sSearch = ''; saveState()"
+                <button @click="billParty = 'customer'; selectedBidCustomer = null; sSearch = ''; saveState()"
                         :class="billParty === 'customer' ? 'bg-card shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground/85'"
                         class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5">
                     <i class="fas fa-user"></i> ລູກຄ້າ
                 </button>
-                <button @click="billParty = 'supplier'; selectedCustomer = null; cSearch = ''; saveState()"
-                        :class="billParty === 'supplier' ? 'bg-card shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground/85'"
+                <button @click="billParty = 'bid_customer'; selectedCustomer = null; cSearch = ''; saveState()"
+                        :class="billParty === 'bid_customer' ? 'bg-card shadow-sm text-primary' : 'text-muted-foreground hover:text-foreground/85'"
                         class="flex-1 py-1.5 rounded-lg text-[10px] font-bold transition-all flex items-center justify-center gap-1.5">
                     <i class="fas fa-truck"></i> ລູກຄ້າທີ່ສະເໜີລາຄາ
                 </button>
@@ -162,8 +162,8 @@
                 </template>
             </div>
 
-            <!-- Supplier Search (shown when billParty === 'supplier') -->
-            <div x-show="billParty === 'supplier'" x-data="{ open: false }" @click.away="open = false">
+            <!-- Bid Customer Search (shown when billParty === 'bid_customer') -->
+            <div x-show="billParty === 'bid_customer'" x-data="{ open: false }" @click.away="open = false">
                 <div class="relative">
                     <input type="text"
                            x-model="sSearch"
@@ -173,7 +173,7 @@
                     <div class="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                         <i class="fas fa-search text-xs"></i>
                     </div>
-                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" x-show="selectedSupplier" @click="selectedSupplier = null; sSearch = ''" style="display:none">
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-300" x-show="selectedBidCustomer" @click="selectedBidCustomer = null; sSearch = ''" style="display:none">
                         <i class="fas fa-times-circle cursor-pointer hover:text-red-500"></i>
                     </div>
                 </div>
@@ -184,7 +184,7 @@
                      class="absolute left-0 right-0 mt-1 bg-card border rounded-2xl shadow-xl z-50 max-h-48 overflow-y-auto"
                      :style="{ left: $el.parentElement.parentElement.offsetLeft + 'px', right: $el.parentElement.parentElement.offsetLeft + 'px', width: $el.parentElement.parentElement.offsetWidth + 'px' }">
                     <template x-for="s in bidCustomers.filter(s => s.name.toLowerCase().includes(sSearch.toLowerCase()) || (s.phone || '').includes(sSearch))" :key="s.id">
-                        <div @click="selectedSupplier = s; sSearch = s.name; open = false; saveState()"
+                        <div @click="selectedBidCustomer = s; sSearch = s.name; open = false; saveState()"
                              class="p-2.5 hover:bg-gray-50 cursor-pointer border-b last:border-0 flex items-center justify-between">
                             <div>
                                 <div class="text-xs font-bold text-foreground" x-text="s.name"></div>
@@ -196,14 +196,14 @@
                         <div class="p-3 text-center text-xs text-muted-foreground">ບໍ່ພົບລູກຄ້າທີ່ສະເໜີລາຄາ</div>
                     </template>
                 </div>
-                <template x-if="selectedSupplier">
+                <template x-if="selectedBidCustomer">
                     <div class="flex items-center gap-2 bg-amber-50 p-2 rounded-xl border border-amber-200 mt-2">
                         <div class="w-7 h-7 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 text-xs">
                             <i class="fas fa-truck"></i>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-xs font-bold text-foreground truncate" x-text="selectedSupplier.name"></p>
-                            <p class="text-[10px] text-muted-foreground" x-text="selectedSupplier.contact_person || selectedSupplier.phone || ''"></p>
+                            <p class="text-xs font-bold text-foreground truncate" x-text="selectedBidCustomer.name"></p>
+                            <p class="text-[10px] text-muted-foreground" x-text="selectedBidCustomer.contact_person || selectedBidCustomer.phone || ''"></p>
                         </div>
                     </div>
                 </template>
@@ -324,7 +324,7 @@ function posSystem() {
         cart: [],
         billParty: 'customer',
         selectedCustomer: null,
-        selectedSupplier: null,
+        selectedBidCustomer: null,
         cSearch: '',
         sSearch: '',
         discount: 0,
@@ -354,7 +354,7 @@ function posSystem() {
                 cart: this.cart,
                 billParty: this.billParty,
                 selectedCustomerId: this.selectedCustomer?.id || null,
-                selectedSupplierId: this.selectedSupplier?.id || null,
+                selectedBidCustomerId: this.selectedBidCustomer?.id || null,
                 discount: this.discount,
                 paidAmount: this.paidAmount,
                 selectedPaymentMethod: this.selectedPaymentMethod,
@@ -372,8 +372,8 @@ function posSystem() {
                 if (data.selectedCustomerId) {
                     this.selectedCustomer = this.customers.find(c => c.id == data.selectedCustomerId) || null;
                 }
-                if (data.selectedSupplierId) {
-                    this.selectedSupplier = this.bidCustomers.find(s => s.id == data.selectedSupplierId) || null;
+                if (data.selectedBidCustomerId) {
+                    this.selectedBidCustomer = this.bidCustomers.find(s => s.id == data.selectedBidCustomerId) || null;
                 }
                 if (data.discount !== undefined) this.discount = data.discount;
                 if (data.paidAmount !== undefined) this.paidAmount = data.paidAmount;
@@ -488,7 +488,7 @@ function posSystem() {
 
             const missing = [];
             if (this.billParty === 'customer' && !this.selectedCustomer) missing.push('ກະລຸນາເລືອກລູກຄ້າ');
-            if (this.billParty === 'supplier' && !this.selectedSupplier) missing.push('ກະລຸນາເລືອກລູກຄ້າທີ່ສະເໜີລາຄາ');
+            if (this.billParty === 'bid_customer' && !this.selectedBidCustomer) missing.push('ກະລຸນາເລືອກລູກຄ້າທີ່ສະເໜີລາຄາ');
             if (Number(this.paidAmount) < this.grandTotal) missing.push('ຈຳນວນເງິນທີ່ຮັບຕ້ອງຫຼາຍກວ່າ ຫຼື ເທົ່າກັບຍອດລວມ');
 
             if (missing.length > 0) {
@@ -507,10 +507,10 @@ function posSystem() {
             let partyLabel = 'ລູກຄ້າ';
             let partyName = 'ລູກຄ້າທົ່ວໄປ';
             let partyDetail = '';
-            if (this.billParty === 'supplier' && this.selectedSupplier) {
+            if (this.billParty === 'bid_customer' && this.selectedBidCustomer) {
                 partyLabel = 'ລູກຄ້າທີ່ສະເໜີລາຄາ';
-                partyName = this.selectedSupplier.name;
-                partyDetail = this.selectedSupplier.contact_person ? (this.selectedSupplier.contact_person + (this.selectedSupplier.phone ? ' | ' + this.selectedSupplier.phone : '')) : (this.selectedSupplier.phone || '');
+                partyName = this.selectedBidCustomer.name;
+                partyDetail = this.selectedBidCustomer.contact_person ? (this.selectedBidCustomer.contact_person + (this.selectedBidCustomer.phone ? ' | ' + this.selectedBidCustomer.phone : '')) : (this.selectedBidCustomer.phone || '');
             } else if (this.selectedCustomer) {
                 partyName = this.selectedCustomer.fullname;
                 partyDetail = this.selectedCustomer.phone || '';
@@ -570,8 +570,8 @@ function posSystem() {
                     customer_id: this.billParty === 'customer' ? (this.selectedCustomer?.id || null) : null,
                     customer_name: this.billParty === 'customer' ? (this.selectedCustomer?.fullname || '') : '',
                     customer_phone: this.billParty === 'customer' ? (this.selectedCustomer?.phone || '') : '',
-                    bid_customer_id: this.billParty === 'supplier' ? (this.selectedSupplier?.id || null) : null,
-                    bid_customer_name: this.billParty === 'supplier' ? (this.selectedSupplier?.name || '') : '',
+                    bid_customer_id: this.billParty === 'bid_customer' ? (this.selectedBidCustomer?.id || null) : null,
+                    bid_customer_name: this.billParty === 'bid_customer' ? (this.selectedBidCustomer?.name || '') : '',
                     subtotal: sub,
                     discount: Number(this.discount),
                     grand_total: grand,

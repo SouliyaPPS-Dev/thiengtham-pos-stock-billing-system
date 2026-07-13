@@ -18,7 +18,7 @@ Full-stack PHP SSR Point-of-Sale system with stock management, customer manageme
 - **POS Interface** — Product grid, cart, checkout with Alpine.js
 - **Stock Management** — Products, categories, stock alerts
 - **Customer Management** — Customer profiles and purchase history
-- **Supplier Management** — Supplier directory
+- **Bid Customer Management** — Bid Customer directory
 - **Sales History** — View past transactions
 - **Invoice/ Bill Printing** — Print-friendly invoices
 - **Dashboard** — Sales charts, popular products, low stock alerts

@@ -54,6 +54,7 @@ class QuotationController extends \App\Controllers\BaseController
     {
         $model = new Quotation();
         $data = $_POST;
+        $data['tax_percent'] = ($data['tax_percent'] !== '' && $data['tax_percent'] !== null) ? floatval($data['tax_percent']) : 0;
         $items = [];
 
         if (!empty($data['bid_customer_id'])) {
@@ -166,6 +167,7 @@ class QuotationController extends \App\Controllers\BaseController
         }
 
         $data = $_POST;
+        $data['tax_percent'] = ($data['tax_percent'] !== '' && $data['tax_percent'] !== null) ? floatval($data['tax_percent']) : 0;
         $items = [];
 
         if (!empty($data['bid_customer_id'])) {
