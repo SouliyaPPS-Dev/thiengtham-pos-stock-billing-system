@@ -26,7 +26,7 @@ class HomeController extends BaseController {
         ];
 
         return view('pages.home', [
-            'title' => 'ໜ້າຫຼັກ - POS & Stock',
+            'title' => 'ໜ້າຫຼັກ - ' . $settings.site_name,
             'stats' => $stats,
             'fromDate' => $fromDate,
             'toDate' => $toDate,

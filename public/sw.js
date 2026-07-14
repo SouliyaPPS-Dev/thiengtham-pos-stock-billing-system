@@ -1,10 +1,10 @@
-const CACHE_NAME = "pos-stock-v2";
+const CACHE_NAME = "pos-stock-v3";
 
 const STATIC_ASSETS = [
-  "./public/css/app.css",
-  "./public/icon-192.png",
-  "./public/icon-512.png",
-  "./public/manifest.json",
+  "./css/app.css",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./manifest.json",
   "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
   "https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js",
   "https://cdn.jsdelivr.net/npm/sweetalert2@11",

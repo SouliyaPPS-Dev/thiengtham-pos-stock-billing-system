@@ -15,6 +15,15 @@ if (!in_array($__lang, $__allowedLangs, true)) {
 
     <link rel="icon" type="image/png" href="<?= url('/public/icon-192.png') ?>">
 
+    <link rel="manifest" href="<?= url('/public/manifest.json') ?>" crossorigin="use-credentials">
+    <meta name="theme-color" content="#0ea5e9" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="POS Stock">
+    <link rel="apple-touch-icon" href="<?= url('/public/apple-touch-icon.png') ?>">
+
     <script>
     (function() {
         var t = localStorage.getItem('theme');
@@ -142,6 +151,11 @@ if (!in_array($__lang, $__allowedLangs, true)) {
                         <span class="text-sm font-bold text-foreground/85 hidden md:block">ເຂົ້າສູ່ລະບົບ</span>
                     </a>
                     <?php endif; ?>
+
+                    <!-- Install App Button -->
+                    <button id="pwa-install-btn" onclick="showPwaInstallPopup()" class="hidden h-10 w-10 rounded-xl items-center justify-center text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors" title="ຕິດຕັ້ງແອັບ">
+                        <i class="fas fa-download text-lg"></i>
+                    </button>
 
                     <!-- Theme Toggle -->
                     <button @click="toggle()" class="h-10 w-10 rounded-xl flex items-center justify-center text-muted-foreground hover:bg-muted transition-colors" :title="isDark ? 'ເປີດໂໝດກາງເວັນ' : 'ເປີດໂໝດກາງຄືນ'">
@@ -915,6 +929,115 @@ if (!in_array($__lang, $__allowedLangs, true)) {
     </style>
     <?php endif; ?>
     <?php endif; ?>
+
+    <!-- PWA Install Script -->
+    <script>
+    (function() {
+        var deferredPrompt = null;
+        var installBtn = document.getElementById('pwa-install-btn');
+        var popupShown = false;
+
+        var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        if (isStandalone) return;
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('<?= url('/sw.js') ?>').catch(function() {});
+        }
+
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBtn) installBtn.classList.remove('hidden');
+            if (!popupShown) {
+                popupShown = true;
+                setTimeout(function() { showPwaInstallPopup(); }, 3000);
+            }
+        });
+
+        window.addEventListener('appinstalled', function() {
+            deferredPrompt = null;
+            popupShown = true;
+            if (installBtn) installBtn.classList.add('hidden');
+        });
+
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        var isMacSafari = navigator.userAgent.indexOf('Safari') > -1 && navigator.userAgent.indexOf('Chrome') === -1;
+        if ((isIOS || isMacSafari) && !popupShown) {
+            popupShown = true;
+            setTimeout(function() { showPwaInstallPopup(); }, 3000);
+        }
+
+        window.showPwaInstallPopup = function() {
+            var isStandaloneNow = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            if (isStandaloneNow) return;
+
+            if (deferredPrompt) {
+                Swal.fire({
+                    title: 'ຕິດຕັ້ງແອັບ',
+                    html: '<div class="text-left space-y-3 text-sm">' +
+                        '<div class="flex items-center gap-3 bg-sky-50 rounded-xl p-3">' +
+                        '<div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-white border border-border shadow-sm"><img src="<?= url('/public/logo.png') ?>" alt="logo" class="w-full h-full object-cover"></div>' +
+                        '<div><p class="font-bold text-foreground">ຕິດຕັ້ງ <?= htmlspecialchars(get_store_name()) ?></p><p class="text-xs text-muted-foreground mt-0.5">ເພີ່ມໄວ້ໜ້າຈໍເພື່ອເຂົ້າເຖິງໄວ</p></div>' +
+                        '</div>' +
+                        '<ul class="space-y-2 mt-3">' +
+                        '<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span>ກົດປຸ່ມ <strong>"ຕິດຕັ້ງ"</strong> ຂ້າງລຸ່ມ</span></li>' +
+                        '<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span>ກົດ <strong>"ເພີ່ມໃສ່ໜ້າຫຼັກ"</strong> ຫຼື <strong>"ຕິດຕັ້ງ"</strong></span></li>' +
+                        '</ul></div>',
+                    icon: 'info',
+                    showCancelButton: true,
+                    confirmButtonColor: '#0ea5e9',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: '<i class="fas fa-download mr-1.5"></i>ຕິດຕັ້ງ',
+                    cancelButtonText: 'ພາຍຫຼັງ',
+                    customClass: { popup: 'rounded-3xl' }
+                }).then(function(result) {
+                    if (result.isConfirmed && deferredPrompt) {
+                        deferredPrompt.prompt();
+                        deferredPrompt.userChoice.then(function(choice) {
+                            deferredPrompt = null;
+                        });
+                    }
+                });
+            } else if (isIOS || isMacSafari) {
+                Swal.fire({
+                    title: 'ຕິດຕັ້ງແອັບ',
+                    html: '<div class="text-left space-y-3 text-sm">' +
+                        '<div class="flex items-center gap-3 bg-sky-50 rounded-xl p-3">' +
+                        '<div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-white border border-border shadow-sm"><img src="<?= url('/public/logo.png') ?>" alt="logo" class="w-full h-full object-cover"></div>' +
+                        '<div><p class="font-bold text-foreground">ຕິດຕັ້ງ <?= htmlspecialchars(get_store_name()) ?></p><p class="text-xs text-muted-foreground mt-0.5">ເພີ່ມໄວ້ໜ້າຈໍເພື່ອເຂົ້າເຖິງໄວ</p></div>' +
+                        '</div>' +
+                        '<ul class="space-y-2 mt-3">' +
+                        '<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span>ກົດປຸ່ມ <strong>Share</strong> (<i class="fas fa-arrow-up-from-bracket text-primary"></i>)</span></li>' +
+                        '<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span>ເລືອກ <strong>"Add to Home Screen"</strong></span></li>' +
+                        '<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span>ກົດ <strong>"Add"</strong></span></li>' +
+                        '</ul></div>',
+                    icon: 'info',
+                    confirmButtonColor: '#0ea5e9',
+                    confirmButtonText: 'ເຂົ້າໃຈແລ້ວ',
+                    customClass: { popup: 'rounded-3xl' }
+                });
+            } else {
+                Swal.fire({
+                    title: 'ຕິດຕັ້ງແອັບ',
+                    html: '<div class="text-left space-y-3 text-sm">' +
+                        '<div class="flex items-center gap-3 bg-sky-50 rounded-xl p-3">' +
+                        '<div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-white border border-border shadow-sm"><img src="<?= url('/public/logo.png') ?>" alt="logo" class="w-full h-full object-cover"></div>' +
+                        '<div><p class="font-bold text-foreground">ຕິດຕັ້ງ <?= htmlspecialchars(get_store_name()) ?></p><p class="text-xs text-muted-foreground mt-0.5">ເພີ່ມໄວ້ໜ້າຈໍເພື່ອເຂົ້າເຖິງໄວ</p></div>' +
+                        '</div>' +
+                        '<ul class="space-y-2 mt-3">' +
+                        '<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">1</span><span>ກົດ <strong>⋮</strong> (ມຸມ) ຢູ່ບຣາວເຊີ</span></li>' +
+                        '<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">2</span><span>ເລືອກ <strong>"Add to Home Screen"</strong></span></li>' +
+                        '<li class="flex items-start gap-2"><span class="w-5 h-5 rounded-full bg-primary text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">3</span><span>ກົດ <strong>"Install"</strong></span></li>' +
+                        '</ul></div>',
+                    icon: 'info',
+                    confirmButtonColor: '#0ea5e9',
+                    confirmButtonText: 'ເຂົ້າໃຈແລ້ວ',
+                    customClass: { popup: 'rounded-3xl' }
+                });
+            }
+        };
+    })();
+    </script>
 
     <!-- Background Google Translate engine (no visible UI) -->
     <?php component('translator'); ?>

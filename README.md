@@ -1,17 +1,17 @@
 ---
-title: POS & Stock
+title: Thiengtham
 emoji: 🛒
 colorFrom: blue
 colorTo: indigo
 sdk: docker
 pinned: false
 license: mit
-short_description: POS System + Stock Management + Invoice/Bill Printing
+short_description: {{settings.site_description}}
 ---
 
-# POS & Stock - ລະບົບຂາຍ ແລະ ຈັດການສາງສິນຄ້າ
+# Thiengtham
 
-Full-stack PHP SSR Point-of-Sale system with stock management, customer management, and bill printing.
+Full-stack PHP SSR {{settings.site_description}}.
 
 ## Features
 

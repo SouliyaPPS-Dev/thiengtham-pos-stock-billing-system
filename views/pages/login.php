@@ -16,7 +16,7 @@
                     <i class="fas fa-cash-register text-3xl text-white"></i>
                 </div>
                 <h1 class="text-2xl font-black text-foreground"><?= get_store_name() ?></h1>
-                <p class="text-sm text-muted-foreground mt-1">ລະບົບຂາຍ ແລະ ຈັດການສາງສິນຄ້າ</p>
+                <p class="text-sm text-muted-foreground mt-1"><?= htmlspecialchars(get_store_setting('store_description', '')) ?></p>
             </div>
 
             <?php if (isset($error) && $error): ?>

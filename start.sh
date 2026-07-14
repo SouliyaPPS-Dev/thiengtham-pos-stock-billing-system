@@ -323,7 +323,7 @@ echo "[start.sh] Apache configured on port ${PORT:-7860} with /uploads alias."
 APP_URL="${PROD_APP_URL:-}"
 
 cat > /var/www/html/.env <<-EOF
-APP_NAME="POS & Stock"
+APP_NAME="${settings.site_name}"
 APP_ENV=production
 APP_ENV_HF=true
 APP_URL=${APP_URL}

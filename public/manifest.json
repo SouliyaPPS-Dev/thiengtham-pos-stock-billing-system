@@ -1,7 +1,7 @@
 {
-  "name": "POS & Stock - ລະບົບຂາຍ ແລະ ຈັດການສາງສິນຄ້າ",
-  "short_name": "POS Stock",
-  "description": "ລະບົບຂາຍສິນຄ້າ ແລະ ຈັດການສາງສິນຄ້າ",
+  "name": "Thiengtham",
+  "short_name": "{{settings.site_short_name}}",
+  "description": "{{settings.site_description}}",
   "id": "pos-stock-app-v1",
   "start_url": "../",
   "scope": "../",
